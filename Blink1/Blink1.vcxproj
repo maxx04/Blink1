@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tvl1_optical_flow.cpp" />
+    <ClCompile Include="..\opencv_windows\lkdemo.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>
@@ -64,6 +64,7 @@
     <ClCompile>
       <ObjectFileName>$(RemoteDebuggerWorkingDirectory)%(filename).o</ObjectFileName>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_ARM</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

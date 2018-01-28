@@ -1,4 +1,8 @@
-//#include "targetver.h"
+
+#ifndef _ARM
+#include "targetver.h"
+
+#endif
 
 #include <stdio.h>
 //#include <tchar.h>
@@ -12,6 +16,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
+
 
 
 using namespace cv;
@@ -129,31 +134,6 @@ static void drawOpticalFlow(const Mat_<Point2f>& flow, Mat& dst, float maxmotion
     }
 }
 
-// binary file format for flow data specified here:
-// http://vision.middlebury.edu/flow/data/
-static void writeOpticalFlowToFile(const Mat_<Point2f>& flow, const string& fileName)
-{
-    static const char FLO_TAG_STRING[] = "PIEH";
-
-    ofstream file(fileName.c_str(), ios_base::binary);
-
-    file << FLO_TAG_STRING;
-
-    file.write((const char*) &flow.cols, sizeof(int));
-    file.write((const char*) &flow.rows, sizeof(int));
-
-    for (int i = 0; i < flow.rows; ++i)
-    {
-        for (int j = 0; j < flow.cols; ++j)
-        {
-            const Point2f u = flow(i, j);
-
-            file.write((const char*) &u.x, sizeof(float));
-            file.write((const char*) &u.y, sizeof(float));
-        }
-    }
-}
-
 static void help()
 {
 	std::cout << "\nThis program demonstrates\n"
@@ -192,7 +172,7 @@ int main(int argc, const char* argv[])
 	std::vector<uchar> status;
 	std::vector<float> err;
 
-	vector<Point2f> fea_calc;
+	//vector<Point2f> fea_calc;
 
 	//BFMatcher matcher(NORM_L2);
 	//matcher.match(descriptors1, descriptors2, matches);
@@ -201,7 +181,7 @@ int main(int argc, const char* argv[])
 
 	
 	//Ptr<ORB> dt = ORB::create();
-	Ptr<BRISK> dt1 = BRISK::create(30);
+	//Ptr<BRISK> dt1 = BRISK::create(30);
 
 	//dt->setThreshold(3e-4);
 	//dt->;
@@ -212,19 +192,19 @@ int main(int argc, const char* argv[])
 	vector<KeyPoint> first_kp;
 	vector<Point2f> object_bb;
 
-	float qLevel = 0.01f;
-	float minDist = 10.0f;
+	float qLevel = 0.05f;
+	float minDist = 6.0f;
 
-	detector = dt1;
+	//detector = dt1;
 
 	cam >> frame0;
 	cvtColor(frame0, fg0, COLOR_BGR2GRAY);
 
-	detector->detectAndCompute(fg0, noArray(), first_kp, first_desc);
+	//detector->detectAndCompute(fg0, noArray(), first_kp, first_desc);
 
 	cv::goodFeaturesToTrack(fg0, // the image 
-		features_next,   // the output detected features
-		20,  // the maximum number of features 
+		features_prev,   // the output detected features
+		380,  // the maximum number of features 
 		qLevel,     // quality level
 		minDist     // min distance between two features
 		);
@@ -237,28 +217,31 @@ int main(int argc, const char* argv[])
 		//frame1.convertTo(fg1, CV_8UC1);
 		cvtColor(frame1, fg1, COLOR_BGR2GRAY);
 
-		features_prev = features_next;
+		
 
 		const double start = (double)getTickCount();
 
 		cv::goodFeaturesToTrack(fg1, // the image 
-			features_next,   // the output detected features
-			20,  // the maximum number of features 
+			features_prev,   // the output detected features
+			380,  // the maximum number of features 
 			qLevel,     // quality level
 			minDist     // min distance between two features
 			);
 
-		features_calc.resize(features_next.size());
+		features_calc.resize(features_prev.size());
 
-		calcOpticalFlowPyrLK(fg0, fg1, features_next, features_calc, status, err);
+		calcOpticalFlowPyrLK(fg0, fg1, features_prev, features_calc, status, err);
+
 
 		const double timeSec = (getTickCount() - start) / getTickFrequency();
 
-		cout << "calcOpticalFlowDual_TVL1 : " << timeSec << " sec " << fr << endl;
+		// features_next = features_prev;
 
-		Mat Affine = estimateRigidTransform(features_next, features_calc, true);
+		cout << "calc" << timeSec << " sec " << "  " << features_prev.size() << endl;
 
-		detector->detectAndCompute(fg0, noArray(), first_kp, first_desc);
+		Mat Affine = estimateRigidTransform(features_prev, features_calc, true);
+
+		// detector->detectAndCompute(fg0, noArray(), first_kp, first_desc);
 
 		//tvl1->calc(fg0, fg1, flow);
 
@@ -272,77 +255,81 @@ int main(int argc, const char* argv[])
 			// umrechnen features
 			perspectiveTransform(features_prev, calc, Affine);
 
-			//cout << features_prev.size() << " - " << calc.cols << "[" << i << "]" << endl;
+			cout << features_prev.size() << " - " << calc.cols  << endl;
 
 
 			// umrechnen feautures
 			transform(features_prev, calc, Affine);
 
 			// Umrechnen bild in neue lage
-			warpAffine(fg0, out, Affine, fg0.size());
+			// warpAffine(fg0, out, Affine, fg0.size());
 		}
 
 
-		Mat substruct = abs(fg1 - out);
+		//Mat substruct = abs(fg1 - out);
 
-		Mat substruct1 = abs(fg1 - fg0);
+		//Mat substruct1 = abs(fg1 - fg0);
 
 		//convertieren in Point2f
 		vector<Point2f> fea_calc = Mat_<Point2f>(calc.reshape(1, calc.cols*calc.rows));
 		
 		frame1.copyTo(out);
 
-		/**
+		
+		
+		//for (size_t i = 0; i < first_kp.size(); i++)
+		//{
+		//	KeyPoint k = first_kp[i];
+		//	circle(out, Point((int)k.pt.x, (int)k.pt.y), 4, Scalar(0, 0, 250));
+		//}
 
-		for each (KeyPoint k in first_kp)
+		for (size_t i = 0; i < features_prev.size(); i++)
 		{
-			circle(out, Point((int)k.pt.x, (int)k.pt.y), 2, Scalar(0, 250, 0));
-		}
-
-		for each (Point2f p in features_next)
-		{
+			Point2f p = features_prev[i];
 			//alle gefundene features
-			circle(out, Point((int)p.x, (int)p.y), 2, Scalar(255, 0, 0));
+			circle(out, Point((int)p.x, (int)p.y), 4, Scalar(0, 0, 250));
 		}
 
-		for each (Point2f p in fea_calc)
+		for (size_t i = 0; i < fea_calc.size(); i++)
 		{
+			Point2f p = fea_calc[i];
 			// draw berechnete features
-			circle(substruct, Point((int)p.x, (int)p.y), 2, Scalar(255, 250, 0));
+			circle(out, Point((int)p.x, (int)p.y), 6, Scalar(255, 0, 0));
 		}
 
-		int index = 0;
-		for each (Point2f p in features_next)
+		
+
+		
+		
+		for (int index = 0; index < features_prev.size() && index < features_calc.size(); index++)
 		{
 
 			if (status[index])
 			{
+			Point2f p = features_prev[index];
+
 				// draw letzte gefundene FEAtures
-				circle(out, Point((int)p.x, (int)p.y), 2, Scalar(255, 250, 0));
-
-
+				//circle(out, Point((int)p.x, (int)p.y), 2, Scalar(255, 250, 0));
 
 				// draw linie von vorherigen Stand zu letzten features
 				line(out, Point((int)p.x, (int)p.y), Point((int)features_calc[index].x, (int)features_calc[index].y), Scalar(0, 250, 255));
 			}
 
-			index++;
+		
 		}
 
-		**/
+		
+		
 
-		//drawOpticalFlow(flow, out);
-		//if (!file.empty())
-			//writeOpticalFlowToFile(flow, file);
-		//imshow("1", fg0);
+		drawOpticalFlow(flow, out);
 
+		
 		imshow("keys", out);
-		//imshow("sub", substruct);
-		//imshow("sub1", substruct1);
+		
 
 		fg1.copyTo(fg0);
 
-		waitKey(100);
+		waitKey(20);
 	}
 
 	waitKey();
