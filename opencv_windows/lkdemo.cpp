@@ -37,7 +37,7 @@ static void onMouse( int event, int x, int y, int /*flags*/, void* /*param*/ )
 
 int main( int argc, char** argv )
 {
-    VideoCapture cap(0);
+    
     TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,20,0.03);
     Size subPixWinSize(10,10), winSize(31,31);
 
@@ -49,10 +49,15 @@ int main( int argc, char** argv )
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
     string input = parser.get<string>("@input");
 
-    //if( input.size() == 1 && isdigit(input[0]) )
-    //    cap.open(input[0] - '0');
-    //else
-    //    cap.open(input);
+	VideoCapture cap;
+
+	if (input.size() == 1 && isdigit(input[0]))
+		cap.open(0);
+		//cap.open(0); //(input[0] - '0');
+    else
+        cap.open(input);
+
+
 
     if( !cap.isOpened() )
     {
@@ -65,6 +70,7 @@ int main( int argc, char** argv )
 
     Mat gray, prevGray, image, frame;
     vector<Point2f> points[2];
+	vector<Point2f> calc[2];
 
     for(;;)
     {
@@ -100,6 +106,32 @@ int main( int argc, char** argv )
 			const double timeSec = (getTickCount() - start) / getTickFrequency();
 
 			cout << "calc" << timeSec << " sec " << "  " << points[1].size() << endl;
+
+			Mat Affine = estimateRigidTransform(points[0], points[1], true);
+
+			//cout << Affine << endl;
+
+			//calc[0].resize(points[0].size());
+
+			if (!Affine.empty())
+			{
+				cout << points[0].size() << " - " << calc[0].size() << endl;
+
+
+				// umrechnen feautures
+				transform(points[0], calc[0], Affine);
+
+			}
+
+			//convertieren in Point2f
+			//vector<Point2f> fea_calc = Mat_<Point2f>(calc.reshape(1, calc.cols*calc.rows));
+
+			for (size_t i = 0; i < calc[0].size(); i++)
+			{
+				Point2f p = calc[0][i];
+				// draw berechnete features
+				circle(image, Point((int)p.x, (int)p.y), 6, Scalar(255, 0, 0));
+			}
 
 
             size_t i, k;
