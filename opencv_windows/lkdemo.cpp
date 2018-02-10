@@ -5,9 +5,15 @@
 
 #include <iostream>
 #include <ctype.h>
+#include <string.h>
+
+#include "SerialPort.h"
 
 using namespace cv;
 using namespace std;
+
+#pragma warning(disable : 4996)
+
 
 static void help()
 {
@@ -44,6 +50,16 @@ int main( int argc, char** argv )
     const int MAX_COUNT = 500;
     bool needToInit = false;
     bool nightMode = false;
+	double timeSec;
+
+	const char* portName = "\\\\.\\COM5";
+	
+	SerialPort sp(portName);
+
+	sp.writeSerialPort("#1P1800T6300\n\r");
+	sp.writeSerialPort("#1P800T630\n\r");
+
+	sp.~SerialPort();
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
@@ -71,6 +87,9 @@ int main( int argc, char** argv )
     Mat gray, prevGray, image, frame;
     vector<Point2f> points[2];
 	vector<Point2f> calc[2];
+
+	float sum_x = 0.0f;
+
 
     for(;;)
     {
@@ -103,19 +122,16 @@ int main( int argc, char** argv )
 			calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize,
 				3, termcrit, 0, 0.001);
 
-			const double timeSec = (getTickCount() - start) / getTickFrequency();
+			timeSec = (getTickCount() - start) / getTickFrequency();
 
-			cout << "calc" << timeSec << " sec " << "  " << points[1].size() << endl;
+			// cout << "calc" << timeSec << " sec " << "  " << points[1].size() << endl;
 
 			Mat Affine = estimateRigidTransform(points[0], points[1], true);
 
-			//cout << Affine << endl;
-
-			//calc[0].resize(points[0].size());
 
 			if (!Affine.empty())
 			{
-				cout << points[0].size() << " - " << calc[0].size() << endl;
+				//cout << points[0].size() << " - " << calc[0].size() << endl;
 
 
 				// umrechnen feautures
@@ -123,15 +139,25 @@ int main( int argc, char** argv )
 
 			}
 
-			//convertieren in Point2f
-			//vector<Point2f> fea_calc = Mat_<Point2f>(calc.reshape(1, calc.cols*calc.rows));
+			calc[1].resize(points[1].size());
 
-			for (size_t i = 0; i < calc[0].size(); i++)
+			sum_x = 0.0f;
+
+			for (size_t i = 0; i < min(points[1].size(), points[0].size()); i++)
 			{
 				Point2f p = calc[0][i];
 				// draw berechnete features
 				circle(image, Point((int)p.x, (int)p.y), 6, Scalar(255, 0, 0));
+
+				calc[1][i] = points[1][i] - points[0][i];
+
+				sum_x += calc[1][i].x;
+
 			}
+
+			sum_x /= min(points[1].size(), points[0].size());
+
+
 
 
             size_t i, k;
@@ -165,7 +191,18 @@ int main( int argc, char** argv )
         }
 
         needToInit = false;
-        imshow("LK Demo", image);
+
+
+		stringstream text;
+
+		//text.width(4);
+		text.precision(2);
+		
+		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x;
+
+		putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
+
+		imshow("LK Demo", image);
 
         char c = (char)waitKey(10);
         if( c == 27 )
