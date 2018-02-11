@@ -53,12 +53,16 @@ int main( int argc, char** argv )
 	double timeSec;
 
 	const char* portName = "\\\\.\\COM5";
+	char m[40];
 	
 	SerialPort sp(portName);
-
-	sp.writeSerialPort("#1P1800T6300\n\r");
-	sp.writeSerialPort("#1P800T630\n\r");
-
+	Sleep(500);
+	sp.writeSerialPort("#1P1800T1300\r\n");
+	//Sleep(2000);
+	while (sp.readSerialPort(m, 2) != 2);
+		sp.writeSerialPort("#1P800T6000\r\n");
+	while (sp.readSerialPort(m, 2) != 2);
+		sp.writeSerialPort("#1P1800T60\r\n");
 	sp.~SerialPort();
 
     help();

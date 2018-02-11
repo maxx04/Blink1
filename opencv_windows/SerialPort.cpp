@@ -41,7 +41,7 @@ SerialPort::SerialPort(const char *portName)
 			else {
 				this->connected = true;
 				PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
-				Sleep(ARDUINO_WAIT_TIME);
+				//Sleep(ARDUINO_WAIT_TIME);
 			}
 		}
 	}
@@ -58,7 +58,7 @@ SerialPort::~SerialPort()
 int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 {
 	DWORD bytesRead;
-	unsigned int toRead;
+	unsigned int toRead=0;
 
 	ClearCommError(this->handler, &this->errors, &this->status);
 
