@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "SerialPort.h"
+#include "Servos.h"
 
 using namespace cv;
 using namespace std;
@@ -52,18 +52,9 @@ int main( int argc, char** argv )
     bool nightMode = false;
 	double timeSec;
 
-	const char* portName = "\\\\.\\COM5";
-	char m[40];
+	Servos s;
 	
-	SerialPort sp(portName);
-	Sleep(500);
-	sp.writeSerialPort("#1P1800T1300\r\n");
-	//Sleep(2000);
-	while (sp.readSerialPort(m, 2) != 2);
-		sp.writeSerialPort("#1P800T6000\r\n");
-	while (sp.readSerialPort(m, 2) != 2);
-		sp.writeSerialPort("#1P1800T60\r\n");
-	sp.~SerialPort();
+
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
@@ -161,8 +152,7 @@ int main( int argc, char** argv )
 
 			sum_x /= min(points[1].size(), points[0].size());
 
-
-
+			s.correction(sum_x * 50);
 
             size_t i, k;
             for( i = k = 0; i < points[1].size(); i++ )
@@ -204,7 +194,9 @@ int main( int argc, char** argv )
 		
 		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x;
 
-		putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
+		// putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
+
+		setWindowTitle("LK Demo", text.str());
 
 		imshow("LK Demo", image);
 

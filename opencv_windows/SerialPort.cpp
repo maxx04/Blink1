@@ -9,7 +9,7 @@ SerialPort::SerialPort(const char *portName)
 		0,
 		NULL,
 		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
+		0,//FILE_ATTRIBUTE_NORMAL,
 		NULL);
 	if (this->handler == INVALID_HANDLE_VALUE) {
 		if (GetLastError() == ERROR_FILE_NOT_FOUND) {
@@ -27,7 +27,7 @@ SerialPort::SerialPort(const char *portName)
 			printf("failed to get current serial parameters");
 		}
 		else {
-			dcbSerialParameters.BaudRate = CBR_9600;
+			dcbSerialParameters.BaudRate = CBR_115200;
 			dcbSerialParameters.ByteSize = 8;
 			dcbSerialParameters.StopBits = ONESTOPBIT;
 			dcbSerialParameters.Parity = NOPARITY;
