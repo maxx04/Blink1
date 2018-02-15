@@ -32,6 +32,7 @@ SerialPort::SerialPort(const char *portName)
 			dcbSerialParameters.StopBits = ONESTOPBIT;
 			dcbSerialParameters.Parity = NOPARITY;
 			dcbSerialParameters.fDtrControl = DTR_CONTROL_ENABLE;
+			//dcbSerialParameters.
 
 
 			if (!SetCommState(handler, &dcbSerialParameters))
@@ -86,6 +87,7 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 
 bool SerialPort::writeSerialPort(const char *buffer)
 {
+	PurgeComm(this->handler, PURGE_TXCLEAR);
 
 	if (!WriteFile(this->handler, (void*)buffer, strlen(buffer), &bytesSend, 0)) {
 		ClearCommError(this->handler, &this->errors, &this->status);

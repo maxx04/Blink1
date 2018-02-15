@@ -152,7 +152,7 @@ int main( int argc, char** argv )
 
 			sum_x /= min(points[1].size(), points[0].size());
 
-			s.correction(sum_x * 50);
+			s.correction(sum_x * 50.0f);
 
             size_t i, k;
             for( i = k = 0; i < points[1].size(); i++ )
@@ -192,7 +192,7 @@ int main( int argc, char** argv )
 		//text.width(4);
 		text.precision(2);
 		
-		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x;
+		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x*50;
 
 		// putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 

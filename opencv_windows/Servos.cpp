@@ -9,28 +9,27 @@ Servos::Servos()
 	sp -> writeSerialPort("#1P1000T300\r\n");
 	while (sp -> readSerialPort(m, 2) < 2);
 	position = 1000.0f;
-	//sp -> writeSerialPort("#1P800T6000\r\n");
-	//while (sp -> readSerialPort(m, 2) < 2);
-	//sp.writeSerialPort("#1P1800T60\r\n");
-	//while (sp.readSerialPort(m, 2) < 2);
+	in_move = false;
+
 }
 
 
 Servos::~Servos()
 {
 	position = 1000.0f;
-	sprintf(m, "#1P%4.0fT600\r\n", position);
+	sprintf(m, "#1P%4.0fT60\r\n", position);
 	sp->writeSerialPort(m);
 	while (sp->readSerialPort(m, 2) < 2);
 }
 
 void Servos::correction(float angle)
 {
-	if (angle < 100.0f) return;
+	//if ((angle) < 10.0f) return;
+	if (sp->readSerialPort(m, 2) < 2 && in_move) return;
 	position += angle;
 	position = (position > 2000) ? 2000 : position;
 	position = (position < 500) ? 500 : position;
 	sprintf(m, "#1P%4.0fT600\r\n", position);
 	sp->writeSerialPort(m);
-	while (sp->readSerialPort(m, 2) < 2);
+	in_move = true;
 }

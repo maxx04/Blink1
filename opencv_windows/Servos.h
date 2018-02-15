@@ -7,6 +7,7 @@ public:
 	const char* portName = "\\\\.\\COM5";
 	char m[40];
 	SerialPort* sp;
+	bool in_move;
 
 	Servos();
 	~Servos();
