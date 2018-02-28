@@ -11,7 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\opencv_windows\lkdemo.cpp" />
+    <ClCompile Include="..\lkdemo.cpp" />
+    <ClCompile Include="..\Servos.cpp" />
+    <ClCompile Include="SerialPort.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\SerialPort.h" />
+    <ClInclude Include="..\Servos.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>
@@ -64,7 +70,7 @@
     <ClCompile>
       <ObjectFileName>$(RemoteDebuggerWorkingDirectory)%(filename).o</ObjectFileName>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_ARM</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ARM;_DEBUG</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

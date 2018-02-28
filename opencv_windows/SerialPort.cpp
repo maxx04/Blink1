@@ -1,4 +1,4 @@
-#include "SerialPort.h"
+#include "../SerialPort.h"
 
 SerialPort::SerialPort(const char *portName)
 {
@@ -27,12 +27,11 @@ SerialPort::SerialPort(const char *portName)
 			printf("failed to get current serial parameters");
 		}
 		else {
-			dcbSerialParameters.BaudRate = CBR_115200;
+			dcbSerialParameters.BaudRate = CBR_9600;
 			dcbSerialParameters.ByteSize = 8;
 			dcbSerialParameters.StopBits = ONESTOPBIT;
 			dcbSerialParameters.Parity = NOPARITY;
 			dcbSerialParameters.fDtrControl = DTR_CONTROL_ENABLE;
-			//dcbSerialParameters.
 
 
 			if (!SetCommState(handler, &dcbSerialParameters))
@@ -42,7 +41,7 @@ SerialPort::SerialPort(const char *portName)
 			else {
 				this->connected = true;
 				PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
-				//Sleep(ARDUINO_WAIT_TIME);
+				Sleep(ARDUINO_WAIT_TIME);
 			}
 		}
 	}
@@ -59,7 +58,7 @@ SerialPort::~SerialPort()
 int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 {
 	DWORD bytesRead;
-	unsigned int toRead=0;
+	unsigned int toRead = 0;
 
 	ClearCommError(this->handler, &this->errors, &this->status);
 
@@ -70,7 +69,13 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 		else toRead = this->status.cbInQue;
 	}
 
-	if (ReadFile(this->handler, buffer, toRead, &bytesRead, NULL)) return bytesRead;
+	if (ReadFile(this->handler, buffer, toRead, &bytesRead, NULL))
+	{
+		printf("%s\r\n", buffer);
+		return bytesRead;
+	}
+	
+
 
 	return 0;
 }
@@ -87,7 +92,7 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 
 bool SerialPort::writeSerialPort(const char *buffer)
 {
-	PurgeComm(this->handler, PURGE_TXCLEAR);
+	////PurgeComm(this->handler, PURGE_TXCLEAR);
 
 	if (!WriteFile(this->handler, (void*)buffer, strlen(buffer), &bytesSend, 0)) {
 		ClearCommError(this->handler, &this->errors, &this->status);

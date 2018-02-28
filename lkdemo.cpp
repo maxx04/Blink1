@@ -54,7 +54,7 @@ int main( int argc, char** argv )
 
 	Servos s;
 	
-
+	float Affine_x=0.0f, Affine_x_last;
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
@@ -76,8 +76,14 @@ int main( int argc, char** argv )
         return 0;
     }
 
+	cout << "capturing initialised \n";
+
+#ifndef _ARM
     namedWindow( "LK Demo", 1 );
+
     setMouseCallback( "LK Demo", onMouse, 0 );
+
+#endif
 
     Mat gray, prevGray, image, frame;
     vector<Point2f> points[2];
@@ -119,16 +125,19 @@ int main( int argc, char** argv )
 
 			timeSec = (getTickCount() - start) / getTickFrequency();
 
-			// cout << "calc" << timeSec << " sec " << "  " << points[1].size() << endl;
+			//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
 			Mat Affine = estimateRigidTransform(points[0], points[1], true);
 
+			
 
 			if (!Affine.empty())
 			{
 				//cout << points[0].size() << " - " << calc[0].size() << endl;
 
+				Affine_x_last = Affine_x;
 
+				Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 				// umrechnen feautures
 				transform(points[0], calc[0], Affine);
 
@@ -150,9 +159,12 @@ int main( int argc, char** argv )
 
 			}
 
-			sum_x /= min(points[1].size(), points[0].size());
+			
 
-			s.correction(sum_x * 50.0f);
+			sum_x /= min(points[1].size(), points[0].size());
+			
+
+			s.correction(Affine_x * 5.0f);
 
             size_t i, k;
             for( i = k = 0; i < points[1].size(); i++ )
@@ -192,13 +204,17 @@ int main( int argc, char** argv )
 		//text.width(4);
 		text.precision(2);
 		
-		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x*50;
+		text << "calc " << timeSec*1000 << " ms " << "  " << points[1].size() << "  " << sum_x*30 << "//" << Affine_x*10;
 
-		// putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
+		//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
+
+#ifndef _ARM
 
 		setWindowTitle("LK Demo", text.str());
 
 		imshow("LK Demo", image);
+
+#endif
 
         char c = (char)waitKey(10);
         if( c == 27 )
