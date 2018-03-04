@@ -1,5 +1,7 @@
 #include "../SerialPort.h"
 
+//TODO Fehlerbearbeitung SerialPort realisieren.
+
 SerialPort::SerialPort(const char *portName)
 {
 	this->connected = false;
@@ -71,7 +73,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 	if (ReadFile(this->handler, buffer, toRead, &bytesRead, NULL))
 	{
-		printf("%s\r\n", buffer);
+		//printf("%s\r\n", buffer);
 		return bytesRead;
 	}
 	
@@ -94,10 +96,12 @@ bool SerialPort::writeSerialPort(const char *buffer)
 {
 	////PurgeComm(this->handler, PURGE_TXCLEAR);
 
-	if (!WriteFile(this->handler, (void*)buffer, strlen(buffer), &bytesSend, 0)) {
+	if (!WriteFile(this->handler, (void*)buffer, strlen(buffer), &bytesSend, 0)) 
+	{
 		ClearCommError(this->handler, &this->errors, &this->status);
 		return false;
 	}
+	
 	else return true;
 }
 
