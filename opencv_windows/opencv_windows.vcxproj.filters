@@ -24,7 +24,7 @@
     <ClInclude Include="..\Servos.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="follower.h">
+    <ClInclude Include="..\follower.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClCompile Include="..\Servos.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="follower.cpp">
+    <ClCompile Include="..\follower.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

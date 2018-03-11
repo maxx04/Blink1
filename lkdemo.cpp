@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "Servos.h"
-#include "./opencv_windows/follower.h"
+#include "follower.h"
 
 using namespace cv;
 using namespace std;
@@ -24,19 +24,13 @@ static void help()
             "\tESC - quit the program\n"
             "\tr - auto-initialize tracking\n"
             "\tc - delete all the points\n"
-            "\tn - switch the \"night\" mode on/off\n"
-            "To add/remove a feature point click it\n" << endl;
+			"\ts - set aim point\n"
+             << endl;
 }
 
 
-//static void onMouse( int event, int x, int y, int /*flags*/, void* /*param*/ )
-//{
-//    if( event == EVENT_LBUTTONDOWN )
-//    {
-//        point = Point2f((float)x, (float)y);
-//        addRemovePt = true;
-//    }
-//}
+
+
 
 int main( int argc, char** argv )
 {
@@ -90,8 +84,8 @@ int main( int argc, char** argv )
 
 		follower_1.show();
 
-			
-		s.seek();
+		follower_1.look_to_aim(&s);
+		//s.seek();
 
 
 		if (follower_1.key()) break;

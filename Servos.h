@@ -1,5 +1,7 @@
 #include "SerialPort.h"
 
+#ifndef _Servos
+#define _Servos
 class Servos
 {
 public:
@@ -16,4 +18,7 @@ public:
 	void move_to_position(float angle);
 	void seek();
 };
+
+#endif // !_Servos
+
 

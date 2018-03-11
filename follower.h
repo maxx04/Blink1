@@ -6,6 +6,8 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/highgui.hpp"
 
+#include "Servos.h"
+
 #include <iostream>
 #include <string.h>
 
@@ -18,6 +20,9 @@ class follower
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	const int MAX_COUNT = 500;
+	Point2f fokus;
+	int number_aim_point = -1;
+
 	bool needToInit = false;
 	bool nightMode = false;
 
@@ -39,6 +44,8 @@ public:
 	void show();
 	void swap();
 	bool key();
+	void look_to_aim(Servos* s);
+	int find_nearest_point(Point2f pt);
 
 };
 
