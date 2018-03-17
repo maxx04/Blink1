@@ -73,7 +73,7 @@ void follower::calcOptFlow()
 		if (prevGray.empty()) gray.copyTo(prevGray);
 
 		calcOpticalFlowPyrLK(prevGray, gray, /*prev*/ points[0], /*next*/ points[1],
-			status, err, winSize, 5, termcrit, 0, 0.001);
+			status, err, winSize, 3, termcrit, 0, 0.001);
 
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
@@ -87,11 +87,9 @@ void follower::transform_Affine()
 {
 	if (!Affine.empty() && !points[0].empty())
 	{
-		//cout << points[0].size() << " - " << calc[0].size() << endl;
-
 		// Affine_x_last = Affine_x;
 
-		// Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
+		//Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 											// umrechnen feautures
 		transform(points[0], calc[0], Affine);
 
@@ -117,18 +115,21 @@ void follower::draw()
 
 	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
 
-	//for (size_t i = 0; i < points[1].size(); i++)
-	//{
-	//	// draw berechnete features
-	//	circle(image, (Point)points[1][i], 4, Scalar(255, 0, 255));
-	//}
+	double Affine_x = 0.0;
 
+	if (!Affine.empty() && !points[0].empty())
+	{
+		Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
+	}
 	for (size_t i = 0; i < min(points[1].size(), points[0].size()); i++)
 	{
 		Point2f p0 = points[0][i];
 		Point2f p1 = points[1][i];
 
-		line(image, (Point)p0, (Point)p1, Scalar(255, 100, 0));
+		//if (Affine_x != 0)
+		//p1.x = ((p1.x - p0.x) / Affine_x) + p0.x;
+
+		line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
 
 		//calc[1][i] = points[1][i] - points[0][i];
 	}
@@ -208,22 +209,18 @@ void follower::look_to_aim()
 	m = points[1][number_aim_point] - fokus;
 
 	// 2) finde richtung
-	//richtung.x = (m.x < 0) ? 5.0 : -5.0;
-	//richtung.y = (m.y > 0) ? 5.0 : -5.0;
-	richtung.x = -m.x / step_to_pixel;
-	richtung.y = m.y / step_to_pixel;
+	richtung.x = -m.x / pixel_pro_step;
+	richtung.y = m.y / pixel_pro_step;
 	// 3a) finde wo ist jetzt den Punkt (z.B. über Matrix)
 	// kontrolle über vergleich p[0] - P[1]
-	// 4) wenn differenz immer noch groß, zu gehe zu schritt 1. 
+	// 4) wenn differenz immer noch groß, gehe zu schritt 1. 
 	// 3) bewege einen schritt in Richtung
 	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
 	{	
-		//richtung.x = (abs(m.x) > 20.0) ? richtung.x : 0.0;
-		//richtung.y = (abs(m.y) > 20.0) ? richtung.y : 0.0;
 
 		s.correction(richtung);
 
-		cout << points[1][number_aim_point] << m << richtung << "|" << s.position << endl;
+		cout <<  points[1][number_aim_point] << m << richtung << "|" << s.position << endl;
 	}
 	else
 	{

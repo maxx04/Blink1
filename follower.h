@@ -20,8 +20,8 @@ class follower
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	const int MAX_COUNT = 300;
-
-	float step_to_pixel = 8.0;
+	
+	float pixel_pro_step = 8.0;
 
 	Point2f fokus;
 	int number_aim_point = -1;
@@ -36,7 +36,6 @@ class follower
 	Mat Affine;
 
 	vector<Point2f> points[2];
-
 	vector<uchar> status;
 	vector<float> err;
 
