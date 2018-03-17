@@ -19,7 +19,7 @@ SerialPort::SerialPort(const char *portName)
 		}
 		else
 		{
-			printf("ERROR!!!");
+			printf("ERROR!!! %d", GetLastError());
 		}
 	}
 	else {

@@ -6,13 +6,18 @@
 Servos::Servos()
 {
 	sp = new SerialPort(portName);
+	max_position.x = 2400.0;
+	min_position.x = 600.0;
+	max_position.y = 1800.0;
+	min_position.y = 1300.0;
 	//	Sleep(500);
-	sp -> writeSerialPort("#1P1250T300\r\n");
-	sp -> writeSerialPort("#2P1250T300\r\n");
-	//  Sleep(500);
-	if (sp -> readSerialPort(m, 2) < 1)
-		printf("Kein Antwort Servo\r\n");
-	position = 1000.0f;
+	move_to_position(Point2f((max_position.x + min_position.x) / 2, max_position.y));
+	wait_on_position(2000);
+	move_to_position(Point2f((max_position.x + min_position.x) / 2, min_position.y));
+	wait_on_position(2000);
+	position = Point2f((max_position + min_position)/2);
+	move_to_position(position);
+	wait_on_position(2000);
 	in_move = false;
 
 }
@@ -20,50 +25,72 @@ Servos::Servos()
 
 Servos::~Servos()
 {
-	position = 1000.0f;
-	sp->writeSerialPort("#1P1250T2000\r\n");
-	sp->writeSerialPort("#2P1250T2000\r\n");
-	sp->writeSerialPort(m);
-	if (sp->readSerialPort(m, 2) < 2) printf("Kein Antwort Servo\r\n");
+	position = Point2f(Point2f((max_position.x + min_position.x) / 2, (max_position.y + min_position.y) / 2));
+	move_to_position(position);
+	if (wait_on_position(1000)) printf("Kein Antwort Servo\r\n");
+
+	sp->~SerialPort();
 }
 
-void Servos::correction(float angle)
+void Servos::correction(Point2f p)
 {
 	if (sp->readSerialPort(m, 2) < 2 && in_move) return;
-	position += angle;
-	position = (position > 2000) ? 2000 : position;
-	position = (position < 500) ? 500 : position;
-	sprintf(m, "#1P%04.0fT600\r\n", position);
+	position += p;
+	position.x = (position.x > max_position.x) ? max_position.x : position.x;
+	position.x = (position.x < min_position.x) ? min_position.x : position.x;
+
+	position.y = (position.y > max_position.y) ? max_position.y : position.y;
+	position.y = (position.y < min_position.y) ? min_position.y : position.y;
+
+	sprintf(m, "#1P%04.0f#2P%04.0fT300\r\n", position.x, position.y);
 	sp->writeSerialPort(m);
 	in_move = true;
 }
 
-void Servos::move_to_position(float angle)
+void Servos::move_to_position(Point2f p)
 {
 	if (sp->readSerialPort(m, 2) < 2 && in_move) return;
-	position = angle;
-	position = (position > 2000) ? 2000 : position;
-	position = (position < 600) ? 600 : position;
-	sprintf(m, "#1P%04.0fT100\r\n", position);
+	position = p;
+	position.x = (position.x > max_position.x) ? max_position.x : position.x;
+	position.x = (position.x < min_position.x) ? min_position.x : position.x;
+
+	position.y = (position.y > max_position.y) ? max_position.y : position.y;
+	position.y = (position.y < min_position.y) ? min_position.y : position.y;
+	sprintf(m, "#1P%04.0f#2P%04.0fT600\r\n", position.x, position.y);
 	sp->writeSerialPort(m);
 	in_move = true;
+}
+
+bool Servos::wait_on_position(const int time)
+{
+	const double start = (double)getTickCount();
+	while (sp->readSerialPort(m, 2) < 2) // Antwort "OK"
+	{
+		if ((double)getTickCount() - start > (double)time)
+		{
+			printf("Kein Antwort Servo - position %f / %f \r\n", position.x, position.y);
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void Servos::seek()
 {
-	if (position > 1800.0f)
+	if (position.x > 1800.0f)
 	{
-		position = 1800.0f;
+		position.x = 1800.0f;
 		servo_delta = -servo_delta;
 	}
 
-	if (position < 800.0f)
+	if (position.x < 800.0f)
 	{
-		position = 800.0f;
+		position.x = 800.0f;
 		servo_delta = -servo_delta;
 	}
 
-	position += servo_delta;
+	position.x += servo_delta;
 
 	move_to_position(position);
 }

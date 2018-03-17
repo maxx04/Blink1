@@ -1,12 +1,22 @@
-#include "SerialPort.h"
+
 
 #ifndef _Servos
 #define _Servos
+
+#include "opencv2\core.hpp"
+#include "SerialPort.h"
+
+using namespace cv;
+using namespace std;
+
 class Servos
 {
 public:
-	float position;
-	float servo_delta = 6.0f;
+	//int N = 0;
+	Point2f position;
+	Point2f max_position;
+	Point2f min_position;
+	float servo_delta = 3.0f;
 	const char* portName = "\\\\.\\COM7";
 	char m[40];
 	SerialPort* sp;
@@ -14,8 +24,9 @@ public:
 
 	Servos();
 	~Servos();
-	void correction(float angle);
-	void move_to_position(float angle);
+	void correction(Point2f p);
+	void move_to_position(Point2f p);
+	bool wait_on_position(const int time);
 	void seek();
 };
 

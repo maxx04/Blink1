@@ -61,7 +61,7 @@ int main( int argc, char** argv )
 
     Mat  frame;
 	follower follower_1;
-	Servos s;
+
 
 	// Hauptzyclus
 
@@ -84,9 +84,7 @@ int main( int argc, char** argv )
 
 		follower_1.show();
 
-		follower_1.look_to_aim(&s);
-		//s.seek();
-
+		follower_1.look_to_aim();
 
 		if (follower_1.key()) break;
 

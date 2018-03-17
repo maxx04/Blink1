@@ -42,13 +42,12 @@ void follower::init_points()
 		// automatic initialization
 		points[0].clear();
 		points[1].clear();
+
 		//finde features
 		goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 3, 3, 0, 0.04);
 
-		//resfine position
+		//refine position
 		cornerSubPix(gray, points[1], subPixWinSize, Size(-1, -1), termcrit);
-
-
 
 		needToInit = false;
 	}
@@ -67,8 +66,7 @@ void follower::take_picture(Mat* frame)
 
 void follower::calcOptFlow()
 {
-	vector<uchar> status;
-	vector<float> err;
+
 
 	if (!points[0].empty())
 	{
@@ -104,11 +102,18 @@ void follower::draw()
 {
 	calc[1].resize(points[1].size());
 
+
 	for (size_t i = 0; i <  points[0].size(); i++)
 	{
 		// draw berechnete features
-		circle(image, (Point)points[0][i], 4, Scalar(255, 0, 0));
+		if (status[i] == 1)
+			circle(image, (Point)points[0][i], 4, Scalar(255, 0, 255));
+		else
+			circle(image, (Point)points[0][i], 4, Scalar(255, 0, 0));
 	}
+
+	if(number_aim_point >= 0 )
+	circle(image, (Point)points[1][number_aim_point], 16, Scalar(0, 0, 255), 3);
 
 	//for (size_t i = 0; i < points[1].size(); i++)
 	//{
@@ -176,9 +181,9 @@ bool follower::key()
 	return false;
 }
 
-void follower::look_to_aim(Servos* s)
+void follower::look_to_aim()
 {
-	float richtung = 0.0;
+	Point2f richtung = Point2f(0.0,0.0);
 	Point2f m;
 
 	if (setAimPt)
@@ -192,21 +197,32 @@ void follower::look_to_aim(Servos* s)
 
 	// 1) finde positiondifferenz
 	m = points[1][number_aim_point] - fokus;
+
 	// 2) finde richtung
-	richtung = (m.x < 0) ? 10.0 : -10.0;
+	richtung.x = (m.x < 0) ? 5.0 : -5.0;
+	richtung.y = (m.y > 0) ? 5.0 : -5.0;
 	// 3a) finde wo ist jetzt den Punkt (z.B. über Matrix)
 	// kontrolle über vergleich p[0] - P[1]
 	// 4) wenn differenz immer noch groß, zu gehe zu schritt 1. 
 	// 3) bewege einen schritt in Richtung
-	if (abs(m.x) > 15.0)
-	{
-		s->correction(richtung);
+	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
+	{	
+		richtung.x = (abs(m.x) > 20.0) ? richtung.x : 0.0;
+		richtung.y = (abs(m.y) > 20.0) ? richtung.y : 0.0;
+
+		s.correction(richtung);
+		s.position;
+
+		cout << points[1][number_aim_point] << m << richtung << endl;
 	}
 	else
 	{
+		cout << "find " << points[1][number_aim_point] << m << richtung << endl;
 		number_aim_point = -1;
 		needToInit = true;
 	}
+
+
 
 }
 
@@ -217,7 +233,7 @@ int follower::find_nearest_point(Point2f pt)
 	for (size_t i = 0; i < points[1].size(); i++)
 	{
 		// draw berechnete features
-		if (abs(AimPoint.x - points[1][i].x) < dist)
+		if (abs(AimPoint.x - points[1][i].x) < dist && status[i] == 1)
 		{
 			dist = abs(AimPoint.x - points[1][i].x);
 			n = i;

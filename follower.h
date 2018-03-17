@@ -23,6 +23,8 @@ class follower
 	Point2f fokus;
 	int number_aim_point = -1;
 
+	Servos s;
+
 	bool needToInit = false;
 	bool nightMode = false;
 
@@ -31,6 +33,10 @@ class follower
 	Mat Affine;
 
 	vector<Point2f> points[2];
+
+	vector<uchar> status;
+	vector<float> err;
+
 	vector<Point2f> calc[2];
 
 public:
@@ -44,7 +50,7 @@ public:
 	void show();
 	void swap();
 	bool key();
-	void look_to_aim(Servos* s);
+	void look_to_aim();
 	int find_nearest_point(Point2f pt);
 
 };
