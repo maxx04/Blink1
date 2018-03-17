@@ -19,7 +19,10 @@ class follower
 
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
-	const int MAX_COUNT = 500;
+	const int MAX_COUNT = 300;
+
+	float step_to_pixel = 8.0;
+
 	Point2f fokus;
 	int number_aim_point = -1;
 

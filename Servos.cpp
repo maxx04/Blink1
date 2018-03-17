@@ -6,9 +6,9 @@
 Servos::Servos()
 {
 	sp = new SerialPort(portName);
-	max_position.x = 2400.0;
-	min_position.x = 600.0;
-	max_position.y = 1800.0;
+	max_position.x = 1900.0;
+	min_position.x = 1000.0;
+	max_position.y = 1900.0;
 	min_position.y = 1300.0;
 	//	Sleep(500);
 	move_to_position(Point2f((max_position.x + min_position.x) / 2, max_position.y));
@@ -34,7 +34,7 @@ Servos::~Servos()
 
 void Servos::correction(Point2f p)
 {
-	if (sp->readSerialPort(m, 2) < 2 && in_move) return;
+	if (sp->readSerialPort(m, 2) < 2 && in_move) return; // noch in Bewegung
 	position += p;
 	position.x = (position.x > max_position.x) ? max_position.x : position.x;
 	position.x = (position.x < min_position.x) ? min_position.x : position.x;

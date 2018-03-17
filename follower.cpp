@@ -7,7 +7,7 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 {
 	if (event == EVENT_LBUTTONDOWN)
 	{
-		AimPoint = Point2f((float)x, (float)y);
+		AimPoint = Point2f((float)x, (float)(y)); 
 		setAimPt = true;
 		
 	}
@@ -44,7 +44,7 @@ void follower::init_points()
 		points[1].clear();
 
 		//finde features
-		goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 3, 3, 0, 0.04);
+		goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
 		cornerSubPix(gray, points[1], subPixWinSize, Size(-1, -1), termcrit);
@@ -115,6 +115,8 @@ void follower::draw()
 	if(number_aim_point >= 0 )
 	circle(image, (Point)points[1][number_aim_point], 16, Scalar(0, 0, 255), 3);
 
+	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
+
 	//for (size_t i = 0; i < points[1].size(); i++)
 	//{
 	//	// draw berechnete features
@@ -136,12 +138,19 @@ void follower::show()
 {
 	stringstream text;
 
-	//text.width(4);
-	text.precision(2);
+	text.width(5);
+	text.precision(3);
 
 	//text << "calc " << timeSec * 1000 << " ms " << "  " << points[1].size() << "  " <<  Affine_x * 10;
 
-	text << "calc " << points[0].size() << " | " << points[1].size();
+	int st = 0;
+
+	for (size_t i = 0; i < status.size(); i++)
+	{
+		st += status[i];
+	}
+
+	text << "calc " << points[0].size() << " | " << points[1].size() << " | " << st;
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
@@ -199,21 +208,22 @@ void follower::look_to_aim()
 	m = points[1][number_aim_point] - fokus;
 
 	// 2) finde richtung
-	richtung.x = (m.x < 0) ? 5.0 : -5.0;
-	richtung.y = (m.y > 0) ? 5.0 : -5.0;
+	//richtung.x = (m.x < 0) ? 5.0 : -5.0;
+	//richtung.y = (m.y > 0) ? 5.0 : -5.0;
+	richtung.x = -m.x / step_to_pixel;
+	richtung.y = m.y / step_to_pixel;
 	// 3a) finde wo ist jetzt den Punkt (z.B. über Matrix)
 	// kontrolle über vergleich p[0] - P[1]
 	// 4) wenn differenz immer noch groß, zu gehe zu schritt 1. 
 	// 3) bewege einen schritt in Richtung
 	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
 	{	
-		richtung.x = (abs(m.x) > 20.0) ? richtung.x : 0.0;
-		richtung.y = (abs(m.y) > 20.0) ? richtung.y : 0.0;
+		//richtung.x = (abs(m.x) > 20.0) ? richtung.x : 0.0;
+		//richtung.y = (abs(m.y) > 20.0) ? richtung.y : 0.0;
 
 		s.correction(richtung);
-		s.position;
 
-		cout << points[1][number_aim_point] << m << richtung << endl;
+		cout << points[1][number_aim_point] << m << richtung << "|" << s.position << endl;
 	}
 	else
 	{
@@ -228,14 +238,18 @@ void follower::look_to_aim()
 
 int follower::find_nearest_point(Point2f pt)
 {
-	float dist = 100000.0;
+	float d, dist = 10000000.0;
+	Point2f v;
 	int n = 0; //TODO wenn 0 bearbeiten
-	for (size_t i = 0; i < points[1].size(); i++)
+	
+	for (size_t i = 0; i < points[0].size(); i++)
 	{
 		// draw berechnete features
-		if (abs(AimPoint.x - points[1][i].x) < dist && status[i] == 1)
+		v = points[0][i] - pt;
+		d = v.x*v.x + v.y*v.y;
+		if (d < dist && status[i] == 1)
 		{
-			dist = abs(AimPoint.x - points[1][i].x);
+			dist = d;
 			n = i;
 		}
 
