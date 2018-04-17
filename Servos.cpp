@@ -5,6 +5,8 @@
 
 Servos::Servos()
 {
+	portName = "\\\\.\\COM7";
+	servo_delta = 3.0f;
 	sp = new SerialPort(portName);
 	max_position.x = 1900.0;
 	min_position.x = 1000.0;

@@ -16,8 +16,8 @@ public:
 	Point2f position;
 	Point2f max_position;
 	Point2f min_position;
-	float servo_delta = 3.0f;
-	const char* portName = "\\\\.\\COM7";
+	float servo_delta;
+	const char* portName;
 	char m[40];
 	SerialPort* sp;
 	bool in_move;

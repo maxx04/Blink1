@@ -63,6 +63,14 @@ int main( int argc, char** argv )
 	follower follower_1;
 
 
+	//const std::string videoStreamAddress = "rtsp://admin:moxter@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
+
+	////open the video stream and make sure it's opened
+	//if (!cap.open(videoStreamAddress)) {
+	//	std::cout << "Error opening video stream or file" << std::endl;
+	//	return -1;
+	//}
+
 	// Hauptzyclus
 
     for(;;)
