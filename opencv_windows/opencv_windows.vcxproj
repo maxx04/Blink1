@@ -51,13 +51,18 @@
     <ClInclude Include="..\follower.h" />
     <ClInclude Include="..\SerialPort.h" />
     <ClInclude Include="..\Servos.h" />
+    <ClInclude Include="keypoints.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\follower.cpp" />
     <ClCompile Include="..\lkdemo.cpp" />
     <ClCompile Include="..\Servos.cpp" />
+    <ClCompile Include="keypoints.cpp" />
     <ClCompile Include="SerialPort.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\test1.mp4" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

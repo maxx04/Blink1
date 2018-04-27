@@ -27,6 +27,9 @@
     <ClInclude Include="..\follower.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="keypoints.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SerialPort.cpp">
@@ -41,5 +44,13 @@
     <ClCompile Include="..\follower.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="keypoints.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\test1.mp4">
+      <Filter>Ressourcendateien</Filter>
+    </Media>
   </ItemGroup>
 </Project>

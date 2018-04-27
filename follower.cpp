@@ -40,14 +40,13 @@ void follower::init_points()
 	if (needToInit)
 	{
 		// automatic initialization
-		points[0].clear();
-		points[1].clear();
+		kp.clear();
 
 		//finde features
-		goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
+		goodFeaturesToTrack(gray, kp.current_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
-		cornerSubPix(gray, points[1], subPixWinSize, Size(-1, -1), termcrit);
+		cornerSubPix(gray, kp.current_points, subPixWinSize, Size(-1, -1), termcrit);
 
 		needToInit = false;
 	}
@@ -68,16 +67,16 @@ void follower::calcOptFlow()
 {
 
 
-	if (!points[0].empty())
+	if (!kp.prev_points.empty())
 	{
 		if (prevGray.empty()) gray.copyTo(prevGray);
 
-		calcOpticalFlowPyrLK(prevGray, gray, /*prev*/ points[0], /*next*/ points[1],
-			status, err, winSize, 3, termcrit, 0, 0.001);
+		calcOpticalFlowPyrLK(prevGray, gray, /*prev*/ kp.prev_points, /*next*/ kp.current_points,
+			kp.status, kp.err, winSize, 3, termcrit, 0, 0.001);
 
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
-		Affine = estimateRigidTransform(points[0], points[1], true);
+		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
 
 		 //needToInit = true;
 	}
@@ -85,46 +84,50 @@ void follower::calcOptFlow()
 
 void follower::transform_Affine()
 {
-	if (!Affine.empty() && !points[0].empty())
+	if (!Affine.empty() && !kp.prev_points.empty())
 	{
 		// Affine_x_last = Affine_x;
 
 		//Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 											// umrechnen feautures
-		transform(points[0], calc[0], Affine);
+		transform(kp.prev_points, kp.calc[0], Affine);
 
 	}
 }
 
 void follower::draw()
 {
-	calc[1].resize(points[1].size());
+	//calc[1].resize(points[1].size());
 
-
-	for (size_t i = 0; i <  points[0].size(); i++)
+	// previous punkte 
+	for (size_t i = 0; i <  kp.prev_points.size(); i++) // TODO
 	{
 		// draw berechnete features
-		if (status[i] == 1)
-			circle(image, (Point)points[0][i], 4, Scalar(255, 0, 255));
+		if (kp.status[i] == 1)
+			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 255));
 		else
-			circle(image, (Point)points[0][i], 4, Scalar(255, 0, 0));
+			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 0));
 	}
 
 	if(number_aim_point >= 0 )
-	circle(image, (Point)points[1][number_aim_point], 16, Scalar(0, 0, 255), 3);
+
+	circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
 
 	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
 
 	double Affine_x = 0.0;
 
-	if (!Affine.empty() && !points[0].empty())
+	if (!Affine.empty() && !kp.prev_points.empty())
 	{
 		Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 	}
-	for (size_t i = 0; i < min(points[1].size(), points[0].size()); i++)
+
+	// aktuelle punkte
+
+	for (size_t i = 0; i < min(kp.current_points.size(), kp.prev_points.size()); i++)
 	{
-		Point2f p0 = points[0][i];
-		Point2f p1 = points[1][i];
+		Point2f p0 = kp.prev_points[i];
+		Point2f p1 = kp.current_points[i];
 
 		//if (Affine_x != 0)
 		//p1.x = ((p1.x - p0.x) / Affine_x) + p0.x;
@@ -146,12 +149,12 @@ void follower::show()
 
 	int st = 0;
 
-	for (size_t i = 0; i < status.size(); i++)
+	for (size_t i = 0; i < kp.status.size(); i++)
 	{
-		st += status[i];
+		st += kp.status[i];
 	}
 
-	text << "calc " << points[0].size() << " | " << points[1].size() << " | " << st;
+	text << "calc " << kp.prev_points.size() << " | " << kp.current_points.size() << " | " << st;
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
@@ -166,13 +169,14 @@ void follower::show()
 
 void follower::swap()
 {
-	std::swap(points[1], points[0]);
+	kp.swap();
+
 	cv::swap(prevGray, gray);
 }
 
 bool follower::key()
 {
-	char c = (char)waitKey(10);
+	char c = (char)waitKey(0);
 
 	if (c == 27) return true;
 
@@ -183,8 +187,7 @@ bool follower::key()
 		break;
 
 	case 'c':
-		points[0].clear();
-		points[1].clear();
+		kp.clear();
 		break;
 	}
 
@@ -206,7 +209,7 @@ void follower::look_to_aim()
 	if (number_aim_point < 0) return;
 
 	// 1) finde positiondifferenz
-	m = points[1][number_aim_point] - fokus;
+	m = kp.current_points[number_aim_point] - fokus;
 
 	// 2) finde richtung
 	richtung.x = -m.x / pixel_pro_step;
@@ -220,11 +223,11 @@ void follower::look_to_aim()
 
 		s.correction(richtung);
 
-		cout <<  points[1][number_aim_point] << m << richtung << "|" << s.position << endl;
+		cout <<  kp.current_points[number_aim_point] << m << richtung << "|" << s.position << endl;
 	}
 	else
 	{
-		cout << "find " << points[1][number_aim_point] << m << richtung << endl;
+		cout << "find " << kp.current_points[number_aim_point] << m << richtung << endl;
 		number_aim_point = -1;
 		needToInit = true;
 	}
@@ -239,12 +242,12 @@ int follower::find_nearest_point(Point2f pt)
 	Point2f v;
 	int n = 0; //TODO wenn 0 bearbeiten
 	
-	for (size_t i = 0; i < points[0].size(); i++)
+	for (size_t i = 0; i < kp.prev_points.size(); i++)
 	{
 		// draw berechnete features
-		v = points[0][i] - pt;
+		v = kp.prev_points[i] - pt;
 		d = v.x*v.x + v.y*v.y;
-		if (d < dist && status[i] == 1)
+		if (d < dist && kp.status[i] == 1)
 		{
 			dist = d;
 			n = i;

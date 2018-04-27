@@ -7,8 +7,10 @@
 #include "opencv2/highgui.hpp"
 
 #include "Servos.h"
+#include "opencv_windows/keypoints.h"
 
 #include <iostream>
+#include <queue>
 #include <string.h>
 
 using namespace cv;
@@ -19,7 +21,6 @@ class follower
 
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
-	const int MAX_COUNT = 300;
 	
 	float pixel_pro_step = 8.0;
 
@@ -34,12 +35,7 @@ class follower
 	Mat gray, prevGray, image;
 
 	Mat Affine;
-
-	vector<Point2f> points[2];
-	vector<uchar> status;
-	vector<float> err;
-
-	vector<Point2f> calc[2];
+	keypoints kp; // keypoints in zeit
 
 public:
 	follower();

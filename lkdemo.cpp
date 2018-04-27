@@ -35,10 +35,7 @@ static void help()
 int main( int argc, char** argv )
 {
   
-
 	double timeSec;
-
-
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
