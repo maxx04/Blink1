@@ -7,9 +7,9 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 {
 	if (event == EVENT_LBUTTONDOWN)
 	{
-		AimPoint = Point2f((float)x, (float)(y)); 
+		AimPoint = Point2f((float)x, (float)(y));
 		setAimPt = true;
-		
+
 	}
 }
 
@@ -23,11 +23,11 @@ follower::follower()
 
 
 
-//#ifndef _ARM
+	//#ifndef _ARM
 	namedWindow("LK Demo", 1);
 
 	setMouseCallback("LK Demo", onMouse, 0);
-//#endif
+	//#endif
 }
 
 
@@ -59,7 +59,7 @@ void follower::take_picture(Mat* frame)
 	fokus.x = (float)(image.cols / 2);
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
 	swap();
-	frame -> copyTo(image);
+	frame->copyTo(image);
 	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
@@ -76,9 +76,11 @@ void follower::calcOptFlow()
 
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
+		kp.load_queue();
+
 		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
 
-		 //needToInit = true;
+		//needToInit = true;
 	}
 }
 
@@ -95,23 +97,31 @@ void follower::transform_Affine()
 	}
 }
 
-void follower::draw()
+int follower::draw()
 {
-	//calc[1].resize(points[1].size());
+	int time = 10; //ms
+
 
 	// previous punkte 
-	for (size_t i = 0; i <  kp.prev_points.size(); i++) // TODO
+	for (size_t i = 0; i < kp.prev_points.size(); i++) // TODO
 	{
 		// draw berechnete features
 		if (kp.status[i] == 1)
+		{
 			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 255));
+		}
 		else
 			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 0));
+
+
 	}
 
-	if(number_aim_point >= 0 )
 
-	circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
+
+
+	if (number_aim_point >= 0)
+
+		circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
 
 	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
 
@@ -124,18 +134,47 @@ void follower::draw()
 
 	// aktuelle punkte
 
-	for (size_t i = 0; i < min(kp.current_points.size(), kp.prev_points.size()); i++)
+
+
+	Point2f p2, p3;
+
+	if (kp.p_sum.size() == queue_size)
 	{
-		Point2f p0 = kp.prev_points[i];
-		Point2f p1 = kp.current_points[i];
+		// draw summ vector
+		p2 = fokus;
+		while (!kp.p_sum.empty())
+		{
+			p3 = p2 + 1.0*kp.p_sum.front();
+			kp.p_sum.pop();
+			line(image, (Point)p2, (Point)p3, Scalar(0, 0, 200), 3);
+			circle(image, (Point)p2, 3, Scalar(0, 255, 0), 1);
+			p2 = p3;
+		};
 
-		//if (Affine_x != 0)
-		//p1.x = ((p1.x - p0.x) / Affine_x) + p0.x;
+		for (size_t i = 0; i < min(kp.current_points.size(), kp.prev_points.size()); i++)
+		{
+			if (kp.status[i] == 1)
+			{
+				Point2f p0, p1;
 
-		line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
+				p0 = kp.prev_points[i];
 
-		//calc[1][i] = points[1][i] - points[0][i];
+				while (!kp.points_queue[i].empty())
+				{
+					p1 = p0 + kp.points_queue[i].front();
+					kp.points_queue[i].pop();
+					line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
+					circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
+					p0 = p1;
+				};
+			}
+
+		}
+
+ 		time = 0;
 	}
+
+	return time;
 }
 
 void follower::show()
@@ -164,7 +203,7 @@ void follower::show()
 
 	imshow("LK Demo", image);
 
-//#endif
+	//#endif
 }
 
 void follower::swap()
@@ -174,9 +213,9 @@ void follower::swap()
 	cv::swap(prevGray, gray);
 }
 
-bool follower::key()
+bool follower::key(int wait)
 {
-	char c = (char)waitKey(0);
+	char c = (char)waitKey(wait);
 
 	if (c == 27) return true;
 
@@ -196,7 +235,7 @@ bool follower::key()
 
 void follower::look_to_aim()
 {
-	Point2f richtung = Point2f(0.0,0.0);
+	Point2f richtung = Point2f(0.0, 0.0);
 	Point2f m;
 
 	if (setAimPt)
@@ -219,11 +258,11 @@ void follower::look_to_aim()
 	// 4) wenn differenz immer noch groß, gehe zu schritt 1. 
 	// 3) bewege einen schritt in Richtung
 	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
-	{	
+	{
 
 		s.correction(richtung);
 
-		cout <<  kp.current_points[number_aim_point] << m << richtung << "|" << s.position << endl;
+		cout << kp.current_points[number_aim_point] << m << richtung << "|" << s.position << endl;
 	}
 	else
 	{
@@ -241,7 +280,7 @@ int follower::find_nearest_point(Point2f pt)
 	float d, dist = 10000000.0;
 	Point2f v;
 	int n = 0; //TODO wenn 0 bearbeiten
-	
+
 	for (size_t i = 0; i < kp.prev_points.size(); i++)
 	{
 		// draw berechnete features

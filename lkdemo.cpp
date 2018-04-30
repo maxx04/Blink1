@@ -37,6 +37,8 @@ int main( int argc, char** argv )
   
 	double timeSec;
 
+	int wait_time = 10;
+
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
     string input = parser.get<string>("@input");
@@ -85,13 +87,13 @@ int main( int argc, char** argv )
 
 		follower_1.transform_Affine();
 
-		follower_1.draw();
+		wait_time = follower_1.draw();
 
 		follower_1.show();
 
 		follower_1.look_to_aim();
 
-		if (follower_1.key()) break;
+		if (follower_1.key(wait_time)) break;
 
     }
 

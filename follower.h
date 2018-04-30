@@ -18,7 +18,7 @@ using namespace std;
 
 class follower
 {
-
+	const int queue_size = 5;
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
@@ -44,10 +44,10 @@ public:
 	void take_picture(Mat* frame);
 	void calcOptFlow();
 	void transform_Affine();
-	void draw();
+	int draw();
 	void show();
 	void swap();
-	bool key();
+	bool key(int wait);
 	void look_to_aim();
 	int find_nearest_point(Point2f pt);
 

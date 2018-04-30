@@ -13,23 +13,27 @@ class keypoints
 {
 public:
 	const int MAX_COUNT = 300;
-	//vector<Point2f> points[2];
-	vector<Point2f> prev_points;
-	vector<Point2f> current_points;
+	queue<Point2f> p_sum;
+
+	vector<Point2f> prev_points; // vorherige punkte
+	vector<Point2f> current_points; // aktuelle punkte
 	vector<Point2f> calc[1]; // berechnete punkte
-	vector<uchar> status;
-	vector<float> err;
+	vector<uchar> status; // status vom calcOpticalFlowPyrLK
+	vector<float> err; // error vom calcOpticalFlowPyrLK
+
+	queue<Point2f>* points_queue; // keypoints in die zeit 
 
 	keypoints();
 	~keypoints();
 	void clear(void);
 	void swap(void);
+	void load_queue(void);
 	vector <Point2f> * get_next_points_addr(void);
 
 private:
-	
 
-	queue<Point2f> points_queue[10]; // keypoints in die zeit 0 bis 9
+
+
 
 };
 
