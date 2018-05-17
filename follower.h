@@ -1,10 +1,19 @@
 #pragma once
 #pragma warning(disable : 4996)
 
+#include <opencv2/core.hpp>
+#include <opencv2/core/utility.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
 #include "opencv2/video/tracking.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/videoio.hpp"
-#include "opencv2/highgui.hpp"
+//#include "opencv2/imgproc.hpp"
+//#include "opencv2/videoio.hpp"
+//#include "opencv2/highgui.hpp"
+//#include "opencv2/calib3d.hpp"
 
 #include "Servos.h"
 #include "opencv_windows/keypoints.h"
@@ -18,7 +27,7 @@ using namespace std;
 
 class follower
 {
-	const int queue_size = 5;
+	const int queue_size = 10;
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
@@ -26,6 +35,7 @@ class follower
 
 	Point2f fokus;
 	int number_aim_point = -1;
+	double frame_time = 0.0;
 
 	Servos s;
 
@@ -46,6 +56,7 @@ public:
 	void transform_Affine();
 	int draw();
 	void show();
+	//void cam_calibrate();
 	void swap();
 	bool key(int wait);
 	void look_to_aim();

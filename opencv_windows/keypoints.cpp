@@ -57,6 +57,20 @@ void keypoints::load_queue(void)
 	}
 }
 
+float keypoints::distance(Point2f a, Point2f b)
+{
+	return sqrt( pow((a.x - b.x),2) + pow((a.y - b.y),2));
+}
+
+double keypoints::get_queue_time(void)
+{
+	const double timeSec = (frame_timestamp.back() - frame_timestamp.front()) / getTickFrequency();
+	// clean
+	while (!frame_timestamp.empty()) frame_timestamp.pop();
+
+	return timeSec;
+}
+
 vector<Point2f>* keypoints::get_next_points_addr(void)
 {
 	return &current_points;

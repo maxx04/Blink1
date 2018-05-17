@@ -43,10 +43,10 @@ void follower::init_points()
 		kp.clear();
 
 		//finde features
-		goodFeaturesToTrack(gray, kp.current_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
+		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
-		cornerSubPix(gray, kp.current_points, subPixWinSize, Size(-1, -1), termcrit);
+		cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
 
 		needToInit = false;
 	}
@@ -60,6 +60,9 @@ void follower::take_picture(Mat* frame)
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
 	swap();
 	frame->copyTo(image);
+
+	kp.frame_timestamp.push((double)getTickCount());
+
 	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
@@ -140,6 +143,10 @@ int follower::draw()
 
 	if (kp.p_sum.size() == queue_size)
 	{
+
+		frame_time = kp.get_queue_time();
+
+
 		// draw summ vector
 		p2 = fokus;
 		while (!kp.p_sum.empty())
@@ -151,10 +158,20 @@ int follower::draw()
 			p2 = p3;
 		};
 
-		for (size_t i = 0; i < min(kp.current_points.size(), kp.prev_points.size()); i++)
+		int i = 0;
+		int n_status = 0;
+		float* move = new float[kp.MAX_COUNT];
+
+		float dist = 0.0f;
+		float max_move = 0.0f;
+		int neahrest_point = 0;
+		bool danger = false;
+
+		for (i = 0; i <  kp.prev_points.size(); i++)
 		{
 			if (kp.status[i] == 1)
 			{
+				n_status++;
 				Point2f p0, p1;
 
 				p0 = kp.prev_points[i];
@@ -165,13 +182,39 @@ int follower::draw()
 					kp.points_queue[i].pop();
 					line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
 					circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
+					dist += kp.distance(p0, p1);
+
 					p0 = p1;
 				};
+
+				move[i] = dist; // Distance für letzten queue_size punkten
+				
+
+				if (dist > max_move)
+				{
+					max_move = dist;
+					neahrest_point = i;
+				}
+
+				dist = 0.0;
 			}
 
 		}
 
- 		time = 0;
+		if (max_move > 10.0f)
+		{
+			danger = true;
+			// zeichne naeheresten punkt
+			circle(image, (Point)kp.prev_points[neahrest_point], 10, Scalar(0, 0, 200), 3);
+		}
+
+
+ 		time = 10;
+
+		if (n_status < 100)
+		{
+			needToInit = true;
+		}
 	}
 
 	return time;
@@ -193,7 +236,8 @@ void follower::show()
 		st += kp.status[i];
 	}
 
-	text << "calc " << kp.prev_points.size() << " | " << kp.current_points.size() << " | " << st;
+	text << "calc " << kp.prev_points.size() << " | " << kp.current_points.size() << " | " << st << "__" << frame_time;
+
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
@@ -204,6 +248,15 @@ void follower::show()
 	imshow("LK Demo", image);
 
 	//#endif
+}
+
+void follower::cam_calibrate()
+{
+	//Size_<int> boardSize(8,8);
+	//vector<Point2f> pointBuf;
+	//int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
+	//bool found = findChessboardCorners(image, boardSize, pointBuf, chessBoardFlags);
+	return;
 }
 
 void follower::swap()
@@ -228,6 +281,8 @@ bool follower::key(int wait)
 	case 'c':
 		kp.clear();
 		break;
+	//case 'k':
+		//cam_calibrate();
 	}
 
 	return false;
@@ -281,7 +336,7 @@ int follower::find_nearest_point(Point2f pt)
 	Point2f v;
 	int n = 0; //TODO wenn 0 bearbeiten
 
-	for (size_t i = 0; i < kp.prev_points.size(); i++)
+	for (int i = 0; i < kp.prev_points.size(); i++)
 	{
 		// draw berechnete features
 		v = kp.prev_points[i] - pt;
