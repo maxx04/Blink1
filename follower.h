@@ -19,6 +19,7 @@
 
 #include "Servos.h"
 #include "opencv_windows/keypoints.h"
+#include "camera_calibration/camera_calibration.h"
 
 using namespace cv;
 using namespace std;

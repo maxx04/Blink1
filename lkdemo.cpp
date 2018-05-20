@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-//#include "Servos.h"
 #include "follower.h"
 
 using namespace cv;

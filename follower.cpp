@@ -252,10 +252,31 @@ void follower::show()
 
 void follower::cam_calibrate()
 {
-	Size_<int> boardSize(8,8);
+	Size_<int> boardSize(7,7);
 	vector<Point2f> pointBuf;
-	//int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
-	//bool found = findChessboardCorners(image, boardSize, pointBuf, chessBoardFlags);
+	vector<vector<Point3f> > objectPoints(1);
+
+
+	//Find intrinsic and extrinsic camera parameters
+	double rms;
+
+	int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
+	bool found = findChessboardCorners(image, boardSize, pointBuf, chessBoardFlags);
+	if (!found) return;
+
+	//calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
+
+	//objectPoints.resize(imagePoints.size(), objectPoints[0]);
+
+	//rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,
+	//	s.flag);
+
+	string a = "r";
+	char* arguments[2];
+	arguments[0] = &a[0];
+
+	calibrate(0, arguments);
+
 	return;
 }
 
@@ -281,8 +302,9 @@ bool follower::key(int wait)
 	case 'c':
 		kp.clear();
 		break;
-	//case 'k':
-		//cam_calibrate();
+
+	case 'k':
+		cam_calibrate();
 	}
 
 	return false;

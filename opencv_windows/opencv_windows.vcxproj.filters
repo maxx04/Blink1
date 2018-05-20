@@ -30,6 +30,9 @@
     <ClInclude Include="keypoints.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\camera_calibration\camera_calibration.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SerialPort.cpp">
@@ -47,10 +50,18 @@
     <ClCompile Include="keypoints.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\camera_calibration\camera_calibration.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\test1.mp4">
       <Filter>Ressourcendateien</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\camera_calibration\default.xml">
+      <Filter>Ressourcendateien</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
