@@ -252,8 +252,8 @@ void follower::show()
 
 void follower::cam_calibrate()
 {
-	//Size_<int> boardSize(8,8);
-	//vector<Point2f> pointBuf;
+	Size_<int> boardSize(8,8);
+	vector<Point2f> pointBuf;
 	//int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 	//bool found = findChessboardCorners(image, boardSize, pointBuf, chessBoardFlags);
 	return;

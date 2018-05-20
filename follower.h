@@ -1,6 +1,12 @@
 #pragma once
 #pragma warning(disable : 4996)
 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <ctime>
+#include <cstdio>
+
 #include <opencv2/core.hpp>
 #include <opencv2/core/utility.hpp>
 #include <opencv2/imgproc.hpp>
@@ -8,22 +14,29 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/video/tracking.hpp>
 
-#include "opencv2/video/tracking.hpp"
+using namespace cv;
+using namespace std;
+
+
+//#include <iostream>
+#include <queue>
+//#include <string.h>
+
+
 //#include "opencv2/imgproc.hpp"
 //#include "opencv2/videoio.hpp"
 //#include "opencv2/highgui.hpp"
-//#include "opencv2/calib3d.hpp"
+//
+//#include <opencv2/calib3d.hpp>
 
 #include "Servos.h"
 #include "opencv_windows/keypoints.h"
 
-#include <iostream>
-#include <queue>
-#include <string.h>
 
-using namespace cv;
-using namespace std;
+//using namespace cv;
+//using namespace std;
 
 class follower
 {
@@ -56,7 +69,7 @@ public:
 	void transform_Affine();
 	int draw();
 	void show();
-	//void cam_calibrate();
+	void cam_calibrate();
 	void swap();
 	bool key(int wait);
 	void look_to_aim();

@@ -1,10 +1,10 @@
-#include "opencv2/video/tracking.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/videoio.hpp"
-#include "opencv2/highgui.hpp"
+//#include "opencv2/video/tracking.hpp"
+//#include "opencv2/imgproc.hpp"
+//#include "opencv2/videoio.hpp"
+//#include "opencv2/highgui.hpp"
 
 #include <iostream>
-#include <ctype.h>
+//#include <ctype.h>
 #include <string.h>
 
 #include "Servos.h"
@@ -34,8 +34,6 @@ static void help()
 
 int main( int argc, char** argv )
 {
-  
-	double timeSec;
 
 	int wait_time = 10;
 
