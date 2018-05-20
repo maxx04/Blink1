@@ -3,7 +3,7 @@
 #ifndef _Servos
 #define _Servos
 
-#include "opencv2\core.hpp"
+#include <opencv2\core.hpp>
 #include "SerialPort.h"
 
 using namespace cv;

@@ -6,6 +6,7 @@
 #include <string>
 #include <ctime>
 #include <cstdio>
+#include <queue>
 
 #include <opencv2/core.hpp>
 #include <opencv2/core/utility.hpp>
@@ -16,27 +17,11 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video/tracking.hpp>
 
-using namespace cv;
-using namespace std;
-
-
-//#include <iostream>
-#include <queue>
-//#include <string.h>
-
-
-//#include "opencv2/imgproc.hpp"
-//#include "opencv2/videoio.hpp"
-//#include "opencv2/highgui.hpp"
-//
-//#include <opencv2/calib3d.hpp>
-
 #include "Servos.h"
 #include "opencv_windows/keypoints.h"
 
-
-//using namespace cv;
-//using namespace std;
+using namespace cv;
+using namespace std;
 
 class follower
 {
