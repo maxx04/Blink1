@@ -18,6 +18,7 @@ static void help()
             "\tr - auto-initialize tracking\n"
             "\tc - delete all the points\n"
 			"\ts - set aim point\n"
+			"\tk - calibrate camera\n"
              << endl;
 }
 
@@ -69,9 +70,10 @@ int main( int argc, char** argv )
 
 		if (frame.empty())
 		{
+			// wenn videodatei in befehlzeile dann beenden.
+			if (input.size() != 0) break;
 			cap.open(0); //TODO fall mit video berücksichtigen
 			cap >> frame;
-			//break;
 		}
 
 

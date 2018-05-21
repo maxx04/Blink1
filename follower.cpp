@@ -17,11 +17,19 @@ follower::follower()
 {
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(10, 10);
-	winSize = Size(13, 13);
+	winSize = Size(31, 31);
 
 	needToInit = true;
 
-	
+	float data[10] = { 1200, 0, 320, 0, 1200, 240, 0, 0, 1 };
+
+	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+
+	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
+
+	Mat n = cameraMatrix * vec;
+
+	cout << n << endl;
 
 	//#ifndef _ARM
 	namedWindow("LK Demo", 1);
@@ -29,7 +37,6 @@ follower::follower()
 	setMouseCallback("LK Demo", onMouse, 0);
 	//#endif
 }
-
 
 follower::~follower()
 {
@@ -46,7 +53,7 @@ void follower::init_points()
 		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
-		//cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
+		cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
 
 		needToInit = false;
 	}
@@ -209,7 +216,7 @@ int follower::draw()
 		}
 
 
- 		time = 10;
+ 		time = 1000;
 
 		if (n_status < 100)
 		{
@@ -252,30 +259,14 @@ void follower::show()
 
 void follower::cam_calibrate()
 {
-	Size_<int> boardSize(7,7);
-	vector<Point2f> pointBuf;
-	vector<vector<Point3f> > objectPoints(1);
-
-
-	//Find intrinsic and extrinsic camera parameters
-	double rms;
-
-	int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
-	bool found = findChessboardCorners(image, boardSize, pointBuf, chessBoardFlags);
-	if (!found) return;
-
-	//calcBoardCornerPositions(s.boardSize, s.squareSize, objectPoints[0], s.calibrationPattern);
-
-	//objectPoints.resize(imagePoints.size(), objectPoints[0]);
-
-	//rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,
-	//	s.flag);
 
 	char a[32];
 	char* arguments[2];
 	arguments[0] = &a[0];
 
 	cameraMatrix = calibrate(0, arguments);
+
+	cout << cameraMatrix << endl;
 
 	return;
 }
