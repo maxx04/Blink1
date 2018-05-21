@@ -2,9 +2,10 @@
 #include "camera_calibration.h"
 
 
-int calibrate(int argc, char* argv[])
+Mat calibrate(int argc, char* argv[])
 {
     cal_help();
+	Mat cameraMatrix, distCoeffs;
 
     //! [file_read]
     Settings s;
@@ -13,7 +14,7 @@ int calibrate(int argc, char* argv[])
     if (!fs.isOpened())
     {
         cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"" << endl;
-        return -1;
+        return cameraMatrix;
     }
     fs["Settings"] >> s;
     fs.release();                                         // close Settings file
@@ -25,16 +26,16 @@ int calibrate(int argc, char* argv[])
     if (!s.goodInput)
     {
         cout << "Invalid input detected. Application stopping. " << endl;
-        return -1;
+        return cameraMatrix;
     }
 
     vector<vector<Point2f> > imagePoints;
-    Mat cameraMatrix, distCoeffs;
+    
     Size imageSize;
     int mode = s.inputType == Settings::IMAGE_LIST ? CAPTURING : DETECTION;
     clock_t prevTimestamp = 0;
     const Scalar RED(0,0,255), GREEN(0,255,0);
-    const char ESC_KEY = 27;
+	const char ESC_KEY = 'e';
 
     //! [get_input]
     for(;;)
@@ -203,7 +204,9 @@ int calibrate(int argc, char* argv[])
     }
     //! [show_results]
 
-    return 0;
+	//TODO close image
+
+    return cameraMatrix;
 }
 
 //! [compute_errors]

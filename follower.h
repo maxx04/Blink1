@@ -44,6 +44,7 @@ class follower
 	Mat gray, prevGray, image;
 
 	Mat Affine;
+	Mat cameraMatrix;
 	keypoints kp; // keypoints in zeit
 
 public:

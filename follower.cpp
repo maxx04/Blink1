@@ -15,13 +15,13 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 
 follower::follower()
 {
-	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 20, 0.03);
+	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(10, 10);
-	winSize = Size(31, 31);
+	winSize = Size(13, 13);
 
 	needToInit = true;
 
-
+	
 
 	//#ifndef _ARM
 	namedWindow("LK Demo", 1);
@@ -46,7 +46,7 @@ void follower::init_points()
 		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
-		cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
+		//cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
 
 		needToInit = false;
 	}
@@ -271,11 +271,11 @@ void follower::cam_calibrate()
 	//rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,
 	//	s.flag);
 
-	string a = "r";
+	char a[32];
 	char* arguments[2];
 	arguments[0] = &a[0];
 
-	calibrate(0, arguments);
+	cameraMatrix = calibrate(0, arguments);
 
 	return;
 }

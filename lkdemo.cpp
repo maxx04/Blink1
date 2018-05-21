@@ -67,7 +67,12 @@ int main( int argc, char** argv )
     {
         cap >> frame;
 
-        if( frame.empty() )  break;
+		if (frame.empty())
+		{
+			cap.open(0); //TODO fall mit video berücksichtigen
+			cap >> frame;
+			//break;
+		}
 
 
 		follower_1.take_picture(&frame);
@@ -85,6 +90,21 @@ int main( int argc, char** argv )
 		follower_1.look_to_aim();
 
 		if (follower_1.key(wait_time)) break;
+
+		if (!cap.isOpened())
+		{
+			if (input.size() == 1 && isdigit(input[0]))
+				cap.open(0);
+			else
+				cap.open(input);
+
+			if (!cap.isOpened())
+			{
+				cout << "Could not initialize capturing...\n";
+				return 0;
+			}
+
+		}
 
     }
 

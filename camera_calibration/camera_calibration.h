@@ -239,6 +239,7 @@ static void cal_help()
 	cout << "This is a camera calibration sample." << endl
 		<< "Usage: camera_calibration [configuration_file -- default ./default.xml]" << endl
 		<< "Near the sample file you'll find the configuration file, which has detailed help of "
+		<< "e - escape, u - distort"
 		"how to edit it.  It may be any OpenCV supported file format XML/YAML." << endl;
 }
 
@@ -256,4 +257,4 @@ enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
 bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat& distCoeffs,
 	vector<vector<Point2f> > imagePoints);
 
-int calibrate(int argc, char* argv[]);
+Mat calibrate(int argc, char* argv[]);
