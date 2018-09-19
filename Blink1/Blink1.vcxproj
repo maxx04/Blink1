@@ -42,7 +42,7 @@
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="..\..\opencv\OPENCV_DEBUG_x64.props" />
+    <Import Project="..\OPENCV_DEBUG_x64.props" />
     <Import Project="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.Cpp.CoreWin.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
