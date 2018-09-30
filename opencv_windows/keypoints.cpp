@@ -4,7 +4,7 @@
 
 keypoints::keypoints()
 {
-	points_queue = new queue<Point2f>[MAX_COUNT];
+	step_vector_queue = new queue<Point2f>[MAX_COUNT];
 	
 }
 
@@ -25,36 +25,32 @@ void keypoints::swap(void)
 	std::swap(current_points, prev_points);
 }
 
-void keypoints::load_queue(void)
+
+///
+
+int keypoints::load_step_vectors(void)
 {
-	Point2f sum = Point2f(0, 0);
+	Point2f step,sum = Point2f(0, 0);
 	int number = 0;
 
-	for (size_t i = 0; i < prev_points.size(); i++) // TODO
+
+	for (size_t i = 0; i < prev_points.size(); i++) 
 	{
-		
-		// draw berechnete features
-		if (status[i] == 1)
-		{
-			sum += (current_points[i] - prev_points[i]);
-			number++;
-		}
-
-	}
-	sum /= (float)number;
-
-	p_sum.push( sum );
-
-	for (size_t i = 0; i < prev_points.size(); i++) // TODO
-	{
-		// draw berechnete features
 		if (status[i] == 1)
 		{
 			//speichere in zeit nur gute punkte
-			points_queue[i].push(current_points[i] - prev_points[i] - sum );
+			//points_queue[i].push(current_points[i] - prev_points[i] - sum );
+			step = (current_points[i] - prev_points[i]);
+			sum += step;
+			number++;
+			step_vector_queue[i].push(step); // step vektor beladen
 		}
 
 	}
+
+	if (number != 0) p_sum.push(sum/(float)number); // TODO Assert 0, summandvektor beladen
+
+	return number;
 }
 
 float keypoints::distance(Point2f a, Point2f b)
@@ -74,4 +70,15 @@ double keypoints::get_queue_time(void)
 vector<Point2f>* keypoints::get_next_points_addr(void)
 {
 	return &current_points;
+}
+
+
+Point2f keypoints::get_next_summ_vector()
+{
+	Point2f sum;
+
+	sum = p_sum.front();
+	p_sum.pop();
+
+	return sum;
 }

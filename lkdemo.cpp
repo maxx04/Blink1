@@ -29,7 +29,7 @@ static void help()
 int main( int argc, char** argv )
 {
 
-	int wait_time = 10;
+	int wait_time = 0;
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
@@ -76,18 +76,24 @@ int main( int argc, char** argv )
 			cap >> frame;
 		}
 
-
+		
 		follower_1.take_picture(&frame);
 
 		follower_1.init_points();
 
 		follower_1.calcOptFlow();
 
+		follower_1.collect_step_vectors();
+
+		follower_1.check_for_followed_points();
+
 		follower_1.transform_Affine();
 
-		wait_time = follower_1.draw();
+		follower_1.calculate_move_vectors();
 
-		follower_1.show();
+		wait_time = follower_1.draw_image();
+
+		follower_1.show_image();
 
 		follower_1.look_to_aim();
 

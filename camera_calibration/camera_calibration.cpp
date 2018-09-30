@@ -70,7 +70,7 @@ Mat calibrate(int argc, char* argv[])
 
         bool found;
 
-        int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
+        int chessBoardFlags = /*CALIB_CB_ADAPTIVE_THRESH | */CALIB_CB_NORMALIZE_IMAGE;
 
         if(!s.useFisheye) {
             // fast check erroneously fails with high distortions like fisheye

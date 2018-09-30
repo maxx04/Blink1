@@ -21,13 +21,14 @@ public:
 	vector<uchar> status; // status vom calcOpticalFlowPyrLK
 	vector<float> err; // error vom calcOpticalFlowPyrLK
 	
-	queue<Point2f>* points_queue; // keypoints in die zeit 
-
+	queue<Point2f>* step_vector_queue; // step_vector von prev_points zu current_points
+							// in queue geladen jedes mal nach aufruf load_step_vectors
+							
 	keypoints();
 	~keypoints();
 	void clear(void);
 	void swap(void);
-	void load_queue(void);
+	int load_step_vectors(void);
 	float distance (Point2f a, Point2f b);
 	double get_queue_time(void);
 	vector <Point2f> * get_next_points_addr(void);
@@ -37,5 +38,15 @@ private:
 
 
 
+public:
+	Point2f get_next_summ_vector();
+
+	// gibt aus ob keine summand vektoren mehr gibts
+	bool summ_queue_empty()
+	{
+		// TODO: Fügen Sie hier Ihren Implementierungscode ein..
+
+		return p_sum.empty();
+	}
 };
 

@@ -26,7 +26,7 @@ using namespace std;
 
 class follower
 {
-	const int queue_size = 10;
+	const int step_butch = 5; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
@@ -52,15 +52,23 @@ public:
 	~follower();
 	void init_points();
 	void take_picture(Mat* frame);
+	void check_for_followed_points();
 	void calcOptFlow();
 	void transform_Affine();
-	int draw();
-	void show();
+	void draw_aim_point();
+	void draw_prev_points();
+	void draw_summ_vector();
+	int draw_image();
+	void draw_nearest_point();
+	void show_image();
 	void cam_calibrate();
 	void swap();
 	bool key(int wait);
 	void look_to_aim();
 	int find_nearest_point(Point2f pt);
 
+	int collect_step_vectors();
+	int calculate_move_vectors();
 };
+
 

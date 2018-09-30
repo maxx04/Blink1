@@ -55,6 +55,7 @@
     <ClInclude Include="..\follower.h" />
     <ClInclude Include="..\SerialPort.h" />
     <ClInclude Include="..\Servos.h" />
+    <ClInclude Include="histogram.h" />
     <ClInclude Include="keypoints.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -63,16 +64,25 @@
     <ClCompile Include="..\follower.cpp" />
     <ClCompile Include="..\lkdemo.cpp" />
     <ClCompile Include="..\Servos.cpp" />
+    <ClCompile Include="histogram.cpp" />
     <ClCompile Include="keypoints.cpp" />
     <ClCompile Include="SerialPort.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\test1.mp4" />
+    <Media Include="..\tilt.mp4" />
+    <Media Include="C:\Users\maxx\Pictures\Camera Roll\Drehen.mp4" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\camera_calibration\default.xml">
       <SubType>Designer</SubType>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\camera_calibration\out_camera_data.yml">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
