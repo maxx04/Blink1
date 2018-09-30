@@ -26,7 +26,7 @@ using namespace std;
 
 class follower
 {
-	const int queue_size = 10;
+	const int queue_size = 10; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
@@ -54,8 +54,12 @@ public:
 	void take_picture(Mat* frame);
 	void calcOptFlow();
 	void transform_Affine();
-	int draw();
-	void show();
+	void draw_aim_point();
+	void draw_prev_points();
+	void draw_summ_vector();
+	int draw_image();
+	void draw_nearest_point();
+	void show_image();
 	void cam_calibrate();
 	void swap();
 	bool key(int wait);
@@ -63,4 +67,5 @@ public:
 	int find_nearest_point(Point2f pt);
 
 };
+
 

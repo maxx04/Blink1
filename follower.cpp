@@ -21,7 +21,7 @@ follower::follower()
 
 	needToInit = true;
 
-	float data[10] = { 1200, 0, 320, 0, 1200, 240, 0, 0, 1 };
+	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
 
@@ -76,7 +76,6 @@ void follower::take_picture(Mat* frame)
 void follower::calcOptFlow()
 {
 
-
 	if (!kp.prev_points.empty())
 	{
 		if (prevGray.empty()) gray.copyTo(prevGray);
@@ -107,12 +106,17 @@ void follower::transform_Affine()
 	}
 }
 
-int follower::draw()
+void follower::draw_aim_point()
 {
-	int time = 10; //ms
+	if (number_aim_point >= 0)
 
+		circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
 
-	// previous punkte 
+	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
+}
+
+void follower::draw_prev_points()
+{
 	for (size_t i = 0; i < kp.prev_points.size(); i++) // TODO
 	{
 		// draw berechnete features
@@ -125,19 +129,36 @@ int follower::draw()
 
 
 	}
+}
+
+void follower::draw_summ_vector()
+{
+	Point2f p2, p3;
+	p2 = fokus;
+	while (!kp.p_sum.empty())
+	{
+		p3 = p2 + 1.0*kp.p_sum.front();
+		kp.p_sum.pop();
+		line(image, (Point)p2, (Point)p3, Scalar(0, 0, 200), 3);
+		circle(image, (Point)p2, 3, Scalar(0, 255, 0), 1);
+		p2 = p3;
+	};
+}
+
+int follower::draw_image()
+{
+	int time = 10; //ms
 
 
+	// draw previous punkte 
+	draw_prev_points();
 
-
-	if (number_aim_point >= 0)
-
-		circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
-
-	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
+	// draw Zielpunkt wenn gibt es 
+	draw_aim_point();
 
 	double Affine_x = 0.0;
 
-	if (!Affine.empty() && !kp.prev_points.empty())
+	if (!Affine.empty() && !kp.prev_points.empty()) // Verschiebung x rausnehmen.
 	{
 		Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 	}
@@ -146,88 +167,87 @@ int follower::draw()
 
 
 
-	Point2f p2, p3;
-
-	if (kp.p_sum.size() == queue_size)
+	if (kp.p_sum.size() == queue_size) // wenn anzahl frames wird erreicht dann abbilden 
 	{
 
-		frame_time = kp.get_queue_time();
+		frame_time = kp.get_queue_time(); //Zeit für Frame holen
 
+		draw_summ_vector();
 
-		// draw summ vector
-		p2 = fokus;
-		while (!kp.p_sum.empty())
-		{
-			p3 = p2 + 1.0*kp.p_sum.front();
-			kp.p_sum.pop();
-			line(image, (Point)p2, (Point)p3, Scalar(0, 0, 200), 3);
-			circle(image, (Point)p2, 3, Scalar(0, 255, 0), 1);
-			p2 = p3;
-		};
+		draw_nearest_point();
 
-		int i = 0;
-		int n_status = 0;
-		float* move = new float[kp.MAX_COUNT];
-
-		float dist = 0.0f;
-		float max_move = 0.0f;
-		int neahrest_point = 0;
-		bool danger = false;
-
-		for (i = 0; i <  kp.prev_points.size(); i++)
-		{
-			if (kp.status[i] == 1)
-			{
-				n_status++;
-				Point2f p0, p1;
-
-				p0 = kp.prev_points[i];
-
-				while (!kp.points_queue[i].empty())
-				{
-					p1 = p0 + kp.points_queue[i].front();
-					kp.points_queue[i].pop();
-					line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
-					circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
-					dist += kp.distance(p0, p1);
-
-					p0 = p1;
-				};
-
-				move[i] = dist; // Distance für letzten queue_size punkten
-				
-
-				if (dist > max_move)
-				{
-					max_move = dist;
-					neahrest_point = i;
-				}
-
-				dist = 0.0;
-			}
-
-		}
-
-		if (max_move > 10.0f)
-		{
-			danger = true;
-			// zeichne naeheresten punkt
-			circle(image, (Point)kp.prev_points[neahrest_point], 10, Scalar(0, 0, 200), 3);
-		}
-
-
- 		time = 1000;
-
-		if (n_status < 100)
-		{
-			needToInit = true;
-		}
+		time = 0; // und time 0 stop 
 	}
+
+
 
 	return time;
 }
 
-void follower::show()
+void follower::draw_nearest_point()
+
+{
+	int i = 0;
+	int n_status = 0;
+	float* move = new float[kp.MAX_COUNT];
+
+	float dist = 0.0f;
+	float max_move = 0.0f;
+	int neahrest_point = 0;
+	bool danger = false;
+
+	for (i = 0; i < kp.prev_points.size(); i++)
+	{
+		if (kp.status[i] == 1)
+		{
+			n_status++;
+			Point2f p0, p1;
+
+			p0 = kp.prev_points[i];
+
+			while (!kp.points_queue[i].empty())
+			{
+				p1 = p0 + kp.points_queue[i].front();
+				kp.points_queue[i].pop();
+				line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
+				circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
+				dist += kp.distance(p0, p1);
+
+				p0 = p1;
+			};
+
+			move[i] = dist; // Distance für letzten queue_size punkten
+
+
+			if (dist > max_move)
+			{
+				max_move = dist;
+				neahrest_point = i;
+			}
+
+			dist = 0.0;
+		}
+
+	}
+
+	if (max_move > 10.0f) // punkt mit maximalen bewegung markieren
+	{
+		danger = true;
+		// zeichne naeheresten punkt
+		circle(image, (Point)kp.prev_points[neahrest_point], 10, Scalar(0, 0, 200), 3);
+	}
+
+
+
+
+	if (n_status < 100) // wenn weniger als 100 Punkten dann neue Punkte erstellen.
+	{
+		needToInit = true;
+	}
+}
+
+
+void follower::show_image()
 {
 	stringstream text;
 

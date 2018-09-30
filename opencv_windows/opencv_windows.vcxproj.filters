@@ -58,10 +58,18 @@
     <Media Include="..\test1.mp4">
       <Filter>Ressourcendateien</Filter>
     </Media>
+    <Media Include="C:\Users\maxx\Pictures\Camera Roll\Drehen.mp4">
+      <Filter>Ressourcendateien</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\camera_calibration\default.xml">
       <Filter>Ressourcendateien</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\camera_calibration\out_camera_data.yml">
+      <Filter>Ressourcendateien</Filter>
+    </None>
   </ItemGroup>
 </Project>

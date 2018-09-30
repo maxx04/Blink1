@@ -29,7 +29,7 @@ static void help()
 int main( int argc, char** argv )
 {
 
-	int wait_time = 10;
+	int wait_time = 0;
 
     help();
     cv::CommandLineParser parser(argc, argv, "{@input|0|}");
@@ -85,9 +85,9 @@ int main( int argc, char** argv )
 
 		follower_1.transform_Affine();
 
-		wait_time = follower_1.draw();
+		wait_time = follower_1.draw_image();
 
-		follower_1.show();
+		follower_1.show_image();
 
 		follower_1.look_to_aim();
 

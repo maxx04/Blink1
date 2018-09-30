@@ -25,12 +25,15 @@ void keypoints::swap(void)
 	std::swap(current_points, prev_points);
 }
 
+
+///
+
 void keypoints::load_queue(void)
 {
 	Point2f sum = Point2f(0, 0);
 	int number = 0;
 
-	for (size_t i = 0; i < prev_points.size(); i++) // TODO
+	for (int i = 0; i < prev_points.size(); i++) // TODO
 	{
 		
 		// draw berechnete features
@@ -43,11 +46,10 @@ void keypoints::load_queue(void)
 	}
 	sum /= (float)number;
 
-	p_sum.push( sum );
+	p_sum.push( sum ); // vectoren für punkte beladen
 
 	for (size_t i = 0; i < prev_points.size(); i++) // TODO
 	{
-		// draw berechnete features
 		if (status[i] == 1)
 		{
 			//speichere in zeit nur gute punkte
