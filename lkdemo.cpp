@@ -76,28 +76,7 @@ int main( int argc, char** argv )
 			cap >> frame;
 		}
 
-		
-		follower_1.take_picture(&frame);
-
-		follower_1.init_points();
-
-		follower_1.calcOptFlow();
-
-		follower_1.collect_step_vectors();
-
-		follower_1.check_for_followed_points();
-
-		follower_1.transform_Affine();
-
-		follower_1.calculate_move_vectors();
-
-		wait_time = follower_1.draw_image();
-
-		follower_1.show_image();
-
-		follower_1.look_to_aim();
-
-		if (follower_1.key(wait_time)) break;
+		if (follower_1.proceed_frame(&frame)) break;
 
 		if (!cap.isOpened())
 		{

@@ -18,8 +18,9 @@
 #include <opencv2/video/tracking.hpp>
 
 #include "Servos.h"
-#include "opencv_windows/keypoints.h"
+#include "keypoints.h"
 #include "camera_calibration/camera_calibration.h"
+#include "histogram.h"
 
 using namespace cv;
 using namespace std;
@@ -45,7 +46,8 @@ class follower
 
 	Mat Affine;
 	Mat cameraMatrix;
-	keypoints kp; // keypoints in zeit
+	keypoints kp; // keypoints von init_points()
+	histogram  hist; // histogramm für step_vectors in batch
 
 public:
 	follower();
@@ -57,8 +59,10 @@ public:
 	void transform_Affine();
 	void draw_aim_point();
 	void draw_prev_points();
+	void draw_calculated_points();
 	void draw_summ_vector();
 	int draw_image();
+	void draw_point_vectors();
 	void draw_nearest_point();
 	void show_image();
 	void cam_calibrate();
@@ -69,6 +73,8 @@ public:
 
 	int collect_step_vectors();
 	int calculate_move_vectors();
+	// Bearbeitet Frame in schritten
+	bool proceed_frame(Mat* frame);
 };
 
 

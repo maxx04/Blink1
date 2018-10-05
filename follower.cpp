@@ -9,7 +9,6 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 	{
 		AimPoint = Point2f((float)x, (float)(y));
 		setAimPt = true;
-
 	}
 }
 
@@ -20,16 +19,21 @@ follower::follower()
 	winSize = Size(31, 31);
 
 	needToInit = true;
+	hist = histogram(10);
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+
+	/***/
 
 	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
 
 	Mat n = cameraMatrix * vec;
 
 	cout << n << endl;
+
+	/***/
 
 	//#ifndef _ARM
 	namedWindow("LK Demo", 1);
@@ -66,9 +70,10 @@ void follower::take_picture(Mat* frame)
 	fokus.x = (float)(image.cols / 2);
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
 	swap();
+
 	frame->copyTo(image);
 
-	kp.frame_timestamp.push((double)getTickCount());
+	kp.frame_timestamp.push((double)getTickCount()); //wenn video berechnen frames pro sec
 
 	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
@@ -91,7 +96,6 @@ void follower::check_for_followed_points()
 
 void follower::calcOptFlow()
 {
-
 	if (!kp.prev_points.empty())
 	{
 		if (prevGray.empty()) gray.copyTo(prevGray);
@@ -101,11 +105,7 @@ void follower::calcOptFlow()
 
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
-
 		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
-
-		
-
 	}
 }
 
@@ -117,7 +117,7 @@ void follower::transform_Affine()
 
 		//Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 											// umrechnen feautures
-		transform(kp.prev_points, kp.calc[0], Affine);
+		transform(kp.prev_points, kp.calculated_points[0], Affine);
 
 	}
 }
@@ -142,8 +142,14 @@ void follower::draw_prev_points()
 		}
 		else
 			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 0));
+	}
+}
 
-
+void follower::draw_calculated_points()
+{
+	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO
+	{
+			circle(image, (Point)kp.prev_points[i], 4, Scalar(0, 0, 250));
 	}
 }
 
@@ -172,25 +178,20 @@ int follower::draw_image()
 	// draw Zielpunkt wenn gibt es 
 	draw_aim_point();
 
-	double Affine_x = 0.0;
-
-	if (!Affine.empty() && !kp.prev_points.empty()) // Verschiebung x rausnehmen.
-	{
-		Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
-	}
-
-	// aktuelle punkte
 
 
-
-	if (kp.p_sum.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
+	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
 	{
 
 		frame_time = kp.get_queue_time(); //Zeit für Frame holen
 
 		draw_summ_vector();
 
+		draw_point_vectors();
+		
 		draw_nearest_point();
+
+		draw_calculated_points();
 
 		time = 0; // und time 0 stop 
 	}
@@ -200,10 +201,38 @@ int follower::draw_image()
 	return time;
 }
 
+void follower::draw_point_vectors()
+
+{
+
+	for (int i = 0; i < kp.prev_points.size(); i++)
+	{
+		if (kp.status[i] == 1)
+		{
+			
+			Point2f p0, p1;
+
+			p0 = kp.prev_points[i];
+			p1 = Point2f(0, 0);
+
+			while (!kp.step_vector_empty(i))
+			{	
+				p1 = kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+				line(image, (Point)p0, (Point)(p0+p1), Scalar(255, 255, 100));
+				circle(image, (Point)p0, 4, Scalar(0, 255, 0), 1);
+		
+				p0 = p1;
+			};
+
+		}
+
+	}
+
+}
+
 void follower::draw_nearest_point()
 
 {
-	int i = 0;
 	
 	float* move = new float[kp.MAX_COUNT];
 
@@ -212,50 +241,50 @@ void follower::draw_nearest_point()
 	int neahrest_point = 0;
 	bool danger = false;
 
-	for (i = 0; i < kp.prev_points.size(); i++)
-	{
-		if (kp.status[i] == 1)
-		{
-			
-			Point2f p0, p1;
+	//for (int i = 0; i < kp.prev_points.size(); i++)
+	//{
+	//	if (kp.status[i] == 1)
+	//	{
 
-			p0 = Point2f(320, 240); // kp.prev_points[i];
-			p1 = Point2f(0, 0);
+	//		Point2f p0, p1;
 
-			while (!kp.step_vector_queue[i].empty())
-			{
-				
-				p1 += kp.step_vector_queue[i].front(); //HACK entnahme aus queue vector
-				kp.step_vector_queue[i].pop();
-				//line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
-				circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
-				dist += kp.distance(p0, p1);
+	//		p0 = Point2f(320, 240); // kp.prev_points[i];
+	//		p1 = Point2f(0, 0);
 
-				// p0 = p1;
-			};
+	//		while (!kp.step_vector_queue[i].empty())
+	//		{
 
-			move[i] = dist; // Distance für letzten queue_size punkten
+	//			p1 += kp.step_vector_queue[i].front(); //HACK entnahme aus queue vector
+	//			kp.step_vector_queue[i].pop();
+	//			//line(image, (Point)p0, (Point)p1, Scalar(255, 255, 100));
+	//			circle(image, (Point)p0, 1, Scalar(0, 255, 0), 1);
+	//			dist += kp.distance(p0, p1);
 
-			line(image, (Point)p0, (Point)(p1+p0), Scalar(255, 255, 100));
-			
+	//			// p0 = p1;
+	//		};
 
-			if (dist > max_move)
-			{
-				max_move = dist;
-				neahrest_point = i;
-			}
+	//		move[i] = dist; // Distance für letzten queue_size punkten
 
-			dist = 0.0;
-		}
+	//		line(image, (Point)p0, (Point)(p1 + p0), Scalar(255, 255, 100));
 
-	}
 
-	if (max_move > 10.0f) // punkt mit maximalen bewegung markieren
-	{
-		danger = true;
-		// zeichne naeheresten punkt
-		circle(image, (Point)kp.prev_points[neahrest_point], 10, Scalar(0, 0, 200), 3);
-	}
+	//		if (dist > max_move)
+	//		{
+	//			max_move = dist;
+	//			neahrest_point = i;
+	//		}
+
+	//		dist = 0.0;
+	//	}
+
+	//}
+
+	//if (max_move > 10.0f) // punkt mit maximalen bewegung markieren
+	//{
+	//	danger = true;
+	//	// zeichne naeheresten punkt
+	//	circle(image, (Point)kp.prev_points[neahrest_point], 10, Scalar(0, 0, 200), 3);
+	//}
 
 
 
@@ -402,18 +431,58 @@ int follower::find_nearest_point(Point2f pt)
 
 int follower::collect_step_vectors()
 {
-	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
+
 	int number_followed_points = kp.load_step_vectors();
 	return 0;
 }
 
 int follower::calculate_move_vectors()
 {
-	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
-	if (kp.p_sum.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
+	Point2f p;
+
+	for (int i = 0; i < kp.prev_points.size(); i++)
+	{
+		p = kp.current_points[i] - kp.prev_points[i]; //TODO uebertragen in kp opti
+		if (p.x != 0) hist.collect(std::atan2f(p.y,p.x)); // TODO assert
+	}
+
+
+	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
 	{
 
 	}
+	hist.calculate();
 
 	return 0;
+}
+
+
+// Bearbeitet Frame in schritten
+bool follower::proceed_frame(Mat* frame)
+{
+	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
+	take_picture(frame);
+
+	init_points();
+
+	calcOptFlow();
+
+	collect_step_vectors(); //
+
+	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
+	//nur dann collect step vectors.
+
+	transform_Affine();
+
+	calculate_move_vectors(); //wird für jedes Frame zuerst ermittelt mit histogramm
+
+	int wait_time = draw_image();
+
+	show_image();
+
+	look_to_aim();
+
+	if (key(wait_time)) return true;
+
+	return false;
 }

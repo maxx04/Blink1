@@ -48,7 +48,7 @@ int keypoints::load_step_vectors(void)
 
 	}
 
-	if (number != 0) p_sum.push(sum/(float)number); // TODO Assert 0, summandvektor beladen
+	if (number != 0) summ_vector.push(sum/(float)number); // TODO Assert 0, summandvektor beladen
 
 	return number;
 }
@@ -77,8 +77,15 @@ Point2f keypoints::get_next_summ_vector()
 {
 	Point2f sum;
 
-	sum = p_sum.front();
-	p_sum.pop();
+	sum = summ_vector.front();
+	summ_vector.pop();
 
 	return sum;
+}
+
+Point2f keypoints::get_next_step_vector(int i)
+{
+	Point2f p1 = step_vector_queue[i].front(); //HACK entnahme aus queue vector
+	step_vector_queue[i].pop();
+	return p1;
 }

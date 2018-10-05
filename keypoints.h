@@ -13,11 +13,11 @@ class keypoints
 {
 public:
 	const int MAX_COUNT = 300;
-	queue<Point2f> p_sum;
+	queue<Point2f> summ_vector;
 	queue<double> frame_timestamp;
 	vector<Point2f> prev_points; // vorherige punkte
 	vector<Point2f> current_points; // aktuelle punkte
-	vector<Point2f> calc[1]; // berechnete punkte
+	vector<Point2f> calculated_points[1]; // berechnete punkte von vorherigen durch Affine
 	vector<uchar> status; // status vom calcOpticalFlowPyrLK
 	vector<float> err; // error vom calcOpticalFlowPyrLK
 	
@@ -46,7 +46,17 @@ public:
 	{
 		// TODO: Fügen Sie hier Ihren Implementierungscode ein..
 
-		return p_sum.empty();
+		return summ_vector.empty();
+	}
+
+	Point2f get_next_step_vector(int i);
+
+	// gibt aus ob keine summand vektoren mehr gibts
+	bool step_vector_empty(int i)
+	{
+		// TODO: Fügen Sie hier Ihren Implementierungscode ein..
+
+		return step_vector_queue[i].empty();
 	}
 };
 

@@ -27,13 +27,13 @@
     <ClInclude Include="..\follower.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="keypoints.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\camera_calibration\camera_calibration.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="histogram.h">
+    <ClInclude Include="..\histogram.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keypoints.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,13 +50,13 @@
     <ClCompile Include="..\follower.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="keypoints.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\camera_calibration\camera_calibration.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="histogram.cpp">
+    <ClCompile Include="..\histogram.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keypoints.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
