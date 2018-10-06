@@ -5,6 +5,13 @@
 histogram::histogram()
 {
 	values_index = 0;
+	window_width = 300;
+	windows_high = 120;
+	windows_h_offset = 10; //base Histogramm
+	namedWindow("Vectorhistogramm", 1);
+	plotResult.create(windows_high + windows_h_offset, window_width, CV_8UC3);
+	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
+
 }
 
 
@@ -15,6 +22,8 @@ histogram::histogram(int _bins, int _dims ):histogram()
 	
 	range_min = 1e10;
 	range_max = -1e10;
+
+
 }
 
 int histogram::collect(float value)
@@ -64,6 +73,8 @@ int histogram::calculate()
 
 	values_index = 0;
 
+	plot_result(Point(0, 0));
+
 	clear();
 
 	return 0;
@@ -77,3 +88,45 @@ void histogram::clear()
 histogram::~histogram()
 {
 }
+
+void histogram::plot_result(Point p)
+{
+	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
+
+	if (bins == 0)
+	{
+		//TODO Assert hinzufügen
+		cerr << "keine bins in Histogramm" << endl;
+		return;
+	}
+
+	int max = 0;
+
+	for (int i = 0; i < bins; i++)
+	{
+		max = MAX(bins_counters[i], max);
+	}
+
+	if (max == 0)
+	{
+		//TODO Assert hinzufügen
+		cerr << "maximale bin 0" << endl;
+		return;
+	}
+
+	int step = window_width / bins;
+	int top = windows_high - windows_h_offset;
+	float magnification = (float)max / (float)top; //TODO assert
+	
+	//HACK window Koordinaten oben_links
+
+	for (int i = 0; i < bins; i++)
+	{
+		int hi = (int)((float)(bins_counters[i]) / magnification); 
+		rectangle(plotResult, Rect(i*step, top - hi, step, hi), Scalar(0,200,0),-5);
+	}
+	
+	imshow("Vectorhistogramm", plotResult);
+}
+
+
