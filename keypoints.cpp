@@ -5,7 +5,7 @@
 keypoints::keypoints()
 {
 	step_vector_queue = new queue<Point2f>[MAX_COUNT];
-	
+	hist = histogram(60);
 }
 
 
@@ -88,4 +88,43 @@ Point2f keypoints::get_next_step_vector(int i)
 	Point2f p1 = step_vector_queue[i].front(); //HACK entnahme aus queue vector
 	step_vector_queue[i].pop();
 	return p1;
+}
+
+Point2f keypoints::get_mainmove_backgraund_vector()
+{
+	return Point2f();
+}
+
+int keypoints::calculate_move_vectors()
+{
+	Point2f p;
+
+	for (int i = 0; i < prev_points.size(); i++)
+	{
+		p = current_points[i] - prev_points[i]; 
+		if (p.x != 0) hist.collect(std::atan2f(p.y, p.x)); // TODO assert
+	}
+
+	hist.calculate(); 
+
+	//TODO finde hauptdirection: das ist backgraund direction
+	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
+
+	//TODO nach histogram vectorlaenge finden hauptvector laenge
+	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
+
+	//TODO weitere hauptvectors finden drehen um achse roll
+
+	//TODO bei fortbewegegung ueber raeder drehgeschwindigkeit und zeit zwischen frames
+	// kann man finden axiale abstand zwischen frames (gibt es alternativen für quadrakopter?
+	// abstand zwischen zwei frames zu finden?)
+	// dadurch kann man finden abstand zu keypoints
+
+	//TODO rausnehmen den hauptvector aus punktenbewegung dabei wird man sehen eigene bewegung von punkten
+
+
+
+
+
+	return 0;
 }

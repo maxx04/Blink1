@@ -72,8 +72,7 @@ public:
 	int find_nearest_point(Point2f pt);
 
 	int collect_step_vectors();
-	int calculate_move_vectors();
-	// Bearbeitet Frame in schritten
+	// Bearbeitet jedes frame
 	bool proceed_frame(Mat* frame);
 };
 
