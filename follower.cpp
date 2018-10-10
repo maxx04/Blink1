@@ -198,29 +198,25 @@ int follower::draw_image()
 		time = 0; // und time 0 stop und warte auf tastatur
 	}
 
-
-
 	return time;
 }
 
 void follower::draw_point_vectors()
 {
+	Point2f p0, p1;
+	p1 = Point2f(0, 0);
 
 	for (int i = 0; i < kp.prev_points.size(); i++)
 	{
 		if (kp.status[i] == 1)
 		{
-			
-			Point2f p0, p1;
-
 			p0 = kp.prev_points[i];
-			p1 = Point2f(0, 0);
 
 			while (!kp.step_vector_empty(i))
 			{	
-				p1 = kp.get_next_step_vector(i); //HACK entnahme aus queue vector
-				line(image, (Point)p0, (Point)(p0+p1), Scalar(255, 255, 100));
-				circle(image, (Point)p0, 4, Scalar(0, 255, 0), 1);
+				p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+				line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
+				circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 		
 				p0 = p1;
 			};

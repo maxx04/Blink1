@@ -5,7 +5,7 @@
 keypoints::keypoints()
 {
 	step_vector_queue = new queue<Point2f>[MAX_COUNT];
-	hist = histogram(60);
+	hist = histogram(10);
 }
 
 
@@ -58,6 +58,11 @@ float keypoints::distance(Point2f a, Point2f b)
 	return sqrt( pow((a.x - b.x),2) + pow((a.y - b.y),2));
 }
 
+float keypoints::length(Point2f a)
+{
+	return sqrt(pow((a.x), 2) + pow((a.y), 2));
+}
+
 double keypoints::get_queue_time(void)
 {
 	const double timeSec = (frame_timestamp.back() - frame_timestamp.front()) / getTickFrequency();
@@ -98,17 +103,26 @@ Point2f keypoints::get_mainmove_backgraund_vector()
 int keypoints::calculate_move_vectors()
 {
 	Point2f p;
+	const double M_PI = 3.14159265359;
+	float l;
 
 	for (int i = 0; i < prev_points.size(); i++)
 	{
-		p = current_points[i] - prev_points[i]; 
-		if (p.x != 0) hist.collect(std::atan2f(p.y, p.x)); // TODO assert
+		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
+		l = length(p);
+		double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
+		if (p.x != 0.0) 
+			hist.collect(point_satz{ i , (float)d}); // TODO assert
+
 	}
 
-	hist.calculate(); 
+	hist.sort(); 
+	
 
-	//TODO finde hauptdirection: das ist backgraund direction
+	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
+	double d = hist.get_background_move_direction();
+	hist.clear();
 
 	//TODO nach histogram vectorlaenge finden hauptvector laenge
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung

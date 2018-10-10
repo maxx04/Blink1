@@ -35,6 +35,7 @@ public:
 	void swap(void);
 	int load_step_vectors(void);
 	float distance (Point2f a, Point2f b);
+	float length(Point2f a);
 	double get_queue_time(void);
 	vector <Point2f> * get_next_points_addr(void);
 

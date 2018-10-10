@@ -9,6 +9,12 @@
 using namespace std;
 using namespace cv;
 
+struct point_satz
+{
+	int n;
+	float v;
+};
+
 class histogram
 {
 private:
@@ -23,9 +29,10 @@ public:
 	float range_max;
 	float range_min;
 	int bins;
-	vector<float> values;
+	vector<point_satz> values;
 	vector<int> bins_counters;
 	vector<float> bins_borders;
+	vector<point_satz>* bins_group; //punkt nummer in bin
 	int values_index;
 
 	histogram();
@@ -34,8 +41,9 @@ public:
 
 	void plot_result(Point p);
 	
-	int collect(float value);
-	int calculate();
+	int collect(point_satz v);
+	int sort();
+	double get_background_move_direction();
 	void clear();
 
 
