@@ -67,17 +67,12 @@ int histogram::sort()
 	}
 
 
-
-	// values_index = 0;
-
 	plot_result(Point(0, 0));
-
-	// clear(); // loeschen values_vector
 
 	return 0;
 }
 
-double histogram::get_background_move_direction()
+double histogram::get_main_middle_value()
 {
 	// Bedinnungen zu finden: max und daneben 70% punkten, mittelwert finden.
 	// TODO verfinern kriterien
@@ -85,7 +80,7 @@ double histogram::get_background_move_direction()
 
 	for (int n = 1; n < bins; n++)
 	{
-		if (max_counter < bins_counters[n]) max_counter = n; // HACK n-1
+		if (bins_counters[max_counter] < bins_counters[n]) max_counter = n; // HACK n-1
 	}
 
 	int sum = 0;
@@ -115,7 +110,7 @@ double histogram::get_background_move_direction()
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.7) //TODO Assert value index
+	if ((float)sum/(float)values_index < 0.4) //TODO Assert value index
 	{
 		return 0.0;
 	}
@@ -140,6 +135,11 @@ double histogram::get_background_move_direction()
 	
 }
 
+double histogram::get_background_move_length()
+{
+	return 0.0;
+}
+
 void histogram::clear()
 {
 	values.clear();
@@ -152,9 +152,8 @@ void histogram::clear()
 	for (int i = 0; i < bins; i++)
 	{
 		bins_group[i].clear();
-//		bins_counters[i] = 0; // clear histogramm values
 	}
-	
+
 }
 
 histogram::~histogram()

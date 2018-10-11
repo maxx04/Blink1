@@ -18,6 +18,7 @@ void keypoints::clear(void)
 {
 	prev_points.clear();
 	current_points.clear();
+
 }
 
 void keypoints::swap(void)
@@ -104,12 +105,12 @@ int keypoints::calculate_move_vectors()
 {
 	Point2f p;
 	const double M_PI = 3.14159265359;
-	float l;
+
 
 	for (int i = 0; i < prev_points.size(); i++)
 	{
 		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
-		l = length(p);
+
 		double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
 		if (p.x != 0.0) 
 			hist.collect(point_satz{ i , (float)d}); // TODO assert
@@ -121,11 +122,24 @@ int keypoints::calculate_move_vectors()
 
 	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
-	double d = hist.get_background_move_direction();
+	double d = hist.get_main_middle_value();
 	hist.clear();
 
 	//TODO nach histogram vectorlaenge finden hauptvector laenge
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
+
+	float l;
+
+	for (int i = 0; i < prev_points.size(); i++)
+	{
+		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
+		l = length(p);
+		hist.collect(point_satz{ i , (float)l }); //
+	}
+
+	hist.sort();
+	double v = hist.get_main_middle_value();
+	hist.clear();
 
 	//TODO weitere hauptvectors finden drehen um achse roll
 
@@ -140,5 +154,5 @@ int keypoints::calculate_move_vectors()
 
 
 
-	return 0;
+ 	return 0;
 }
