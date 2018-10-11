@@ -104,6 +104,7 @@ Point2f keypoints::get_mainmove_backgraund_vector()
 int keypoints::calculate_move_vectors()
 {
 	Point2f p;
+	Point2f main;
 	const double M_PI = 3.14159265359;
 
 
@@ -141,6 +142,9 @@ int keypoints::calculate_move_vectors()
 	double v = hist.get_main_middle_value();
 	hist.clear();
 
+	main.y = cos(d * M_PI * 2.0 / 360.0 )*v;
+	main.x = sin(d * M_PI * 2.0 / 360.0 )*v; //HACK 90 Grad verdreht
+
 	//TODO weitere hauptvectors finden drehen um achse roll
 
 	//TODO bei fortbewegegung ueber raeder drehgeschwindigkeit und zeit zwischen frames
@@ -154,5 +158,5 @@ int keypoints::calculate_move_vectors()
 
 
 
- 	return 0;
+  	return 0;
 }
