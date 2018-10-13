@@ -44,7 +44,6 @@ public:
 	int collect(point_satz v);
 	int sort();
 	double get_main_middle_value();
-	double get_background_move_length();
 	void clear();
 
 

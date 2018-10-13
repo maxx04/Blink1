@@ -62,7 +62,7 @@ public:
 	void draw_calculated_points();
 	void draw_summ_vector();
 	int draw_image();
-	void draw_point_vectors();
+	void draw_step_vectors();
 	void draw_nearest_point();
 	void show_image();
 	void cam_calibrate();

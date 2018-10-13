@@ -45,7 +45,7 @@ int histogram::sort()
 	bins_borders[0] = range_min;
 	float step = (range_max - range_min) / (float)bins;
 
-	if (step == 0.0) return 0;
+	//if (step == 0.0) return 0;
 
 	for (int n = 0; n < bins+1; n++)
 	{
@@ -110,7 +110,7 @@ double histogram::get_main_middle_value()
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.6) //TODO Assert value index
+	if ((float)sum/(float)values_index < 0.0) //TODO Assert value index
 	{
 		return 0.0;
 	}
@@ -135,10 +135,7 @@ double histogram::get_main_middle_value()
 	
 }
 
-double histogram::get_background_move_length()
-{
-	return 0.0;
-}
+
 
 void histogram::clear()
 {

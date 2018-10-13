@@ -126,7 +126,7 @@ void follower::transform_Affine()
 
 void follower::draw_aim_point()
 {
-	if (number_aim_point >= 0)
+	if (number_aim_point >= 0 && number_aim_point <= kp.current_points.size()) //TODO manchmal nummer out of size
 
 		circle(image, (Point)kp.current_points[number_aim_point], 16, Scalar(0, 0, 255), 3);
 
@@ -143,7 +143,7 @@ void follower::draw_prev_points()
 			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 255));
 		}
 		else
-			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 0));
+			circle(image, (Point)kp.prev_points[i], 8, Scalar(255, 0, 0));
 	}
 }
 
@@ -189,7 +189,7 @@ int follower::draw_image()
 
 		draw_summ_vector();
 
-		draw_point_vectors();
+		draw_step_vectors();
 		
 		draw_nearest_point();
 
@@ -201,27 +201,28 @@ int follower::draw_image()
 	return time;
 }
 
-void follower::draw_point_vectors()
+void follower::draw_step_vectors() // batch
 {
 	Point2f p0, p1;
 	p1 = Point2f(0, 0);
 
 	for (int i = 0; i < kp.prev_points.size(); i++)
 	{
-		if (kp.status[i] == 1)
-		{
+		//if (kp.status[i] == 1)
+		//{
 			p0 = kp.prev_points[i];
 
 			while (!kp.step_vector_empty(i))
 			{	
 				p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+				
 				line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
 				circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 		
 				p0 = p1;
 			};
 
-		}
+		//}
 
 	}
 
@@ -380,7 +381,7 @@ int follower::find_nearest_point(Point2f pt)
 int follower::collect_step_vectors()
 {
 
-	int number_followed_points = kp.load_step_vectors();
+	int number_followed_points = kp.save_step_vectors();
 	return 0;
 }
 

@@ -4,7 +4,7 @@
 
 keypoints::keypoints()
 {
-	step_vector_queue = new queue<Point2f>[MAX_COUNT];
+	step_vector = new vector<Point2f>[MAX_COUNT];
 	hist = histogram(10);
 }
 
@@ -29,27 +29,23 @@ void keypoints::swap(void)
 
 ///
 
-int keypoints::load_step_vectors(void)
+int keypoints::save_step_vectors(void)
 {
-	Point2f step,sum = Point2f(0, 0);
+	Point2f step;
 	int number = 0;
 
 
 	for (size_t i = 0; i < prev_points.size(); i++) 
 	{
-		if (status[i] == 1)
-		{
+		//if (status[i] == 1)
+		//{
 			//speichere in zeit nur gute punkte
-			//points_queue[i].push(current_points[i] - prev_points[i] - sum );
 			step = (current_points[i] - prev_points[i]);
-			sum += step;
 			number++;
-			step_vector_queue[i].push(step); // step vektor beladen
-		}
+			step_vector[i].push_back(step); // step vektor beladen
+		//}
 
 	}
-
-	if (number != 0) summ_vector.push(sum/(float)number); // TODO Assert 0, summandvektor beladen
 
 	return number;
 }
@@ -91,8 +87,8 @@ Point2f keypoints::get_next_summ_vector()
 
 Point2f keypoints::get_next_step_vector(int i)
 {
-	Point2f p1 = step_vector_queue[i].front(); //HACK entnahme aus queue vector
-	step_vector_queue[i].pop();
+	Point2f p1 = step_vector[i].front(); //HACK entnahme aus queue vector
+	step_vector[i].pop_back();
 	return p1;
 }
 
@@ -101,16 +97,16 @@ Point2f keypoints::get_mainmove_backgraund_vector()
 	return Point2f();
 }
 
-int keypoints::calculate_move_vectors()
+int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 {
-	Point2f p;
-	Point2f main;
+	Point2f p,main,tmp;
+	
 	const double M_PI = 3.14159265359;
 
 
 	for (int i = 0; i < prev_points.size(); i++)
 	{
-		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
+		p =  current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
 
 		double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
 		if (p.x != 0.0) 
@@ -155,8 +151,15 @@ int keypoints::calculate_move_vectors()
 	//TODO rausnehmen den hauptvector aus punktenbewegung dabei wird man sehen eigene bewegung von punkten
 
 
+	summ_vector.push(main);
 
+	for (int i = 0; i < prev_points.size(); i++)
+	{
 
+		tmp = step_vector[i].back();
+		step_vector[i].pop_back();
+		step_vector[i].push_back(tmp-main);
 
+	}
   	return 0;
 }
