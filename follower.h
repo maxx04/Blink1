@@ -27,11 +27,11 @@ using namespace std;
 
 class follower
 {
-	const int step_butch = 5; // anzahl frames die auf block werden bearbeitet.
+	const int step_butch = 1; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
-	float pixel_pro_step = 8.0;
+	float pixel_pro_step = 8.0; //TODO loeschen
 
 	Point2f fokus;
 	int number_aim_point = -1;
@@ -60,12 +60,14 @@ public:
 	void draw_aim_point();
 	void draw_prev_points();
 	void draw_calculated_points();
+	void draw_main_points();
 	void draw_summ_vector();
 	int draw_image();
 	void draw_step_vectors();
 	void draw_nearest_point();
 	void show_image();
 	void cam_calibrate();
+	void calculate_move_vectors();
 	void swap();
 	bool key(int wait);
 	void look_to_aim();

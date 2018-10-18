@@ -72,11 +72,12 @@ int histogram::sort()
 	return 0;
 }
 
-double histogram::get_main_middle_value()
+double histogram::get_main_middle_value(vector<int>* main_points)
 {
 	// Bedinnungen zu finden: max und daneben 70% punkten, mittelwert finden.
 	// TODO verfinern kriterien
 	int max_counter = 0;
+	main_points->clear();
 
 	for (int n = 1; n < bins; n++)
 	{
@@ -110,7 +111,7 @@ double histogram::get_main_middle_value()
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.0) //TODO Assert value index
+	if ((float)sum/(float)values_index < 0.6) //TODO Assert value index
 	{
 		return 0.0;
 	}
@@ -123,6 +124,7 @@ double histogram::get_main_middle_value()
 			for (point_satz s : bins_group[max_bins[i]]) // 
 			{
 				result += s.v;
+				main_points->push_back(s.n);
 				++n; //HACK 2 Grad + 358 Grad Mitte gibt 180 Grad
 			}
 

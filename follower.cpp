@@ -54,7 +54,7 @@ void follower::init_points()
 		kp.clear();
 
 		//finde features
-		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.05, 12, Mat(), 5, 5, 0, 0.04);
+		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.02, 12, Mat(), 5, 5, 0, 0.04);
 
 		//refine position
 		cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
@@ -90,9 +90,11 @@ void follower::check_for_followed_points()
 	{
 		if (kp.status[i] == 1) number_followed_points++;
 	}
-	if (number_followed_points < 100) // wenn weniger als 100 Punkten dann neue Punkte erstellen.
+	if (number_followed_points < 10) // TODO 100 als parameter
+		//wenn weniger als 100 Punkten dann neue Punkte erstellen.
 	{
 		needToInit = true;
+		//TODO sauberes vorherige naechste punkte generieren 
 	}
 }
 
@@ -108,6 +110,9 @@ void follower::calcOptFlow()
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
 		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
+		//Was ich eigentlich tue
+
+		cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
 	}
 }
 
@@ -149,9 +154,17 @@ void follower::draw_prev_points()
 
 void follower::draw_calculated_points()
 {
-	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO
+	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
 	{
-			circle(image, (Point)kp.prev_points[i], 4, Scalar(0, 0, 250));
+			circle(image, (Point)kp.calculated_points[0][i], 4, Scalar(0, 0, 250));
+	}
+}
+
+void follower::draw_main_points()
+{
+	for (size_t i = 0; i < kp.main_points.size(); i++) // TODO
+	{
+		circle(image, (Point)kp.prev_points[kp.main_points[i]], 7, Scalar(0, 0, 250));
 	}
 }
 
@@ -180,6 +193,8 @@ int follower::draw_image()
 	// draw Zielpunkt wenn gibt es 
 	draw_aim_point();
 
+	//Draw die Punkte die entsprechen hintegrundvector
+	draw_main_points();
 
 
 	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
@@ -285,6 +300,13 @@ void follower::cam_calibrate()
 	return;
 }
 
+void follower::calculate_move_vectors()
+{
+	kp.calculate_move_vectors();
+	Point2f main = kp.summ_vector.back();
+	cout << "main: " << main.x << " - " << main.y << endl << endl;
+}
+
 void follower::swap()
 {
 	kp.swap();
@@ -363,10 +385,11 @@ int follower::find_nearest_point(Point2f pt)
 	Point2f v;
 	int n = 0; //TODO wenn 0 bearbeiten
 
-	for (int i = 0; i < kp.prev_points.size(); i++)
+	n = 0;
+	for (int i = 0; i < kp.current_points.size(); i++)
 	{
 		// draw berechnete features
-		v = kp.prev_points[i] - pt;
+		v = kp.current_points[i] - pt;
 		d = v.x*v.x + v.y*v.y;
 		if (d < dist && kp.status[i] == 1)
 		{
@@ -404,7 +427,7 @@ bool follower::proceed_frame(Mat* frame)
 
 	transform_Affine();
 
-	kp.calculate_move_vectors();
+	calculate_move_vectors();
 
 	int wait_time = draw_image();
 

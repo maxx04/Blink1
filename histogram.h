@@ -43,7 +43,7 @@ public:
 	
 	int collect(point_satz v);
 	int sort();
-	double get_main_middle_value();
+	double get_main_middle_value( vector<int>* main_points);
 	void clear();
 
 

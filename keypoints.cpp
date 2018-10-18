@@ -119,7 +119,7 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
-	double d = hist.get_main_middle_value();
+	double d = hist.get_main_middle_value(&main_points);
 	hist.clear();
 
 	//TODO nach histogram vectorlaenge finden hauptvector laenge
@@ -135,7 +135,7 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 	}
 
 	hist.sort();
-	double v = hist.get_main_middle_value();
+	double v = hist.get_main_middle_value(&main_points);
 	hist.clear();
 
 	main.y = cos(d * M_PI * 2.0 / 360.0 )*v;
@@ -152,6 +152,7 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 
 	summ_vector.push(main);
+
 
 	for (int i = 0; i < prev_points.size(); i++)
 	{
