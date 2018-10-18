@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>$(OPENCV_BUILD)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;$(OPENCV_DIR)\bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OPENCV_BUILD)\lib\$(Configuration);$(OPENCV_BUILD)\bin\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world341d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
