@@ -46,23 +46,18 @@ follower::~follower()
 {
 }
 
-void follower::init_points()
+void follower::find_keypoints()
 {
-	if (needToInit)
-	{
-		// automatic initialization
-		kp.clear();
 
-		//finde features
-		goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.02, 12, Mat(), 5, 5, 0, 0.04);
+	// automatic initialization
+	kp.clear();
 
-		//refine position
-		cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
+	//finde features
+	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.02, 12, Mat(), 5, 5, 0, 0.04);
 
+	//refine position
+	cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
 
-
-		needToInit = false;
-	}
 }
 
 void follower::take_picture(Mat* frame)
@@ -88,9 +83,9 @@ void follower::check_for_followed_points()
 	// TODO nur die Punkte aufnehmen?
 	for (int i : kp.status)
 	{
-		if (kp.status[i] == 1) number_followed_points++;
+		if (i == 1) number_followed_points++;
 	}
-	if (number_followed_points < 10) // TODO 100 als parameter
+	if (number_followed_points < 250) // TODO 100 als parameter
 		//wenn weniger als 100 Punkten dann neue Punkte erstellen.
 	{
 		needToInit = true;
@@ -156,15 +151,15 @@ void follower::draw_calculated_points()
 {
 	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
 	{
-			circle(image, (Point)kp.calculated_points[0][i], 4, Scalar(0, 0, 250));
+		circle(image, (Point)kp.calculated_points[0][i], 4, Scalar(0, 0, 250));
 	}
 }
 
 void follower::draw_main_points()
 {
-	for (size_t i = 0; i < kp.main_points.size(); i++) // TODO
+	for (size_t i = 0; i < kp.background_points.size(); i++) // TODO
 	{
-		circle(image, (Point)kp.prev_points[kp.main_points[i]], 7, Scalar(0, 0, 250));
+		circle(image, (Point)kp.prev_points[kp.background_points[i]], 7, Scalar(0, 0, 250));
 	}
 }
 
@@ -188,7 +183,7 @@ int follower::draw_image()
 
 
 	// draw previous punkte 
-	draw_prev_points();
+	// draw_prev_points();
 
 	// draw Zielpunkt wenn gibt es 
 	draw_aim_point();
@@ -205,10 +200,10 @@ int follower::draw_image()
 		draw_summ_vector();
 
 		draw_step_vectors();
-		
+
 		draw_nearest_point();
 
-		draw_calculated_points();
+		//	draw_calculated_points();
 
 		time = 0; // und time 0 stop und warte auf tastatur
 	}
@@ -225,17 +220,17 @@ void follower::draw_step_vectors() // batch
 	{
 		//if (kp.status[i] == 1)
 		//{
-			p0 = kp.prev_points[i];
+		p0 = kp.prev_points[i];
 
-			while (!kp.step_vector_empty(i))
-			{	
-				p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
-				
-				line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
-				circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
-		
-				p0 = p1;
-			};
+		while (!kp.step_vector_empty(i))
+		{
+			p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+
+			line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
+			circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
+
+			p0 = p1;
+		};
 
 		//}
 
@@ -246,7 +241,7 @@ void follower::draw_step_vectors() // batch
 void follower::draw_nearest_point()
 
 {
-	
+
 	float* move = new float[kp.MAX_COUNT];
 
 	float dist = 0.0f;
@@ -416,7 +411,13 @@ bool follower::proceed_frame(Mat* frame)
 	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
 	take_picture(frame);
 
-	init_points();
+	if (needToInit)
+	{
+		find_keypoints();
+		needToInit = false;
+		kp.swap();
+		return false;
+	}
 
 	calcOptFlow();
 

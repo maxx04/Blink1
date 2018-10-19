@@ -77,7 +77,7 @@ int main( int argc, char** argv )
 		}
 
 		if (follower_1.proceed_frame(&frame)) break;
-
+		
 		if (!cap.isOpened())
 		{
 			if (input.size() == 1 && isdigit(input[0]))

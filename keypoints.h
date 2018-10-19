@@ -30,7 +30,7 @@ public:
 	histogram hist; //histogramm zum finden vom backgraund move vector
 	//TODO spaeter soll man gruppieren punkte und zuordnen zu bewegungsteilen
 
-	vector<int> main_points; // die punkten die zum hintergrund gehoeren
+	vector<int> background_points; // die punkten die zum hintergrund gehoeren
 					
 	keypoints();
 	~keypoints();
