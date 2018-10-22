@@ -27,7 +27,7 @@ using namespace std;
 
 class follower
 {
-	const int step_butch = 1; // anzahl frames die auf block werden bearbeitet.
+	const int step_butch = 10; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
@@ -59,6 +59,7 @@ public:
 	void transform_Affine();
 	void draw_aim_point();
 	void draw_prev_points();
+	void draw_current_points();
 	void draw_calculated_points();
 	void draw_main_points();
 	void draw_summ_vector();

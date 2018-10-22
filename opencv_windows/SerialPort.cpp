@@ -44,6 +44,7 @@ SerialPort::SerialPort(const char *portName)
 				this->connected = true;
 				PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
 				Sleep(ARDUINO_WAIT_TIME);
+				printf("Bluetooth connected\n");
 			}
 		}
 	}
@@ -73,7 +74,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 	if (ReadFile(this->handler, buffer, toRead, &bytesRead, NULL))
 	{
-		//printf("%s\r\n", buffer);
+		printf("%s\r\n", buffer);
 		return bytesRead;
 	}
 	

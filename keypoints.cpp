@@ -87,7 +87,7 @@ Point2f keypoints::get_next_summ_vector()
 
 Point2f keypoints::get_next_step_vector(int i)
 {
-	Point2f p1 = step_vector[i].front(); //HACK entnahme aus queue vector
+	Point2f p1 = step_vector[i].back(); //HACK entnahme aus queue vector
 	step_vector[i].pop_back();
 	return p1;
 }
@@ -159,7 +159,7 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 		tmp = step_vector[i].back();
 		step_vector[i].pop_back();
-		step_vector[i].push_back(tmp-main);
+		step_vector[i].push_back(-(tmp-main)); //TODO Richtung richtig verwenden 
 
 	}
   	return 0;

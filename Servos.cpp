@@ -5,7 +5,7 @@
 
 Servos::Servos()
 {
-	portName = "\\\\.\\COM7";
+	portName = "\\\\.\\COM4";
 	servo_delta = 1.0f;
 	sp = new SerialPort(portName);
 	max_position.x = 1900.0;
@@ -51,6 +51,7 @@ void Servos::correction(Point2f p)
 
 void Servos::move_to_position(Point2f p)
 {
+	// wenn nichts gelesen ist
 	if (sp->readSerialPort(m, 2) < 2 && in_move) return;
 	position = p;
 	position.x = (position.x > max_position.x) ? max_position.x : position.x;

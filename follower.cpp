@@ -80,17 +80,12 @@ void follower::check_for_followed_points()
 	int number_followed_points = 0;
 
 	// die punkte die kann man volgen werden gezählt 
-	// TODO nur die Punkte aufnehmen?
 	for (int i : kp.status)
 	{
 		if (i == 1) number_followed_points++;
 	}
-	if (number_followed_points < 250) // TODO 100 als parameter
-		//wenn weniger als 100 Punkten dann neue Punkte erstellen.
-	{
-		needToInit = true;
-		//TODO sauberes vorherige naechste punkte generieren 
-	}
+	//wenn weniger als 100 Punkten dann neue Punkte erstellen.
+	if (number_followed_points < 200) needToInit = true; // TODO 100 als parameter
 }
 
 void follower::calcOptFlow()
@@ -107,7 +102,7 @@ void follower::calcOptFlow()
 		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
 		//Was ich eigentlich tue
 
-		cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
+//		cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
 	}
 }
 
@@ -140,10 +135,18 @@ void follower::draw_prev_points()
 		// draw berechnete features
 		if (kp.status[i] == 1)
 		{
-			circle(image, (Point)kp.prev_points[i], 4, Scalar(255, 0, 255));
+			circle(image, (Point)kp.prev_points[i], 3, Scalar(255, 0, 255));
 		}
 		else
-			circle(image, (Point)kp.prev_points[i], 8, Scalar(255, 0, 0));
+			circle(image, (Point)kp.prev_points[i], 3, Scalar(255, 0, 0));
+	}
+}
+
+void follower::draw_current_points()
+{
+	for (Point2f p : kp.current_points)
+	{
+			circle(image, (Point)p, 3, Scalar(255, 250, 0));
 	}
 }
 
@@ -159,7 +162,7 @@ void follower::draw_main_points()
 {
 	for (size_t i = 0; i < kp.background_points.size(); i++) // TODO
 	{
-		circle(image, (Point)kp.prev_points[kp.background_points[i]], 7, Scalar(0, 0, 250));
+		circle(image, (Point)kp.prev_points[kp.background_points[i]], 7, Scalar(0, 200, 0));
 	}
 }
 
@@ -181,10 +184,6 @@ int follower::draw_image()
 {
 	int time = 10; //ms
 
-
-	// draw previous punkte 
-	// draw_prev_points();
-
 	// draw Zielpunkt wenn gibt es 
 	draw_aim_point();
 
@@ -201,11 +200,18 @@ int follower::draw_image()
 
 		draw_step_vectors();
 
+		draw_prev_points();
+
+		draw_current_points();
+
 		draw_nearest_point();
 
 		//	draw_calculated_points();
 
+		check_for_followed_points();
+
 		time = 0; // und time 0 stop und warte auf tastatur
+
 	}
 
 	return time;
@@ -227,7 +233,7 @@ void follower::draw_step_vectors() // batch
 			p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
 
 			line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
-			circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
+			//circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 
 			p0 = p1;
 		};
@@ -299,7 +305,7 @@ void follower::calculate_move_vectors()
 {
 	kp.calculate_move_vectors();
 	Point2f main = kp.summ_vector.back();
-	cout << "main: " << main.x << " - " << main.y << endl << endl;
+	//cout << "main: " << main.x << " - " << main.y << endl << endl;
 }
 
 void follower::swap()
@@ -403,8 +409,6 @@ int follower::collect_step_vectors()
 	return 0;
 }
 
-
-
 // Bearbeitet Frame in schritten
 bool follower::proceed_frame(Mat* frame)
 {
@@ -421,10 +425,10 @@ bool follower::proceed_frame(Mat* frame)
 
 	calcOptFlow();
 
-	collect_step_vectors(); //
-
-	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
+//	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.
+
+	collect_step_vectors(); //
 
 	transform_Affine();
 

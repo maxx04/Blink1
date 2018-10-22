@@ -79,12 +79,6 @@
       <SubType>Designer</SubType>
     </Xml>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\camera_calibration\out_camera_data.yml">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

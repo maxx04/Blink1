@@ -76,9 +76,4 @@
       <Filter>Ressourcendateien</Filter>
     </Xml>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\camera_calibration\out_camera_data.yml">
-      <Filter>Ressourcendateien</Filter>
-    </None>
-  </ItemGroup>
 </Project>

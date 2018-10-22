@@ -102,7 +102,7 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 	}
 	else
 	{
-		max_bins[0] = max_counter - 1;
+		max_bins[0] = max_counter  - 1;
 		max_bins[1] = max_counter;
 		max_bins[2] = max_counter + 1;
 	}
@@ -111,7 +111,7 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.3) //TODO Assert value index
+	if ((float)sum/(float)values_index < 0.6) //TODO Assert value index
 	{
 		return 0.0;
 	}
