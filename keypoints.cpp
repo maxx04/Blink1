@@ -100,8 +100,10 @@ Point2f keypoints::get_mainmove_backgraund_vector()
 int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 {
 	Point2f p,main,tmp;
-	
+
+#ifndef _ARM
 	const double M_PI = 3.14159265359;
+#endif // !ARM
 
 
 	for (int i = 0; i < prev_points.size(); i++)

@@ -232,7 +232,7 @@ void follower::draw_step_vectors() // batch
 		{
 			p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
 
-			line(image, (Point)p0, (Point)(p1), Scalar(255, 255, 100));
+			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 170));
 			//circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 
 			p0 = p1;

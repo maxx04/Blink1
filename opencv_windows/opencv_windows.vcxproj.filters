@@ -27,9 +27,6 @@
     <ClInclude Include="..\follower.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\camera_calibration\camera_calibration.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\histogram.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>

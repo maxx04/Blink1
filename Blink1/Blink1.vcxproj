@@ -7,15 +7,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\camera_calibration\camera_calibration.cpp" />
     <ClCompile Include="..\follower.cpp" />
+    <ClCompile Include="..\histogram.cpp" />
+    <ClCompile Include="..\keypoints.cpp" />
     <ClCompile Include="..\lkdemo.cpp" />
     <ClCompile Include="..\Servos.cpp" />
     <ClCompile Include="SerialPort.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\camera_calibration\camera_calibration.h" />
     <ClInclude Include="..\follower.h" />
+    <ClInclude Include="..\histogram.h" />
+    <ClInclude Include="..\keypoints.h" />
     <ClInclude Include="..\SerialPort.h" />
     <ClInclude Include="..\Servos.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\camera_calibration\default.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\test1.mp4" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>

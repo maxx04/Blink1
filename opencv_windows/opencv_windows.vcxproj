@@ -52,7 +52,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\camera_calibration\camera_calibration.h" />
     <ClInclude Include="..\follower.h" />
     <ClInclude Include="..\histogram.h" />
     <ClInclude Include="..\keypoints.h" />

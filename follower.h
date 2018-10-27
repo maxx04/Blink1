@@ -31,7 +31,7 @@ class follower
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
-	float pixel_pro_step = 8.0; //TODO loeschen
+	float pixel_pro_step = 8.0; // TODO Übertragen in Servo?
 
 	Point2f fokus;
 	int number_aim_point = -1;
