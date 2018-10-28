@@ -19,6 +19,7 @@ follower::follower()
 	winSize = Size(31, 31);
 
 	needToInit = true;
+	step_butch = 10;
 
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };

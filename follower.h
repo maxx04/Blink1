@@ -27,7 +27,7 @@ using namespace std;
 
 class follower
 {
-	const int step_butch = 10; // anzahl frames die auf block werden bearbeitet.
+	int step_butch; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 	
