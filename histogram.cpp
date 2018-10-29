@@ -7,17 +7,19 @@ histogram::histogram()
 	values_index = 0;
 	window_width = 300;
 	windows_high = 120;
+	mean = 0;
 	windows_h_offset = 10; //base Histogramm
-	namedWindow("Vectorhistogramm", 1);
+	//namedWindow("Vectorhistogramm", 1);
 	plotResult.create(windows_high + windows_h_offset, window_width, CV_8UC3);
 	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
 }
 
 
-histogram::histogram(int _bins, int _dims ):histogram()
+histogram::histogram(int _bins, string _name, int _dims ):histogram()
 {
 	bins = _bins;
 	dims = _dims;
+	name = _name;
 	
 	range_min = 1e10;
 	range_max = -1e10;
@@ -32,7 +34,9 @@ int histogram::collect(point_satz value)
 
 	values.push_back(value); // index == punkt_nr
 	values_index++;
-
+	mean = ((mean*(values_index - 1)) + value.v) / values_index;
+		// ('previous mean' * '(count -1)') + 'new value') / 'count'
+	
 	return values_index;
 }
 
@@ -143,6 +147,7 @@ void histogram::clear()
 {
 	values.clear();
 	values_index = 0;
+	mean = 0;
 	bins_counters.clear();
 
 	range_min = 1e10;
@@ -198,7 +203,7 @@ void histogram::plot_result(Point p)
 		rectangle(plotResult, Rect(i*step, top - hi, step, hi), Scalar(0,200,0),-5);
 	}
 	
-	imshow("Vectorhistogramm", plotResult);
+	imshow(name, plotResult);
 }
 
 

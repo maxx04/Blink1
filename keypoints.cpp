@@ -5,7 +5,8 @@
 keypoints::keypoints()
 {
 	step_vector = new vector<Point2f>[MAX_COUNT];
-	hist = histogram(10);
+	hist = histogram(120, "winkel");
+	hist_l = histogram(50, "length");
 }
 
 
@@ -116,6 +117,9 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 	}
 
+	hist.range_min = 0;
+	hist.range_max = 360;
+
 	hist.sort(); 
 	
 
@@ -133,12 +137,17 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 	{
 		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
 		l = length(p);
-		hist.collect(point_satz{ i , (float)l }); //
+		hist_l.collect(point_satz{ i , (float)l }); //
 	}
 
-	hist.sort();
-	double v = hist.get_main_middle_value(&background_points);
-	hist.clear();
+	hist_l.range_min = hist_l.mean - hist_l.mean * 0.5;
+	hist_l.range_max = hist_l.mean + hist_l.mean * 0.5;
+
+	hist_l.sort();
+
+	double v = hist_l.get_main_middle_value(&background_points);
+
+	hist_l.clear();
 
 	main.y = cos(d * M_PI * 2.0 / 360.0 )*v;
 	main.x = sin(d * M_PI * 2.0 / 360.0 )*v; //HACK 90 Grad verdreht

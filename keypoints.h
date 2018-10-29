@@ -27,7 +27,8 @@ public:
 	vector<Point2f>* step_vector; // step_vector von prev_points zu current_points
 							// in vector geladen jedes mal nach aufruf load_step_vectors
 
-	histogram hist; //histogramm zum finden vom backgraund move vector
+	histogram hist; //histogramm zum finden vom background move vector
+	histogram hist_l;
 	//TODO spaeter soll man gruppieren punkte und zuordnen zu bewegungsteilen
 
 	vector<int> background_points; // die punkten die zum hintergrund gehoeren

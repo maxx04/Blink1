@@ -29,14 +29,16 @@ public:
 	float range_max;
 	float range_min;
 	int bins;
+	string name;
 	vector<point_satz> values;
 	vector<int> bins_counters;
 	vector<float> bins_borders;
 	vector<point_satz>* bins_group; //punkt nummer in bin
 	int values_index;
+	float mean;
 
 	histogram();
-	histogram(int bins, int dims = 1);
+	histogram(int bins, string name, int dims = 1 );
 	~histogram();
 
 	void plot_result(Point p);

@@ -19,7 +19,7 @@ follower::follower()
 	winSize = Size(31, 31);
 
 	needToInit = true;
-	step_butch = 10;
+	step_butch = 1;
 
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
@@ -173,7 +173,7 @@ void follower::draw_summ_vector()
 	p2 = fokus;
 	while (!kp.summ_queue_empty())
 	{
-		p3 = p2 + 1.0 * kp.get_next_summ_vector();
+		p3 = p2 + 5.0 * kp.get_next_summ_vector();
 
 		line(image, (Point)p2, (Point)p3, Scalar(0, 0, 200), 3);
 		circle(image, (Point)p2, 3, Scalar(0, 255, 0), 1);
@@ -231,7 +231,7 @@ void follower::draw_step_vectors() // batch
 
 		while (!kp.step_vector_empty(i))
 		{
-			p1 = p0 + kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+			p1 = p0 + 5*kp.get_next_step_vector(i); //HACK entnahme aus queue vector
 
 			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 170));
 			//circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
