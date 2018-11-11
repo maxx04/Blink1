@@ -14,7 +14,6 @@ histogram::histogram()
 	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
 }
 
-
 histogram::histogram(int _bins, string _name, int _dims ):histogram()
 {
 	bins = _bins;
@@ -115,7 +114,7 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.6) //TODO Assert value index
+	if ((float)sum/(float)values_index < 0.1) //TODO Assert value index
 	{
 		return 0.0;
 	}
@@ -140,8 +139,6 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 
 	
 }
-
-
 
 void histogram::clear()
 {

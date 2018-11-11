@@ -20,6 +20,7 @@ follower::follower()
 
 	needToInit = true;
 	step_butch = 1;
+	magnify_vektor_draw = 5;
 
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
@@ -115,7 +116,7 @@ void follower::transform_Affine()
 
 		//Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 											// umrechnen feautures
-		transform(kp.prev_points, kp.calculated_points[0], Affine);
+	//	transform(kp.prev_points, kp.calculated_points[0], Affine);
 
 	}
 }
@@ -171,9 +172,10 @@ void follower::draw_summ_vector()
 {
 	Point2f p1, p2, p3;
 	p2 = fokus;
+
 	while (!kp.summ_queue_empty())
 	{
-		p3 = p2 + 5.0 * kp.get_next_summ_vector();
+		p3 = p2 + magnify_vektor_draw * kp.get_next_summ_vector();
 
 		line(image, (Point)p2, (Point)p3, Scalar(0, 0, 200), 3);
 		circle(image, (Point)p2, 3, Scalar(0, 255, 0), 1);
@@ -209,7 +211,7 @@ int follower::draw_image()
 
 		//	draw_calculated_points();
 
-		check_for_followed_points();
+
 
 		time = 0; // und time 0 stop und warte auf tastatur
 
@@ -225,21 +227,18 @@ void follower::draw_step_vectors() // batch
 
 	for (int i = 0; i < kp.prev_points.size(); i++)
 	{
-		//if (kp.status[i] == 1)
-		//{
+
 		p0 = kp.prev_points[i];
 
 		while (!kp.step_vector_empty(i))
 		{
-			p1 = p0 + 5*kp.get_next_step_vector(i); //HACK entnahme aus queue vector
-
-			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 170));
+			//p1 = p0 + magnif * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+			p1 = p0 + magnify_vektor_draw * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 250));
 			//circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 
 			p0 = p1;
 		};
-
-		//}
 
 	}
 
@@ -305,7 +304,7 @@ void follower::cam_calibrate()
 void follower::calculate_move_vectors()
 {
 	kp.calculate_move_vectors();
-	Point2f main = kp.summ_vector.back();
+	main_of_frame = kp.summ_vector.back();
 	//cout << "main: " << main.x << " - " << main.y << endl << endl;
 }
 
@@ -425,6 +424,8 @@ bool follower::proceed_frame(Mat* frame)
 	}
 
 	calcOptFlow();
+
+	check_for_followed_points();
 
 //	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.

@@ -38,7 +38,12 @@ int main( int argc, char** argv )
 	VideoCapture cap;
 
 	if (input.size() == 1 && isdigit(input[0]))
+	{
 		cap.open(0);
+		cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+		cap.set(cv::CAP_PROP_FPS, 90);
+	}
     else
         cap.open(input);
 
@@ -48,7 +53,9 @@ int main( int argc, char** argv )
         return 0;
     }
 
-	cout << "capturing initialised \n";
+	cout << "capturing initialised" << cap.get(cv::CAP_PROP_FPS) << "  \n";
+
+
 
     Mat  frame;
 	follower follower_1;
@@ -78,20 +85,20 @@ int main( int argc, char** argv )
 
 		if (follower_1.proceed_frame(&frame)) break;
 		
-		if (!cap.isOpened())
-		{
-			if (input.size() == 1 && isdigit(input[0]))
-				cap.open(0);
-			else
-				cap.open(input);
+		//if (!cap.isOpened())
+		//{
+		//	if (input.size() == 1 && isdigit(input[0]))
+		//		cap.open(0);
+		//	else
+		//		cap.open(input);
 
-			if (!cap.isOpened())
-			{
-				cout << "Could not initialize capturing...\n";
-				return 0;
-			}
+		//	if (!cap.isOpened())
+		//	{
+		//		cout << "Could not initialize capturing...\n";
+		//		return 0;
+		//	}
 
-		}
+		//}
 
     }
 

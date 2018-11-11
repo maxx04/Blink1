@@ -140,8 +140,8 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 		hist_l.collect(point_satz{ i , (float)l }); //
 	}
 
-	hist_l.range_min = hist_l.mean - hist_l.mean * 0.5;
-	hist_l.range_max = hist_l.mean + hist_l.mean * 0.5;
+	hist_l.range_min = hist_l.mean - hist_l.mean * 0.9;
+	hist_l.range_max = hist_l.mean + hist_l.mean * 0.9;
 
 	hist_l.sort();
 

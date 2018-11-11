@@ -48,6 +48,8 @@ class follower
 	Mat cameraMatrix;
 	keypoints kp; // keypoints von init_points()
 	histogram  hist; // histogramm für step_vectors in batch
+	Point2f main_of_frame; //ergebnissvektor fur frame verschiebung
+	float magnify_vektor_draw;
 
 public:
 	follower();
