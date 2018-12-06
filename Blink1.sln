@@ -6,11 +6,16 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7591AAF8-AA60-471B-8434-29BD7DC7D24F}"
 	ProjectSection(SolutionItems) = preProject
 		Berechnung.docx = Berechnung.docx
+		UDP_Base.cpp = UDP_Base.cpp
+		UDP_Base.h = UDP_Base.h
+		xsocket.hpp = xsocket.hpp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opencv_windows", "opencv_windows\opencv_windows.vcxproj", "{73E5DB30-9398-42FC-830D-7DAA1D8425C0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raspi", "raspi\raspi.vcxproj", "{5883A6E6-555E-417E-91A7-298F74D2C66F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlinkClient", "BlinkClient\BlinkClient.vcxproj", "{926862E0-AEFB-4D70-84DD-8E23D6D2E089}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +28,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{73E5DB30-9398-42FC-830D-7DAA1D8425C0}.Debug|ARM.ActiveCfg = Debug|x64
+		{73E5DB30-9398-42FC-830D-7DAA1D8425C0}.Debug|ARM.Build.0 = Debug|x64
 		{73E5DB30-9398-42FC-830D-7DAA1D8425C0}.Debug|x64.ActiveCfg = Debug|x64
 		{73E5DB30-9398-42FC-830D-7DAA1D8425C0}.Debug|x64.Build.0 = Debug|x64
 		{73E5DB30-9398-42FC-830D-7DAA1D8425C0}.Debug|x86.ActiveCfg = Debug|x64
@@ -44,6 +50,16 @@ Global
 		{5883A6E6-555E-417E-91A7-298F74D2C66F}.Release|x64.Build.0 = Debug|ARM
 		{5883A6E6-555E-417E-91A7-298F74D2C66F}.Release|x86.ActiveCfg = Debug|ARM
 		{5883A6E6-555E-417E-91A7-298F74D2C66F}.Release|x86.Build.0 = Debug|ARM
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Debug|ARM.ActiveCfg = Debug|Win32
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Debug|x64.ActiveCfg = Debug|x64
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Debug|x64.Build.0 = Debug|x64
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Debug|x86.ActiveCfg = Debug|Win32
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Debug|x86.Build.0 = Debug|Win32
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Release|ARM.ActiveCfg = Release|Win32
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Release|x64.ActiveCfg = Release|x64
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Release|x64.Build.0 = Release|x64
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Release|x86.ActiveCfg = Release|Win32
+		{926862E0-AEFB-4D70-84DD-8E23D6D2E089}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

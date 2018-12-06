@@ -13,6 +13,7 @@
     <ClCompile Include="..\keypoints.cpp" />
     <ClCompile Include="..\lkdemo.cpp" />
     <ClCompile Include="..\Servos.cpp" />
+    <ClCompile Include="..\UDP_Base.cpp" />
     <ClCompile Include="SerialPort_raspi.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +23,8 @@
     <ClInclude Include="..\keypoints.h" />
     <ClInclude Include="..\SerialPort.h" />
     <ClInclude Include="..\Servos.h" />
+    <ClInclude Include="..\UDP_Base.h" />
+    <ClInclude Include="..\xsocket.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\camera_calibration\default.xml" />
@@ -62,7 +65,13 @@
       <ObjectFileName>$(RemoteDebuggerWorkingDirectory)%(filename).o</ObjectFileName>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ARM;_DEBUG</PreprocessorDefinitions>
+      <ThreadSafeStatics>No</ThreadSafeStatics>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

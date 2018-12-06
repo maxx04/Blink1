@@ -1,7 +1,10 @@
 #include <iostream>
 #include <string>
-
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include "follower.h"
+#include "UDP_Base.h"
 
 using namespace cv;
 using namespace std;
@@ -53,12 +56,14 @@ int main( int argc, char** argv )
         return 0;
     }
 
-	cout << "capturing initialised" << cap.get(cv::CAP_PROP_FPS) << "  \n";
-
+	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
 
     Mat  frame;
 	follower follower_1;
+	UDP_Base udp_base;
+
+	udp_base.start();
 
 
 	//const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
