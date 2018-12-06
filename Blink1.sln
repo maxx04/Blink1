@@ -6,8 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7591AAF8-AA60-471B-8434-29BD7DC7D24F}"
 	ProjectSection(SolutionItems) = preProject
 		Berechnung.docx = Berechnung.docx
-		UDP_Base.cpp = UDP_Base.cpp
-		UDP_Base.h = UDP_Base.h
 		xsocket.hpp = xsocket.hpp
 	EndProjectSection
 EndProject
