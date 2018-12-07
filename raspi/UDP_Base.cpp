@@ -60,8 +60,9 @@ void start_Server(int args)
 	while (true) 
 	{
 		int i = v6s.recvfrom(&buff, 512, &ep);
-		if (i == 4 || i == -1)
-			break;
+		cout << "i: " << i << endl;
+		if (buff == "qiut" || i == -1)	break;
+
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl << buff << std::endl
 			<< "DATA END" << std::endl;

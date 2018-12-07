@@ -19,15 +19,17 @@ follower::follower()
 	winSize = Size(31, 31);
 
 	needToInit = true;
-	step_butch = 1;
+	step_butch = 10;
 	magnify_vektor_draw = 5;
+
+	s.test();
 
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
 
-	/***/
+	/*
 
 	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
 
@@ -35,7 +37,7 @@ follower::follower()
 
 	cout << n << endl;
 
-	/***/
+	*/
 
 	//#ifndef _ARM
 	namedWindow("LK Demo", 1);

@@ -4,6 +4,7 @@
 #define _Servos
 
 #include <opencv2/core.hpp>
+#include <iostream>
 #include "SerialPort.h"
 
 using namespace cv;
@@ -18,12 +19,13 @@ public:
 	Point2f min_position;
 	float servo_delta;
 	const char* portName;
-	char m[40];
+	char m[100];
 	SerialPort* sp;
 	bool in_move;
 
 	Servos();
 	~Servos();
+	void test();
 	void correction(Point2f p);
 	void move_to_position(Point2f p);
 	bool wait_on_position(const int time);
