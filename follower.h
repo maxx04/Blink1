@@ -21,6 +21,7 @@
 #include "keypoints.h"
 #include "camera_calibration/camera_calibration.h"
 #include "histogram.h"
+#include "raspi/UDP_Base.h"
 
 
 using namespace cv;
@@ -80,6 +81,7 @@ public:
 	int collect_step_vectors();
 	// Bearbeitet jedes frame
 	bool proceed_frame(Mat* frame);
+	void new_data_proceed();
 };
 
 

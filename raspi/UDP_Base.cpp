@@ -19,6 +19,8 @@ int f = 0;
 
 int current_thread = 0;
 
+static union_data dt;
+
 std::string buff;
 net::endpoint ep;
 
@@ -53,13 +55,14 @@ void start_Server(int args)
 	//we can recv directly into a std::string or a char* buffer
 
 	//recv a packet up to 512 bytes and store the sender in endpoint ep
-	v6s.recvfrom(&buff, 512, &ep);
+	v6s.recvfrom(dt.buf512, 512, &ep);
 	std::cout << "erstes pack, buffer: " << buff << std::endl;
 	std::cout << ep.to_string() << std::endl;
 
 	while (true) 
 	{
-		int i = v6s.recvfrom(&buff, 512, &ep);
+		int i = v6s.recvfrom(dt.buf512, 512, &ep);
+
 		cout << "i: " << i << endl;
 		if (buff == "qiut" || i == -1)	break;
 
@@ -67,11 +70,10 @@ void start_Server(int args)
 			<< "DATA START" << std::endl << buff << std::endl
 			<< "DATA END" << std::endl;
 
-		//if (r > 0 && buff == "ip\n")
-		{
 			std::string msg = ep.get_ip();
-			v6s.sendto(&msg,ep);
-		}
+
+			v6s.sendto(dt.buf512,512,ep); //TODO aendern auf UDP_BLOCK_SIZE
+		
 
 	}
 
@@ -86,9 +88,7 @@ UDP_Base::UDP_Base()
 
 		th1 = new thread(start_Server, 3);
 
-		cout << "Thread started, Id: " << th1->get_id() << endl;
-
-		
+		cout << "Thread started, Id: " << th1->get_id() << endl;	
 
 		if (f == 1)
 			cout << "Key element found" << endl;

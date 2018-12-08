@@ -2,6 +2,7 @@
 #pragma warning(disable : 4996)
 
 //TODO Fehlerbearbeitung realisieren
+//TODO Klass als einzelne Servo realisieren
 
 Servos::Servos()
 {
@@ -18,11 +19,9 @@ Servos::Servos()
 
 Servos::~Servos()
 {
-	position = Point2f(Point2f((max_position.x + min_position.x) / 2, (max_position.y + min_position.y) / 2));
+	position = Point2f(Point2f((max_position.x + min_position.x)/2, (max_position.y + min_position.y)/2));
 	move_to_position(position);
-
 	wait_on_position(10000);
-
 	sp->~SerialPort();
 }
 
@@ -58,6 +57,8 @@ void Servos::correction(Point2f p)
 	sp->writeSerialPort(m);
 	in_move = true;
 }
+
+//TODO mit OK kann man grenzen ueberpruefen 
 
 void Servos::move_to_position(Point2f p)
 {

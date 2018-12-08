@@ -24,12 +24,11 @@ follower::follower()
 
 	s.test();
 
-
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
 
-	/*
+	/* Probeberechnung
 
 	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
 
@@ -447,4 +446,9 @@ bool follower::proceed_frame(Mat* frame)
 	if (key(wait_time)) return true;
 
 	return false;
+}
+
+void new_data_proceed(union_data data)
+{
+
 }
