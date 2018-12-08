@@ -18,6 +18,7 @@ int key = 220;
 int f = 0;
 
 int current_thread = 0;
+bool new_udp_data = false;
 
 static union_data dt;
 
@@ -29,6 +30,8 @@ net::endpoint ep;
 void start_Server(int args)
 {
 	int num = current_thread++;
+
+	
 
 	for (int i = 0;	i < max; i++)
 	{
@@ -64,14 +67,21 @@ void start_Server(int args)
 		int i = v6s.recvfrom(dt.buf512, 512, &ep);
 
 		cout << "i: " << i << endl;
-		if (buff == "qiut" || i == -1)	break;
+		if (buff == "qiut" || i == -1)	break; //TODO quit bedingungen korrigieren
+
+		new_udp_data = true;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
-			<< "DATA START" << std::endl << buff << std::endl
+			<< "DATA START" << std::endl <<
+			dt.data.servo_position
+			<< std::endl
 			<< "DATA END" << std::endl;
 
-			std::string msg = ep.get_ip();
+	//		std::string msg = ep.get_ip();
 
+		dt.data.servo_position += 1.5;
+
+	//TODO wenn gibtes neues antwort dann senden
 			v6s.sendto(dt.buf512,512,ep); //TODO aendern auf UDP_BLOCK_SIZE
 		
 
@@ -86,7 +96,12 @@ UDP_Base::UDP_Base()
 {
 	// Driver Code 
 
+
 		th1 = new thread(start_Server, 3);
+
+		udp_data = &dt.data;
+
+		new_data = ::new_udp_data;
 
 		cout << "Thread started, Id: " << th1->get_id() << endl;	
 
@@ -100,12 +115,15 @@ UDP_Base::UDP_Base()
 
 UDP_Base::~UDP_Base()
 {
+	
 }
 
-
-
- void UDP_Base::start()
+void UDP_Base::udp_data_received()
 {
-
-
+	new_data = false;
+	::new_udp_data = false;
 }
+
+
+
+

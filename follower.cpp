@@ -448,7 +448,13 @@ bool follower::proceed_frame(Mat* frame)
 	return false;
 }
 
-void new_data_proceed(union_data data)
+void follower::new_data_proceed(UDP_Base* udp_base)
 {
+	cout << "new servo-position: " << udp_base -> udp_data -> servo_position << endl;
 
+	udp_base->udp_data_received();
+
+	//send antwort an client 
 }
+
+

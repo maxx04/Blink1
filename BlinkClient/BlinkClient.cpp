@@ -4,10 +4,13 @@
 #include "pch.h"
 #include <iostream>
 #include "../xsocket.hpp"
+#include "../raspi/UDP_Base.h"
 
 int main()
 {
 	int i;
+
+	union_data _data;
 
 	std::string buff;
 	net::endpoint ep;
@@ -30,27 +33,36 @@ int main()
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	std::string send_str = "ip\n";
+	std::string send_str = "connect\n";
 
-	sock.send(&send_str); 
+	sock.send(_data.buf512, 512); 
 	
 	Sleep(1000);
 
-	sock.send(&send_str);
+	//sock.send(_data.buf512, 512);
 
 	while (true) 
 	{
-		sock.send(&send_str);
+		float inp;
 
-		int i = sock.recvfrom(&buff, 512, &ep);
+		std::cin >> inp;
+		std::cout << inp << std::endl;
+
+		_data.data.servo_position = inp;
+
+		sock.send(_data.buf512, 512);
+
+		int i = sock.recvfrom(_data.buf512, 512, &ep);
 
 		if (i == 4 || i == -1)	break;
+
+		std::cout << "antwort position : " << _data.data.servo_position << std::endl;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl << buff << std::endl
 			<< "DATA END" << std::endl;
 
-		std::cin >> send_str;
+		
 	}
 
 	sock.close();

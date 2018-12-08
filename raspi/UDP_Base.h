@@ -3,10 +3,10 @@
 #include <iostream>
 #include <thread> 
 #include "../xsocket.hpp"
-#include <opencv2/core.hpp>
+//#include <opencv2/core.hpp>
 
 struct exchange_data {
-	Point2f servo_position;
+	float servo_position;
 };
 
 union union_data
@@ -19,14 +19,15 @@ union union_data
 class UDP_Base
 {
 	std::thread* th1;
+	
 public:
 
-
+	exchange_data* udp_data;
 
 	UDP_Base();
 	~UDP_Base();
+	void udp_data_received();
 
-	static void start();
 	bool new_data;
 };
 
