@@ -43,7 +43,7 @@ SerialPort::SerialPort(const char *portName)
 			else {
 				this->connected = true;
 				PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
-				Sleep(ARDUINO_WAIT_TIME);
+				Sleep(3000);
 				printf("Bluetooth connected\n");
 			}
 		}
