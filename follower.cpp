@@ -452,6 +452,8 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 {
 	cout << "new servo-position: " << udp_base -> udp_data -> servo_position << endl;
 
+	s.move_to_position(udp_base->udp_data->servo_position);
+
 	udp_base->udp_data_received();
 
 	//send antwort an client 

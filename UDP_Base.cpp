@@ -2,38 +2,50 @@
 
 using namespace std;
 
-// Max size of array 
-#define max 16 
 
-// Max number of threads to create 
-#define thread_max 4 
 
-int a[max] = { 1, 5, 7, 10, 12, 14, 15,
-			   18, 20, 22, 25, 27, 30,
-			   64, 110, 220 };
-int key = 220;
 
-// Flag to indicate if key is found in a[] 
-// or not. 
-int f = 0;
+UDP_Base::UDP_Base()
+{
+	// Driver Code 
+		assert(sizeof(exchange_data) > 512);
 
-int current_thread = 0;
-bool new_udp_data = false;
+		th1 = new thread(start_Server, 3);
 
-static union_data dt;
+	//	udp_data = &dt.dt_udp;
 
-std::string buff;
-net::endpoint ep;
+	//	new_data = new_udp_data;
+
+		cout << "Thread started, Id: " << th1->get_id() << endl;	
+
+		//if (f == 1)
+		//	cout << "Key element found" << endl;
+		//else
+		//	cout << "Key not present" << endl;
+
+}
+
+
+UDP_Base::~UDP_Base()
+{
+	
+}
+
+void UDP_Base::udp_data_received()
+{
+	new_data = false;
+	new_udp_data = false;
+}
+
 
 // Linear search function which will 
 	// run for all the threads 
-void start_Server(int args)
+void UDP_Base::start_Server(int args)
 {
 	int num = current_thread++;
 
-	
 
-	for (int i = 0;	i < max; i++)
+	for (int i = 0; i < max; i++)
 	{
 		if (a[i] == key) f = 1;
 	}
@@ -62,68 +74,29 @@ void start_Server(int args)
 	std::cout << "erstes pack, buffer: " << buff << std::endl;
 	std::cout << ep.to_string() << std::endl;
 
-	while (true) 
+	while (true)
 	{
 		int i = v6s.recvfrom(dt.buf512, 512, &ep);
 
 		cout << "i: " << i << endl;
-		if (buff == "qiut" || i == -1)	break; //TODO quit bedingungen korrigieren
+		if (i == -1)	break; //TODO quit bedingungen korrigieren
 
 		new_udp_data = true;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl <<
-			dt.data.servo_position
+			dt.dt_udp.servo_position
 			<< std::endl
 			<< "DATA END" << std::endl;
 
-	//		std::string msg = ep.get_ip();
+		//TODO wenn gibtes neues antwort dann senden
+		v6s.sendto(dt.buf512, 512, ep); //TODO aendern auf UDP_BLOCK_SIZE
 
-		dt.data.servo_position += 1.5;
-
-	//TODO wenn gibtes neues antwort dann senden
-			v6s.sendto(dt.buf512,512,ep); //TODO aendern auf UDP_BLOCK_SIZE
-		
 
 	}
 
 	v6s.close();
 	cout << "closed" << endl;
 }
-
-
-UDP_Base::UDP_Base()
-{
-	// Driver Code 
-
-
-		th1 = new thread(start_Server, 3);
-
-		udp_data = &dt.data;
-
-		new_data = ::new_udp_data;
-
-		cout << "Thread started, Id: " << th1->get_id() << endl;	
-
-		if (f == 1)
-			cout << "Key element found" << endl;
-		else
-			cout << "Key not present" << endl;
-
-}
-
-
-UDP_Base::~UDP_Base()
-{
-	
-}
-
-void UDP_Base::udp_data_received()
-{
-	new_data = false;
-	::new_udp_data = false;
-}
-
-
 
 

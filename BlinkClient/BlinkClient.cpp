@@ -33,13 +33,9 @@ int main()
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	std::string send_str = "connect\n";
-
 	sock.send(_data.buf512, 512); 
 	
 	Sleep(1000);
-
-	//sock.send(_data.buf512, 512);
 
 	while (true) 
 	{
@@ -48,18 +44,20 @@ int main()
 		std::cin >> inp;
 		std::cout << inp << std::endl;
 
-		_data.data.servo_position = inp;
+		_data.data.servo_position.x = inp;
 
 		sock.send(_data.buf512, 512);
 
 		int i = sock.recvfrom(_data.buf512, 512, &ep);
 
-		if (i == 4 || i == -1)	break;
+		if (i == -1)	break;
 
-		std::cout << "antwort position : " << _data.data.servo_position << std::endl;
+		std::cout << "antwort position : " << _data.data.servo_position.x << std::endl;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
-			<< "DATA START" << std::endl << buff << std::endl
+			<< "DATA START" << std::endl <<
+			buff 
+			<< std::endl
 			<< "DATA END" << std::endl;
 
 		
