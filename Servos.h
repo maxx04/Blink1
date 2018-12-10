@@ -26,6 +26,7 @@ public:
 	Servos();
 	~Servos();
 	void test();
+	void read_udp_data(float x, float y);
 	void correction(Point2f p);
 	void move_to_position(Point2f p);
 	bool wait_on_position(const int time);

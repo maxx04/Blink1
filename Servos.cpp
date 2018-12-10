@@ -43,6 +43,12 @@ void Servos::test()
 	in_move = false;
 }
 
+void Servos::read_udp_data(float x, float y)
+{
+	position.x = x;
+	position.y = y;
+}
+
 void Servos::correction(Point2f p)
 {
 //	if (sp->readSerialPort(m, 2) < 2 && in_move) return; // noch in Bewegung

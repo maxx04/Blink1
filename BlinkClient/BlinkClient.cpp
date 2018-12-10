@@ -4,13 +4,13 @@
 #include "pch.h"
 #include <iostream>
 #include "../xsocket.hpp"
-#include "../raspi/UDP_Base.h"
+#include "../UDP_Base.h"
 
 int main()
 {
 	int i;
 
-	union_data _data;
+	udata _data;
 
 	std::string buff;
 	net::endpoint ep;
@@ -39,12 +39,9 @@ int main()
 
 	while (true) 
 	{
-		float inp;
 
-		std::cin >> inp;
-		std::cout << inp << std::endl;
-
-		_data.data.servo_position.x = inp;
+		std::cin >> _data.dt_udp.servo_position_x;
+		std::cin >> _data.dt_udp.servo_position_y;
 
 		sock.send(_data.buf512, 512);
 
@@ -52,7 +49,7 @@ int main()
 
 		if (i == -1)	break;
 
-		std::cout << "antwort position : " << _data.data.servo_position.x << std::endl;
+		std::cout << "antwort position : " << _data.dt_udp.servo_position_x << std::endl;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl <<
