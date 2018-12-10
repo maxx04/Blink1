@@ -14,6 +14,7 @@
     <ClCompile Include="..\lkdemo.cpp" />
     <ClCompile Include="..\Servos.cpp" />
     <ClCompile Include="..\UDP_Base.cpp" />
+    <ClCompile Include="Motor.cpp" />
     <ClCompile Include="SerialPort_raspi.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -25,6 +26,7 @@
     <ClInclude Include="..\Servos.h" />
     <ClInclude Include="..\UDP_Base.h" />
     <ClInclude Include="..\xsocket.hpp" />
+    <ClInclude Include="Motor.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\camera_calibration\default.xml" />

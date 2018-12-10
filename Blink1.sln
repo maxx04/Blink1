@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7591AAF8-AA60-471B-8434-29BD7DC7D24F}"
 	ProjectSection(SolutionItems) = preProject
-		Berechnung.docx = Berechnung.docx
+		Doc\Berechnung.docx = Doc\Berechnung.docx
+		Doc\HG7881C_EN.pdf = Doc\HG7881C_EN.pdf
+		j8header-3b-large.png = j8header-3b-large.png
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opencv_windows", "opencv_windows\opencv_windows.vcxproj", "{73E5DB30-9398-42FC-830D-7DAA1D8425C0}"
