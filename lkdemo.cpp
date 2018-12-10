@@ -60,8 +60,9 @@ int main( int argc, char** argv )
 
 
     Mat  frame;
-	follower follower_1;
 	UDP_Base udp_base;
+	follower follower_1;
+
 
 
 	//const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
@@ -85,7 +86,13 @@ int main( int argc, char** argv )
 			cap >> frame;
 		}
 
-		if (udp_base.new_data) follower_1.new_data_proceed(&udp_base);
+		
+
+		if (udp_base.check_incoming_data())
+		{
+			cout << "new udp data " << udp_base.check_incoming_data() << endl;
+			follower_1.new_data_proceed(&udp_base);
+		}
 
 		if (follower_1.proceed_frame(&frame)) break;
 

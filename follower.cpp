@@ -450,9 +450,16 @@ bool follower::proceed_frame(Mat* frame)
 
 void follower::new_data_proceed(UDP_Base* udp_base)
 {
-	cout << "new servo-position: " << udp_base -> udp_data -> servo_position << endl;
 
-	s.move_to_position(udp_base->udp_data->servo_position);
+	s.read_udp_data(udp_base->udp_data->servo_position_x,
+		udp_base->udp_data->servo_position_y);
+
+	Point2f p(udp_base->udp_data->servo_position_x,
+		udp_base->udp_data->servo_position_y);
+
+	cout << "new servo-position: " << p << endl;
+
+	s.move_to_position(p);
 
 	udp_base->udp_data_received();
 

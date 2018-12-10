@@ -9,12 +9,13 @@
 
 using namespace cv;
 
-
-struct exchange_data {
-	Point2f servo_position;
+struct exchange_data 
+{
+	float servo_position_x;
+	float servo_position_y;
 };
 
-union union_data
+union udata
 {
 	exchange_data dt_udp; 
 	char buf512[512];
@@ -25,39 +26,23 @@ union union_data
 class UDP_Base
 {
 	std::thread* th1;
-	// Max size of array 
-#define max 16 
 
-// Max number of threads to create 
-#define thread_max 4 
+	static bool new_udp_data;
 
-	int a[max] = { 1, 5, 7, 10, 12, 14, 15,
-				   18, 20, 22, 25, 27, 30,
-				   64, 110, 220 };
-	int key = 220;
+	static udata dt;
 
-	// Flag to indicate if key is found in a[] 
-	// or not. 
-	int f = 0;
-
-	int current_thread = 0;
-	bool new_udp_data = false;
-
-	union_data dt;
-
-	std::string buff;
-	net::endpoint ep;
+	static std::string buff;
+	static net::endpoint ep;
 	
 public:
 
 	exchange_data* udp_data;
-	bool new_data;
-
 
 	UDP_Base();
 	~UDP_Base();
 	void udp_data_received();
-	void start_Server(int args);
+	bool check_incoming_data();
+	static void start_Server(int args);
 
 };
 

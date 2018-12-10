@@ -2,26 +2,27 @@
 
 using namespace std;
 
+bool UDP_Base::new_udp_data = false;
 
+
+udata UDP_Base::dt;
+
+std::string UDP_Base::buff;
+net::endpoint UDP_Base::ep;
 
 
 UDP_Base::UDP_Base()
 {
-	// Driver Code 
-		assert(sizeof(exchange_data) > 512);
+
+		cout << sizeof(exchange_data) << endl;
+
+		assert(sizeof(exchange_data) < 512);
 
 		th1 = new thread(start_Server, 3);
 
-	//	udp_data = &dt.dt_udp;
-
-	//	new_data = new_udp_data;
+		udp_data = &dt.dt_udp;
 
 		cout << "Thread started, Id: " << th1->get_id() << endl;	
-
-		//if (f == 1)
-		//	cout << "Key element found" << endl;
-		//else
-		//	cout << "Key not present" << endl;
 
 }
 
@@ -33,22 +34,19 @@ UDP_Base::~UDP_Base()
 
 void UDP_Base::udp_data_received()
 {
-	new_data = false;
 	new_udp_data = false;
 }
 
-
-// Linear search function which will 
-	// run for all the threads 
-void UDP_Base::start_Server(int args)
+bool UDP_Base::check_incoming_data()
 {
-	int num = current_thread++;
+	return new_udp_data;
+}
 
 
-	for (int i = 0; i < max; i++)
-	{
-		if (a[i] == key) f = 1;
-	}
+
+ void UDP_Base::start_Server(int args)
+{
+
 
 	//init only required for windows, no-op on *nix
 	net::init();
@@ -83,9 +81,12 @@ void UDP_Base::start_Server(int args)
 
 		new_udp_data = true;
 
+		cout << "new_data_set " << new_udp_data << endl;
+
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl <<
-			dt.dt_udp.servo_position
+			dt.dt_udp.servo_position_x << ":" <<
+			dt.dt_udp.servo_position_y 
 			<< std::endl
 			<< "DATA END" << std::endl;
 
