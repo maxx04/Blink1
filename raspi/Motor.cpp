@@ -9,8 +9,15 @@
 #define	LED	4
 
 
-Motor::Motor()
+Motor::Motor(int p1, int p2)
 {
+	pin1 = p1;
+	pin2 = p2;
+
+	wiringPiSetupSys();
+
+	pinMode(pin1, OUTPUT);
+	pinMode(pin2, OUTPUT);
 }
 
 
@@ -20,15 +27,21 @@ Motor::~Motor()
 
 void Motor::rotate(float speed)
 {
-	wiringPiSetupSys();
+	digitalWrite(pin1, LOW);
+	digitalWrite(pin2, LOW);
 
-	pinMode(LED, OUTPUT);
-
-	while (true)
+	if (speed = 0)
 	{
-		digitalWrite(LED, HIGH);  // Ein
-		delay(500); // ms
-		digitalWrite(LED, LOW);	  // Aus
-		delay(500);
+		digitalWrite( pin1, LOW);
+		digitalWrite( pin2, LOW);
+
+		return;
 	}
+	
+
+		digitalWrite(pin1, HIGH);  // Ein
+		delay(500); // ms
+		digitalWrite(pin1, LOW);	  // Aus
+		delay(500);
+	
 }
