@@ -1,5 +1,7 @@
 #include "Motor.h"
 
+int Motor::delay_time = 999; 
+bool Motor::speed_changed = false;
 
 // LED-PIN - wiringPi-PIN 0 ist BCM_GPIO 17.
 // Wir müssen bei der Initialisierung mit wiringPiSetupSys die BCM-Nummerierung verwenden.
@@ -25,23 +27,26 @@ Motor::~Motor()
 {
 }
 
-void Motor::rotate(float speed)
+void Motor::zyclus()
 {
 	digitalWrite(pin1, LOW);
 	digitalWrite(pin2, LOW);
 
-	if (speed = 0)
+	
+	while (true)
 	{
-		digitalWrite( pin1, LOW);
-		digitalWrite( pin2, LOW);
+		if (delay_time != 999)
+		{
+			digitalWrite(pin1, HIGH);	
+			delay(delay_time);
+		}
 
-		return;
-	}
-	
+		digitalWrite(pin1, LOW);	
+		delay(delay_time);
+	}	
+}
 
-		digitalWrite(pin1, HIGH);  // Ein
-		delay(500); // ms
-		digitalWrite(pin1, LOW);	  // Aus
-		delay(500);
-	
+void Motor::rotate(int speed)
+{
+	delay_time = (int)speed;
 }
