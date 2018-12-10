@@ -461,6 +461,8 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 
 	s.move_to_position(p);
 
+	s.move_to_position(udp_base->udp_data->servo_position);
+
 	udp_base->udp_data_received();
 
 	//send antwort an client 
