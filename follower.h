@@ -42,6 +42,7 @@ class follower
 
 	Servos s;
 	Motor* motor_r;
+	Motor* motor_l;
 
 	bool needToInit = false;
 	bool nightMode = false;

@@ -1,57 +1,87 @@
 #include "Motor.h"
 
-int Motor::delay_time = 99; 
-bool Motor::speed_changed = false;
-
-// LED-PIN - wiringPi-PIN 0 ist BCM_GPIO 17.
-// Wir müssen bei der Initialisierung mit wiringPiSetupSys die BCM-Nummerierung verwenden.
-// Wenn Sie eine andere PIN-Nummer wählen, verwenden Sie die BCM-Nummerierung, und
-// aktualisieren Sie die Eigenschaftenseiten – Buildereignisse – Remote-Postbuildereignisbefehl 
-// der den GPIO-Export für die Einrichtung für wiringPiSetupSys verwendet.
-#define	LED	4
-
+int Motor::number_of_motors = 0;
+int* Motor::delay_time = NULL; 
+bool* Motor::direction = NULL;
 
 Motor::Motor(int p1, int p2)
 {
 	pin1 = p1;
 	pin2 = p2;
 
+	assert(number_of_motors <= MAX_MOTORS);
+
+	if (number_of_motors == 0)
+	{
+		delay_time = new int[MAX_MOTORS];
+		direction = new bool[MAX_MOTORS];
+	}
+
+	motor_number = number_of_motors++; //HACK Nummirierung faengt von 0 an
+
+	delay_time[motor_number] = 99;
+	direction[motor_number] = true;
+
 	wiringPiSetupSys();
 
 	pinMode(pin1, OUTPUT);
 	pinMode(pin2, OUTPUT);
 
-	delay_time = 99;
+	th1 = new thread (main_loop, pin1, pin2, motor_number);
 
-	th1 = new thread (main_loop, pin1, pin2);
-
-	cout << "Motor started, Id: " << th1->get_id() << endl;
+	cout << "Motor " << motor_number << " started, Id: " << th1->get_id() << endl;
 }
 
 
 Motor::~Motor()
 {
+
 }
 
-void Motor::main_loop(int pin1, int pin2)
+void Motor::main_loop(int pin1, int pin2, int motor_number)
 {
+	int p = pin1;
+
 	digitalWrite(pin1, LOW);
 	digitalWrite(pin2, LOW);
+
+	//TODO optimieren
 	
 	while (true)
 	{
-		if (delay_time != 99)
+		p = (direction[motor_number]) ? pin1 : pin2;
+
+		if (delay_time[motor_number] != 99)
 		{
-			digitalWrite(pin1, HIGH);	
-			delay(delay_time);
+			digitalWrite(p, HIGH);	
+			delay(50);
 		}
 
-		digitalWrite(pin1, LOW);	
-		delay(50);
+		digitalWrite(p, LOW);	
+		delay(delay_time[motor_number]);
 	}	
 }
 
-void Motor::rotate(int speed)
+void Motor::rotate(float speed)
 {
-	delay_time = (int)speed;
+	if (speed == 0)
+	{
+		delay_time[motor_number] = 99;
+		return;
+	}
+
+	direction[motor_number] = (speed > 0) ? true : false;
+
+	delay_time[motor_number] = (int)(1/abs(speed)*1000); //TODO Abhaengigket ermitteln.
+}
+
+void Motor::test()
+{
+	rotate(1);
+	delay(3000);
+	rotate(10);
+	delay(3000);
+	rotate(-10);
+	delay(3000);
+	stop();
 }

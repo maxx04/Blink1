@@ -58,7 +58,7 @@
       <LibraryDependencies>wiringPi;opencv_world</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 23 out </Command>
+      <Command>gpio export 23 out &amp;&amp; gpio export 24 out &amp;&amp; gpio export 25 out &amp;&amp; gpio export 8 out</Command>
       <Message>export pin 23 using the gpio utility so that we can execute the blink program without sudo</Message>
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>

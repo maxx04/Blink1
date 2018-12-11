@@ -2,6 +2,8 @@
 
 #define MOTOR_RECHTS_FW 23
 #define MOTOR_RECHTS_BW 24
+#define MOTOR_LINKS_FW 25
+#define MOTOR_LINKS_BW 8
 
 Point2f AimPoint;
 bool setAimPt = false;
@@ -29,13 +31,11 @@ follower::follower()
 
 	s.test();
 
-	motor_r->rotate(1000);
-
 	motor_r = new Motor(MOTOR_RECHTS_FW, MOTOR_RECHTS_BW);
+	motor_l = new Motor(MOTOR_LINKS_FW, MOTOR_LINKS_BW);
 
-	motor_r->rotate(500);
-
-
+	motor_r -> test();
+	motor_l -> test();
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
