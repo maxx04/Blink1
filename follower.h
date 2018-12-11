@@ -22,6 +22,7 @@
 #include "camera_calibration/camera_calibration.h"
 #include "histogram.h"
 #include "UDP_Base.h"
+#include "raspi/Motor.h"
 
 
 using namespace cv;
@@ -40,6 +41,7 @@ class follower
 	double frame_time = 0.0;
 
 	Servos s;
+	Motor* motor_r;
 
 	bool needToInit = false;
 	bool nightMode = false;

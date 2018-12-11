@@ -1,7 +1,12 @@
 #include "follower.h"
 
+#define MOTOR_RECHTS_FW 23
+#define MOTOR_RECHTS_BW 24
+
 Point2f AimPoint;
 bool setAimPt = false;
+
+//fu
 
 static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 {
@@ -23,6 +28,14 @@ follower::follower()
 	magnify_vektor_draw = 5;
 
 	s.test();
+
+	motor_r->rotate(1000);
+
+	motor_r = new Motor(MOTOR_RECHTS_FW, MOTOR_RECHTS_BW);
+
+	motor_r->rotate(500);
+
+
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
@@ -460,8 +473,6 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 	cout << "new servo-position: " << p << endl;
 
 	s.move_to_position(p);
-
-	s.move_to_position(udp_base->udp_data->servo_position);
 
 	udp_base->udp_data_received();
 

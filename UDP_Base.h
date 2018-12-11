@@ -2,12 +2,13 @@
 
 #include <iostream>
 #include <thread> 
+#include <assert.h>
 
-#include <opencv2/core.hpp>
+//#include <opencv2/core.hpp>
 
 #include "xsocket.hpp"
 
-using namespace cv;
+//using namespace cv;
 
 struct exchange_data 
 {
