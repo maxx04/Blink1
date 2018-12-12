@@ -7,6 +7,9 @@ bool UDP_Base::new_udp_data = false;
 
 udata UDP_Base::dt;
 
+Mat* UDP_Base::ptrFrame = NULL;
+
+
 std::string UDP_Base::buff;
 net::endpoint UDP_Base::ep;
 
@@ -17,6 +20,8 @@ UDP_Base::UDP_Base()
 	cout << sizeof(exchange_data) << endl;
 
 	assert(sizeof(exchange_data) < 512);
+
+	ptrFrame = new Mat(3, 3, CV_32FC1);
 
 	udp_thread = new thread(start_Server, 3);
 
@@ -93,13 +98,13 @@ void UDP_Base::start_Server(int args)
 		v6s.sendto(dt.union_buff, SOCKET_BLOCK_SIZE, ep); 
 
 		//Bild senden
-		//char* start_picture;
+		char* start_picture = (char*)ptrFrame;
 
-		//int n = 15;
-		//while (n++ < 15 )
-		//{
-		//	v6s.sendto(start_picture, SOCKET_BLOCK_SIZE, ep);
-		//}
+		int n = 15;
+		while (n++ < 15 )
+		{
+			v6s.sendto(start_picture, SOCKET_BLOCK_SIZE, ep);
+		}
 
 
 	}

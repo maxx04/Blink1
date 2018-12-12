@@ -3,8 +3,10 @@
 
 #include "pch.h"
 #include <iostream>
-//#include "../xsocket.hpp"
+
 #include "../UDP_Base.h"
+
+#include <opencv2/core.hpp>
 
 int main()
 {
@@ -14,6 +16,8 @@ int main()
 
 	std::string buff;
 	net::endpoint ep;
+
+	Mat* ptrFrame = new Mat(640, 480, CV_16U);
 
 	//we must call net::init() on windows, if not on windows it is a no-op
 	net::init();
@@ -56,6 +60,14 @@ int main()
 			buff 
 			<< std::endl
 			<< "DATA END" << std::endl;
+
+		//Bild senden
+
+		int n = 15;
+		while (n++ < 15)
+		{
+			sock.recvfrom((char*)ptrFrame, SOCKET_BLOCK_SIZE, &ep);
+		}
 
 		
 	}

@@ -36,40 +36,85 @@ int main( int argc, char** argv )
 	VideoCapture cap;
 
     Mat  frame;
-	UDP_Base udp_base;
+	
 	station PC;
 
+	std::string buff;
+	net::endpoint ep;
 
+	udata _data;
 
-	const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
-	//open the video stream and make sure it's opened
-	if (!cap.open(videoStreamAddress)) 
-	{
-		std::cout << "Error opening video stream or file" << std::endl;
+	Mat* ptrFrame = new Mat(640, 480, CV_16U);
+
+	//we must call net::init() on windows, if not on windows it is a no-op
+	net::init();
+
+	//create a socket without binding in the ctor
+	net::socket sock(net::af::inet, net::sock::dgram, 4010);
+
+	ep = net::endpoint("192.168.178.41", 8080);
+
+	//most calls in xsocket return the same value as there c counterparts
+	//like so if sock.bind returns -1 it failed
+	int r = sock.connect(ep);
+	if (r == -1) {
+		perror("failed to connect");
 		return -1;
 	}
+
+	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
+
+	sock.send("connect", 512);
+
+	Sleep(1000);
+
+
+	//const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
+	////open the video stream and make sure it's opened
+	//if (!cap.open(videoStreamAddress)) 
+	//{
+	//	std::cout << "Error opening video stream or file" << std::endl;
+	//	return -1;
+	//}
 
 	// Hauptzyclus
 
     for(;;)
     {
-        cap >> frame;
+     //   cap >> frame;
 
-		if (frame.empty())
+		//if (frame.empty())
+		//{
+		//	// wenn videodatei in befehlzeile dann beenden.
+		//	if (input.size() != 0) break;
+		//	cap.open(0); //TODO fall mit video berücksichtigen
+		//	cap >> frame;
+		//}
+
+		std::cin >> wait_time;
+
+		sock.send(_data.union_buff, 512);
+
+		int i = sock.recvfrom(_data.union_buff, 512, &ep);
+
+		if (i == -1)	break;
+
+		std::cout << "antwort position : " << _data.dt_udp.servo_position_x << std::endl;
+
+		std::cout << "packet from: " << ep.to_string() << std::endl
+			<< "DATA START" << std::endl <<
+			buff
+			<< std::endl
+			<< "DATA END" << std::endl;
+
+		//Bild senden
+
+		int n = 15;
+		while (n++ < 15)
 		{
-			// wenn videodatei in befehlzeile dann beenden.
-			if (input.size() != 0) break;
-			cap.open(0); //TODO fall mit video berücksichtigen
-			cap >> frame;
+			sock.recvfrom((char*)ptrFrame, SOCKET_BLOCK_SIZE, &ep);
 		}
-
-		
-
-		if (udp_base.check_incoming_data())
-		{
-			cout << "new udp data " << udp_base.check_incoming_data() << endl;
-			PC.new_data_proceed(&udp_base);
-		}
+	
 
 		if (PC.proceed_frame(&frame)) break;
 
@@ -77,5 +122,7 @@ int main( int argc, char** argv )
 
     }
 
-    return 0;
+	sock.close();
+
+    
 }

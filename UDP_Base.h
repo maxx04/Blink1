@@ -27,7 +27,7 @@ union udata
 
 union uFrame
 {
-	cv::Mat dt_udp;
+	cv::Mat frm;
 	char union_buff[SOCKET_BLOCK_SIZE];
 
 };
@@ -40,6 +40,7 @@ class UDP_Base
 	static bool new_udp_data;
 
 	static udata dt;
+	static Mat* ptrFrame;
 
 	static std::string buff;
 	static net::endpoint ep;

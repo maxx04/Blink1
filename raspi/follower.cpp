@@ -136,10 +136,9 @@ bool follower::proceed_frame(Mat* frame)
 	look_to_aim();
 
 	if (key(wait_time)) return true;
-
-	return false;
 	*/
-	return true;
+	return false;
+	
 }
 
 void follower::new_data_proceed(UDP_Base* udp_base)
