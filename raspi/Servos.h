@@ -1,14 +1,13 @@
-
-
 #ifndef _Servos
 #define _Servos
 
-#include <opencv2/core.hpp>
-#include <iostream>
-#include "SerialPort.h"
 
-using namespace cv;
+#include <iostream>
+#include <opencv2/core.hpp>
+#include "SerialPort_raspi.h"
+
 using namespace std;
+using namespace cv;
 
 class Servos
 {

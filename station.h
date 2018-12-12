@@ -2,11 +2,13 @@
 #pragma warning(disable : 4996)
 
 #include <iostream>
-#include <sstream>
+//#include <sstream>
 #include <string>
 #include <ctime>
-#include <cstdio>
+//#include <cstdio>
 #include <queue>
+
+#include "UDP_Base.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/core/utility.hpp>
@@ -17,18 +19,13 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video/tracking.hpp>
 
-#include "Servos.h"
 #include "keypoints.h"
-#include "camera_calibration/camera_calibration.h"
 #include "histogram.h"
-#include "UDP_Base.h"
-#include "raspi/Motor.h"
-
 
 using namespace cv;
 using namespace std;
 
-class follower
+class station
 {
 	int step_butch; // anzahl frames die auf block werden bearbeitet.
 	TermCriteria termcrit;
@@ -39,10 +36,6 @@ class follower
 	Point2f fokus;
 	int number_aim_point = -1;
 	double frame_time = 0.0;
-
-	Servos s;
-	Motor* motor_r;
-	Motor* motor_l;
 
 	bool needToInit = false;
 	bool nightMode = false;
@@ -57,8 +50,8 @@ class follower
 	float magnify_vektor_draw;
 
 public:
-	follower();
-	~follower();
+	station();
+	~station();
 	void find_keypoints();
 	void take_picture(Mat* frame);
 	void check_for_followed_points();
@@ -74,11 +67,11 @@ public:
 	void draw_step_vectors();
 	void draw_nearest_point();
 	void show_image();
-	void cam_calibrate();
+//	void cam_calibrate();
 	void calculate_move_vectors();
 	void swap();
 	bool key(int wait);
-	void look_to_aim();
+//	void look_to_aim();
 	int find_nearest_point(Point2f pt);
 
 	int collect_step_vectors();

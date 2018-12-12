@@ -3,8 +3,9 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+
+#include "../UDP_Base.h"
 #include "follower.h"
-#include "UDP_Base.h"
 
 using namespace cv;
 using namespace std;
@@ -61,19 +62,9 @@ int main( int argc, char** argv )
 
     Mat  frame;
 	UDP_Base udp_base;
-	follower follower_1;
-
-
-
-	//const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
-	////open the video stream and make sure it's opened
-	//if (!cap.open(videoStreamAddress)) {
-	//	std::cout << "Error opening video stream or file" << std::endl;
-	//	return -1;
-	//}
+	follower robot;
 
 	// Hauptzyclus
-
     for(;;)
     {
         cap >> frame;
@@ -86,15 +77,15 @@ int main( int argc, char** argv )
 			cap >> frame;
 		}
 
-		
+
 
 		if (udp_base.check_incoming_data())
 		{
 			cout << "new udp data " << udp_base.check_incoming_data() << endl;
-			follower_1.new_data_proceed(&udp_base);
+			robot.new_data_proceed(&udp_base);
 		}
 
-		if (follower_1.proceed_frame(&frame)) break;
+		if (robot.proceed_frame(&frame)) break;
 
 		//TODO skip frames
 

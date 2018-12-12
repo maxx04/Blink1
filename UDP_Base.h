@@ -4,11 +4,12 @@
 #include <thread> 
 #include <assert.h>
 
-//#include <opencv2/core.hpp>
-
 #include "xsocket.hpp"
+#include <opencv2/core.hpp>
 
-//using namespace cv;
+#define SOCKET_BLOCK_SIZE 512
+
+using namespace cv;
 
 struct exchange_data 
 {
@@ -16,17 +17,25 @@ struct exchange_data
 	float servo_position_y;
 };
 
+
 union udata
 {
 	exchange_data dt_udp; 
-	char buf512[512];
+	char union_buff[SOCKET_BLOCK_SIZE];
 	
 }; 
+
+union uFrame
+{
+	cv::Mat dt_udp;
+	char union_buff[SOCKET_BLOCK_SIZE];
+
+};
 
 
 class UDP_Base
 {
-	std::thread* th1;
+	std::thread* udp_thread;
 
 	static bool new_udp_data;
 

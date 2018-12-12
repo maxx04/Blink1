@@ -1,5 +1,7 @@
 #include "Motor.h"
 
+using namespace std;
+
 int Motor::number_of_motors = 0;
 int* Motor::delay_time = NULL; 
 bool* Motor::direction = NULL;

@@ -1,13 +1,17 @@
 #pragma once
 
+
+
 #include <iostream>
+#include <vector>
+
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <vector>
 
 using namespace std;
 using namespace cv;
+
 
 struct point_satz
 {

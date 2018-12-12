@@ -1,14 +1,8 @@
-#include "follower.h"
+#include "station.h"
 
-#define MOTOR_RECHTS_FW 23
-#define MOTOR_RECHTS_BW 24
-#define MOTOR_LINKS_FW 25
-#define MOTOR_LINKS_BW 8
 
-Point2f AimPoint;
-bool setAimPt = false;
-
-//fu
+static bool setAimPt = false;
+static Point2f AimPoint;
 
 static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 {
@@ -19,7 +13,7 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 	}
 }
 
-follower::follower()
+station::station()
 {
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(10, 10);
@@ -29,40 +23,17 @@ follower::follower()
 	step_butch = 10;
 	magnify_vektor_draw = 5;
 
-	s.test();
-
-	motor_r = new Motor(MOTOR_RECHTS_FW, MOTOR_RECHTS_BW);
-	motor_l = new Motor(MOTOR_LINKS_FW, MOTOR_LINKS_BW);
-
-	motor_r -> test();
-	motor_l -> test();
-
-	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
-
-	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
-
-	/* Probeberechnung
-
-	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
-
-	Mat n = cameraMatrix * vec;
-
-	cout << n << endl;
-
-	*/
-
-	//#ifndef _ARM
 	namedWindow("LK Demo", 1);
 
 	setMouseCallback("LK Demo", onMouse, 0);
-	//#endif
+
 }
 
-follower::~follower()
+station::~station()
 {
 }
 
-void follower::find_keypoints()
+void station::find_keypoints()
 {
 
 	// automatic initialization
@@ -76,7 +47,7 @@ void follower::find_keypoints()
 
 }
 
-void follower::take_picture(Mat* frame)
+void station::take_picture(Mat* frame)
 {
 	if (frame->empty())	return; //TODO Fehlerabarbeitung
 
@@ -91,7 +62,7 @@ void follower::take_picture(Mat* frame)
 	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
-void follower::check_for_followed_points()
+void station::check_for_followed_points()
 {
 	int number_followed_points = 0;
 
@@ -104,7 +75,7 @@ void follower::check_for_followed_points()
 	if (number_followed_points < 200) needToInit = true; // TODO 100 als parameter
 }
 
-void follower::calcOptFlow()
+void station::calcOptFlow()
 {
 	if (!kp.prev_points.empty())
 	{
@@ -122,7 +93,7 @@ void follower::calcOptFlow()
 	}
 }
 
-void follower::transform_Affine()
+void station::transform_Affine()
 {
 	if (!Affine.empty() && !kp.prev_points.empty())
 	{
@@ -135,7 +106,7 @@ void follower::transform_Affine()
 	}
 }
 
-void follower::draw_aim_point()
+void station::draw_aim_point()
 {
 	if (number_aim_point >= 0 && number_aim_point <= kp.current_points.size()) //TODO manchmal nummer out of size
 
@@ -144,7 +115,7 @@ void follower::draw_aim_point()
 	circle(image, (Point)AimPoint, 16, Scalar(0, 255, 0), 3);
 }
 
-void follower::draw_prev_points()
+void station::draw_prev_points()
 {
 	for (size_t i = 0; i < kp.prev_points.size(); i++) // TODO
 	{
@@ -158,7 +129,7 @@ void follower::draw_prev_points()
 	}
 }
 
-void follower::draw_current_points()
+void station::draw_current_points()
 {
 	for (Point2f p : kp.current_points)
 	{
@@ -166,7 +137,7 @@ void follower::draw_current_points()
 	}
 }
 
-void follower::draw_calculated_points()
+void station::draw_calculated_points()
 {
 	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
 	{
@@ -174,7 +145,7 @@ void follower::draw_calculated_points()
 	}
 }
 
-void follower::draw_main_points()
+void station::draw_main_points()
 {
 	for (size_t i = 0; i < kp.background_points.size(); i++) // TODO
 	{
@@ -182,7 +153,7 @@ void follower::draw_main_points()
 	}
 }
 
-void follower::draw_summ_vector()
+void station::draw_summ_vector()
 {
 	Point2f p1, p2, p3;
 	p2 = fokus;
@@ -197,7 +168,7 @@ void follower::draw_summ_vector()
 	};
 }
 
-int follower::draw_image()
+int station::draw_image()
 {
 	int time = 10; //ms
 
@@ -234,7 +205,7 @@ int follower::draw_image()
 	return time;
 }
 
-void follower::draw_step_vectors() // batch
+void station::draw_step_vectors() // batch
 {
 	Point2f p0, p1;
 	p1 = Point2f(0, 0);
@@ -258,7 +229,7 @@ void follower::draw_step_vectors() // batch
 
 }
 
-void follower::draw_nearest_point()
+void station::draw_nearest_point()
 
 {
 
@@ -271,7 +242,7 @@ void follower::draw_nearest_point()
 
 }
 
-void follower::show_image()
+void station::show_image()
 {
 	stringstream text;
 
@@ -301,35 +272,21 @@ void follower::show_image()
 	//#endif
 }
 
-void follower::cam_calibrate()
-{
-
-	char a[32];
-	char* arguments[2];
-	arguments[0] = &a[0];
-
-	cameraMatrix = calibrate(0, arguments);
-
-	cout << cameraMatrix << endl;
-
-	return;
-}
-
-void follower::calculate_move_vectors()
+void station::calculate_move_vectors()
 {
 	kp.calculate_move_vectors();
 	main_of_frame = kp.summ_vector.back();
 	//cout << "main: " << main.x << " - " << main.y << endl << endl;
 }
 
-void follower::swap()
+void station::swap()
 {
 	kp.swap();
 
 	cv::swap(prevGray, gray);
 }
 
-bool follower::key(int wait)
+bool station::key(int wait)
 {
 	char c = (char)waitKey(wait);
 
@@ -345,14 +302,14 @@ bool follower::key(int wait)
 		kp.clear();
 		break;
 
-	case 'k':
-		cam_calibrate();
+	//case 'k':
+	//	cam_calibrate();
 	}
 
 	return false;
 }
-
-void follower::look_to_aim()
+/*
+void station::look_to_aim()
 {
 	Point2f richtung = Point2f(0.0, 0.0);
 	Point2f m;
@@ -379,9 +336,10 @@ void follower::look_to_aim()
 	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
 	{
 
-		s.correction(richtung);
+		//s.correction(richtung);
+		//TODO ueber Verbindung realisieren
 
-		cout << kp.current_points[number_aim_point] << m << richtung << "|" << s.position << endl;
+//		cout << kp.current_points[number_aim_point] << m << richtung << "|" << s.position << endl;
 	}
 	else
 	{
@@ -393,8 +351,8 @@ void follower::look_to_aim()
 
 
 }
-
-int follower::find_nearest_point(Point2f pt)
+*/
+int station::find_nearest_point(Point2f pt)
 {
 	float d, dist = 10000000.0;
 	Point2f v;
@@ -416,15 +374,14 @@ int follower::find_nearest_point(Point2f pt)
 	return n;
 }
 
-int follower::collect_step_vectors()
+int station::collect_step_vectors()
 {
 
 	int number_followed_points = kp.save_step_vectors();
 	return 0;
 }
-
 // Bearbeitet Frame in schritten
-bool follower::proceed_frame(Mat* frame)
+bool station::proceed_frame(Mat* frame)
 {
 	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
 	take_picture(frame);
@@ -444,7 +401,7 @@ bool follower::proceed_frame(Mat* frame)
 //	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.
 
-	collect_step_vectors(); //
+	collect_step_vectors(); 
 
 	transform_Affine();
 
@@ -454,29 +411,21 @@ bool follower::proceed_frame(Mat* frame)
 
 	show_image();
 
-	look_to_aim();
+//	look_to_aim();
 
 	if (key(wait_time)) return true;
 
 	return false;
 }
 
-void follower::new_data_proceed(UDP_Base* udp_base)
+void station::new_data_proceed(UDP_Base* udp_base)
 {
 
-	s.read_udp_data(udp_base->udp_data->servo_position_x,
-		udp_base->udp_data->servo_position_y);
 
-	Point2f p(udp_base->udp_data->servo_position_x,
-		udp_base->udp_data->servo_position_y);
-
-	cout << "new servo-position: " << p << endl;
-
-	s.move_to_position(p);
 
 	udp_base->udp_data_received();
 
-	//send antwort an client 
+	//send antwort an server 
 }
 
 

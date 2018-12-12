@@ -18,11 +18,11 @@ UDP_Base::UDP_Base()
 
 	assert(sizeof(exchange_data) < 512);
 
-	th1 = new thread(start_Server, 3);
+	udp_thread = new thread(start_Server, 3);
 
 	udp_data = &dt.dt_udp;
 
-	cout << "Thread started, Id: " << th1->get_id() << endl;
+	cout << "Thread started, Id: " << udp_thread->get_id() << endl;
 
 }
 
@@ -51,7 +51,7 @@ void UDP_Base::start_Server(int args)
 	//init only required for windows, no-op on *nix
 	net::init();
 
-	//create an ipv6 udp socket, we can optionaly specify the port to bind to as the 3rd arg
+	//create an ipv4 udp socket, we can optionaly specify the port to bind to as the 3rd arg
 	net::socket v6s(net::af::inet, net::sock::dgram, 8080);
 
 	if (!v6s.good()) {
@@ -65,23 +65,21 @@ void UDP_Base::start_Server(int args)
 	std::cout << "listening at: " << v6s.getlocaladdr().to_string() << std::endl
 		<< "send a udp packet to :: " << v6s.getlocaladdr().get_port() << " to continue" << std::endl;
 
-	//we can recv directly into a std::string or a char* buffer
 
 	//recv a packet up to 512 bytes and store the sender in endpoint ep
-	v6s.recvfrom(dt.buf512, 512, &ep);
+	v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
 	std::cout << "erstes pack, buffer: " << buff << std::endl;
 	std::cout << ep.to_string() << std::endl;
 
 	while (true)
 	{
-		int i = v6s.recvfrom(dt.buf512, 512, &ep);
-
-		cout << "i: " << i << endl;
-		if (i == -1)	break; //TODO quit bedingungen korrigieren
+		//wartet auf inkommende hauptdaten
+		//TODO quit bedingungen korrigieren;
+		if (int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep) == -1)	break;
 
 		new_udp_data = true;
 
-		cout << "new_data_set " << new_udp_data << endl;
+/*		cout << "new_data_set " << new_udp_data << endl;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl
 			<< "DATA START" << std::endl <<
@@ -89,9 +87,19 @@ void UDP_Base::start_Server(int args)
 			dt.dt_udp.servo_position_y
 			<< std::endl
 			<< "DATA END" << std::endl;
+*/
 
 		//TODO wenn gibtes neues antwort dann senden
-		v6s.sendto(dt.buf512, 512, ep); //TODO aendern auf UDP_BLOCK_SIZE
+		v6s.sendto(dt.union_buff, SOCKET_BLOCK_SIZE, ep); 
+
+		//Bild senden
+		//char* start_picture;
+
+		//int n = 15;
+		//while (n++ < 15 )
+		//{
+		//	v6s.sendto(start_picture, SOCKET_BLOCK_SIZE, ep);
+		//}
 
 
 	}

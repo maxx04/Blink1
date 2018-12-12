@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include <iostream>
-#include "../xsocket.hpp"
+//#include "../xsocket.hpp"
 #include "../UDP_Base.h"
 
 int main()
@@ -33,7 +33,7 @@ int main()
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	sock.send(_data.buf512, 512); 
+	sock.send(_data.union_buff, 512); 
 	
 	Sleep(1000);
 
@@ -43,9 +43,9 @@ int main()
 		std::cin >> _data.dt_udp.servo_position_x;
 		std::cin >> _data.dt_udp.servo_position_y;
 
-		sock.send(_data.buf512, 512);
+		sock.send(_data.union_buff, 512);
 
-		int i = sock.recvfrom(_data.buf512, 512, &ep);
+		int i = sock.recvfrom(_data.union_buff, 512, &ep);
 
 		if (i == -1)	break;
 

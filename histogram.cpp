@@ -1,7 +1,6 @@
 
 #include "histogram.h"
 
-
 histogram::histogram()
 {
 	values_index = 0;

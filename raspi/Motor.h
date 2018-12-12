@@ -7,7 +7,7 @@
 
 #define MAX_MOTORS 2
 
-using namespace std;
+
 class Motor
 {
 	static int number_of_motors;

@@ -7,8 +7,8 @@
 #include "opencv2/core.hpp"
 #include "histogram.h"
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
 class keypoints
 {
