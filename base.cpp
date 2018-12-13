@@ -35,16 +35,26 @@ int main( int argc, char** argv )
 
 	VideoCapture cap;
 
-    Mat  frame;
+    Mat  frame, im8u;
+
+
+	//cap.open(0);
+
+	//if (!cap.isOpened())
+	//{
+	//	cout << "Could not initialize capturing...\n";
+	//	return 0;
+	//}
 	
-	station PC;
+
+
+	Mat* ptr_in_Frame = new Mat(480, 640, CV_8U);
 
 	std::string buff;
 	net::endpoint ep;
 
 	udata _data;
-
-	Mat* ptrFrame = new Mat(640, 480, CV_16U);
+	//	station PC;
 
 	//we must call net::init() on windows, if not on windows it is a no-op
 	net::init();
@@ -81,7 +91,7 @@ int main( int argc, char** argv )
 
     for(;;)
     {
-     //   cap >> frame;
+       cap >> frame;
 
 		//if (frame.empty())
 		//{
@@ -99,24 +109,42 @@ int main( int argc, char** argv )
 
 		if (i == -1)	break;
 
-		std::cout << "antwort position : " << _data.dt_udp.servo_position_x << std::endl;
-
-		std::cout << "packet from: " << ep.to_string() << std::endl
-			<< "DATA START" << std::endl <<
-			buff
-			<< std::endl
-			<< "DATA END" << std::endl;
+		std::cout << "packet from: " << ep.to_string() << std::endl;
+			//<< "DATA START" << std::endl <<
+			//buff
+			//<< std::endl
+			//<< "DATA END" << std::endl;
 
 		//Bild senden
 
-		int n = 15;
-		while (n++ < 15)
-		{
-			sock.recvfrom((char*)ptrFrame, SOCKET_BLOCK_SIZE, &ep);
-		}
-	
+		int n = 0;
 
-		if (PC.proceed_frame(&frame)) break;
+		size_t n_blocks = ptr_in_Frame->total() * ptr_in_Frame->elemSize() / SOCKET_BLOCK_SIZE;
+
+		if (ptr_in_Frame->isContinuous())
+		{
+			cout << "is Continuous" << endl;
+		}
+
+		char* data_start = (char*)(ptr_in_Frame->data);
+
+		cout << "start transfer \t" << hex << int(data_start) << dec << endl;
+
+		while (n < n_blocks)
+		{
+			//cout << n << "\r";
+			sock.recvfrom(data_start + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
+
+			sock.send("ready", 512);
+			n++;
+		}
+
+		cout << "end transfer " << n << " blocks" << endl;
+	
+		imshow("LK", *ptr_in_Frame);
+		waitKey(100);
+
+//		if (PC.proceed_frame(ptr_in_Frame)) break;
 
 		//TODO skip frames
 

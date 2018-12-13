@@ -51,15 +51,15 @@ void station::take_picture(Mat* frame)
 {
 	if (frame->empty())	return; //TODO Fehlerabarbeitung
 
-	fokus.x = (float)(image.cols / 2);
-	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
-	swap();
+	//fokus.x = (float)(image.cols / 2);
+	//fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
+	//swap();
 
 	frame->copyTo(image);
 
-	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
+	//kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 
-	cvtColor(image, gray, COLOR_BGR2GRAY);
+	//cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
 void station::check_for_followed_points()
@@ -386,9 +386,11 @@ bool station::proceed_frame(Mat* frame)
 	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
 	take_picture(frame);
 
+	imshow("LK Demo", *frame);
+
 	if (needToInit)
 	{
-		find_keypoints();
+//		find_keypoints();
 		needToInit = false;
 		kp.swap();
 		return false;

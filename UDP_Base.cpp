@@ -3,7 +3,7 @@
 using namespace std;
 
 bool UDP_Base::new_udp_data = false;
-
+bool UDP_Base::transfer_busy = false; //HACK make privat
 
 udata UDP_Base::dt;
 
@@ -14,14 +14,14 @@ std::string UDP_Base::buff;
 net::endpoint UDP_Base::ep;
 
 
-UDP_Base::UDP_Base()
+UDP_Base::UDP_Base(Mat* frame)
 {
 
 	cout << sizeof(exchange_data) << endl;
 
 	assert(sizeof(exchange_data) < 512);
 
-	ptrFrame = new Mat(3, 3, CV_32FC1);
+	ptrFrame = frame;
 
 	udp_thread = new thread(start_Server, 3);
 
@@ -45,6 +45,16 @@ void UDP_Base::udp_data_received()
 bool UDP_Base::check_incoming_data()
 {
 	return new_udp_data;
+}
+
+void UDP_Base::set_frame_pointer(Mat* frame)
+{
+	ptrFrame = frame;
+}
+
+Mat * UDP_Base::get_frame_pointer()
+{
+	return ptrFrame;
 }
 
 
@@ -98,19 +108,37 @@ void UDP_Base::start_Server(int args)
 		v6s.sendto(dt.union_buff, SOCKET_BLOCK_SIZE, ep); 
 
 		//Bild senden
-		char* start_picture = (char*)ptrFrame;
+		char* start_picture = (char*)(ptrFrame->data);
 
-		int n = 15;
-		while (n++ < 15 )
+		transfer_busy = true;
+
+		int n = 0;
+		size_t n_blocks = ptrFrame->total() * ptrFrame->elemSize() / SOCKET_BLOCK_SIZE;
+		if (ptrFrame->isContinuous())
 		{
-			v6s.sendto(start_picture, SOCKET_BLOCK_SIZE, ep);
+			cout << "is Continuous" << endl;
 		}
 
+		cout << "start transfer \t" << hex << int(start_picture) << dec << endl;
+
+		while (n < n_blocks)
+		{
+			//cout << n << "\r";
+
+			v6s.sendto(start_picture + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, ep);
+			n++;
+
+			if (int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep) == -1)	break;
+		}
+
+		cout << "end transfer " << n << " blocks " << endl;
+
+		transfer_busy = false;
 
 	}
 
 	v6s.close();
-	cout << "closed" << endl;
+	cout << "socket closed" << endl;
 }
 
 

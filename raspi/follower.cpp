@@ -66,13 +66,14 @@ void follower::take_picture(Mat* frame)
 
 	fokus.x = (float)(image.cols / 2);
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
-	swap();
 
-	frame->copyTo(image);
+	// swap();
+
+//	frame->copyTo(image);
 
 //	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 
-	cvtColor(image, gray, COLOR_BGR2GRAY);
+//	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
 void follower::swap()

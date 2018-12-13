@@ -47,12 +47,15 @@ class UDP_Base
 	
 public:
 
+	static bool transfer_busy;
 	exchange_data* udp_data;
 
-	UDP_Base();
+	UDP_Base(Mat* frame);
 	~UDP_Base();
 	void udp_data_received();
 	bool check_incoming_data();
+	void set_frame_pointer(Mat* frame);
+	Mat* get_frame_pointer();
 	static void start_Server(int args);
 
 };

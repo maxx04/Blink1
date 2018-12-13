@@ -44,9 +44,9 @@ int main( int argc, char** argv )
 	if (input.size() == 1 && isdigit(input[0]))
 	{
 		cap.open(0);
-		cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-		cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-		cap.set(cv::CAP_PROP_FPS, 90);
+		//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+		//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+		//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
 	}
     else
         cap.open(input);
@@ -59,33 +59,46 @@ int main( int argc, char** argv )
 
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
+	static Mat  frame, gray;
 
-    Mat  frame;
-	UDP_Base udp_base;
+	cap >> frame;
+	cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+	//imshow("LK Demo", frame);
+	//waitKey(100);
+
+	int k;
+
+	cin >> k;
+
+	UDP_Base udp_base(&gray);
 	follower robot;
 
 	// Hauptzyclus
+
     for(;;)
     {
-        cap >> frame;
-
-		if (frame.empty())
-		{
-			// wenn videodatei in befehlzeile dann beenden.
-			if (input.size() != 0) break;
-			cap.open(0); //TODO fall mit video berücksichtigen
-			cap >> frame;
-		}
-
-
 
 		if (udp_base.check_incoming_data())
 		{
+
+			//imshow("LK Demo", *udp_base.get_frame_pointer());
+			//waitKey(100);
 			cout << "new udp data " << udp_base.check_incoming_data() << endl;
 			robot.new_data_proceed(&udp_base);
+
+			while (!udp_base.transfer_busy) 
+			{
+				cout << "waiting transfer \r";
+			}
+				cap >> frame;
+
+				cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+			if (robot.proceed_frame(&gray)) return 0;
 		}
 
-		if (robot.proceed_frame(&frame)) break;
+
 
 		//TODO skip frames
 
