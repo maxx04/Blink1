@@ -45,7 +45,7 @@
   <ImportGroup Label="Shared" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <SourcesToCopyRemotelyOverride>~project\raspi\@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
     <LocalRemoteCopySources>true</LocalRemoteCopySources>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
