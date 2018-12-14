@@ -1,9 +1,11 @@
 #include "UDP_Base.h"
 
+
 using namespace std;
 
 bool UDP_Base::new_udp_data = false;
 bool UDP_Base::transfer_busy = false; //HACK make privat
+bool UDP_Base::imagegrab_ready = false; //HACK make privat
 
 udata UDP_Base::dt;
 
@@ -27,7 +29,7 @@ UDP_Base::UDP_Base(Mat* frame)
 
 	udp_data = &dt.dt_udp;
 
-	cout << "Thread started, Id: " << udp_thread->get_id() << endl;
+	cout << "Server thread started, Id: " << udp_thread->get_id() << endl;
 
 }
 
@@ -89,35 +91,34 @@ void UDP_Base::start_Server(int args)
 	while (true)
 	{
 		//wartet auf inkommende hauptdaten
-		//TODO quit bedingungen korrigieren;
-		if (int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep) == -1)	break;
-
-		new_udp_data = true;
-
-/*		cout << "new_data_set " << new_udp_data << endl;
-
-		std::cout << "packet from: " << ep.to_string() << std::endl
-			<< "DATA START" << std::endl <<
-			dt.dt_udp.servo_position_x << ":" <<
-			dt.dt_udp.servo_position_y
-			<< std::endl
-			<< "DATA END" << std::endl;
-*/
+		cout << "wartet auf client \n";
+		int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep);
+		if (i == -1)	break;
 
 		//TODO wenn gibtes neues antwort dann senden
 		v6s.sendto(dt.union_buff, SOCKET_BLOCK_SIZE, ep); 
+		cout << "antwort gesendet \n";
+
+		//imagegrab_ready = false;
+		new_udp_data = true;
 
 		//Bild senden
 		char* start_picture = (char*)(ptrFrame->data);
 
-		transfer_busy = true;
-
 		int n = 0;
 		size_t n_blocks = ptrFrame->total() * ptrFrame->elemSize() / SOCKET_BLOCK_SIZE;
-		if (ptrFrame->isContinuous())
+		//if (ptrFrame->isContinuous())
+		//{
+		//	cout << "image in Continuous memory" << endl;
+		//}
+
+		while (!imagegrab_ready)
 		{
-			cout << "is Continuous" << endl;
+			cout << "waiting imagegrab \n"; //TODO Zeit einfügen
+			usleep(500000);
 		}
+
+		transfer_busy = true;
 
 		cout << "start transfer \t" << hex << int(start_picture) << dec << endl;
 
@@ -128,12 +129,13 @@ void UDP_Base::start_Server(int args)
 			v6s.sendto(start_picture + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, ep);
 			n++;
 
-			if (int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep) == -1)	break;
+			if (int i = v6s.recvfrom(dt.union_buff, 6, &ep) == -1)	break;
 		}
 
 		cout << "end transfer " << n << " blocks " << endl;
 
 		transfer_busy = false;
+		imagegrab_ready = false;
 
 	}
 

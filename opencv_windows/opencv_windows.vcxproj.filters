@@ -47,9 +47,6 @@
     <ClCompile Include="..\station.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\UDP_Base.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\test1.mp4">

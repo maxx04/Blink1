@@ -35,21 +35,25 @@ int main( int argc, char** argv )
 
 	int wait_time = 0;
 
-    help();
-    cv::CommandLineParser parser(argc, argv, "{@input|0|}");
-    string input = parser.get<string>("@input");
+ //   help();
+    //cv::CommandLineParser parser(argc, argv, "{@input|0|}");
+    //string input = parser.get<string>("@input");
 
 	VideoCapture cap;
 
-	if (input.size() == 1 && isdigit(input[0]))
-	{
-		cap.open(0);
-		//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-		//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-		//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
-	}
-    else
-        cap.open(input);
+	//if (input.size() == 1 && isdigit(input[0]))
+	//{
+	//	cap.open(0);
+	//	//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	//	//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+	//	//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
+	//}
+ //   else
+ //       cap.open(input);
+
+	cap.open(0);
+	cap.set(cv::CAP_PROP_FPS, 15);
+	cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
 
     if( !cap.isOpened() )
     {
@@ -59,17 +63,19 @@ int main( int argc, char** argv )
 
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
-	static Mat  frame, gray;
+	static Mat  frame, buff, gray;
 
-	cap >> frame;
+	cout << cap.grab() << " grab result \n";
+	cap.retrieve(frame);
+
+	imwrite("test.jpg", frame);
 	cvtColor(frame, gray, COLOR_BGR2GRAY);
 
-	//imshow("LK Demo", frame);
+
+	//for (int i = 0; i < 6; i++) cap >> frame;
+
+	//imshow("LK Demo", gray);
 	//waitKey(100);
-
-	int k;
-
-	cin >> k;
 
 	UDP_Base udp_base(&gray);
 	follower robot;
@@ -81,19 +87,38 @@ int main( int argc, char** argv )
 
 		if (udp_base.check_incoming_data())
 		{
-
-			//imshow("LK Demo", *udp_base.get_frame_pointer());
-			//waitKey(100);
-			cout << "new udp data " << udp_base.check_incoming_data() << endl;
+			cout << "new udp data \n";
 			robot.new_data_proceed(&udp_base);
+			cout << "aufnahme \n";
 
-			while (!udp_base.transfer_busy) 
+			for (int i = 0; i < 6; i++) cap >> frame;
+			 
+			if (cap.read(frame))
+			{
+				cout << "aufgenommen \n";
+			}
+			else
+			{
+				cout << "nicht aufgenommen \n";
+			}
+			
+			cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+			udp_base.imagegrab_ready = true; // fuer thread mit Server
+
+
+
+			//imwrite("test.jpg", frame);
+			cout << "grab true \n";
+			imshow("LK Demo", frame);
+			waitKey(200);
+
+
+
+			while (udp_base.transfer_busy) 
 			{
 				cout << "waiting transfer \r";
 			}
-				cap >> frame;
-
-				cvtColor(frame, gray, COLOR_BGR2GRAY);
 
 			if (robot.proceed_frame(&gray)) return 0;
 		}
