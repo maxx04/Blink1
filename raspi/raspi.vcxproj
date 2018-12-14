@@ -25,9 +25,6 @@
     <ClInclude Include="SerialPort_raspi.h" />
     <ClInclude Include="Servos.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\test1.mp4" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>
     <Keyword>Linux</Keyword>
@@ -47,6 +44,10 @@
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <SourcesToCopyRemotelyOverride>~project\raspi\@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
+    <LocalRemoteCopySources>true</LocalRemoteCopySources>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <LibraryDependencies>wiringPi;opencv_world</LibraryDependencies>

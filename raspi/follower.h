@@ -56,7 +56,7 @@ class follower
 public:
 	follower();
 	~follower();
-	void find_keypoints();
+	//void find_keypoints();
 	void take_picture(Mat* frame);
 	//void check_for_followed_points();
 	//void calcOptFlow();
