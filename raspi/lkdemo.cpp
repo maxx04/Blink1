@@ -41,19 +41,15 @@ int main( int argc, char** argv )
 
 	VideoCapture cap;
 
-	//if (input.size() == 1 && isdigit(input[0]))
-	//{
-	//	cap.open(0);
-	//	//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-	//	//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-	//	//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
-	//}
- //   else
- //       cap.open(input);
-
-	cap.open(0);
-	cap.set(cv::CAP_PROP_FPS, 15);
-	cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
+	if (input.size() == 1 && isdigit(input[0]))
+	{
+		cap.open(0);
+		//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+		//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+		//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
+	}
+    else
+        cap.open(input);
 
     if( !cap.isOpened() )
     {
@@ -87,22 +83,19 @@ int main( int argc, char** argv )
 
 		if (udp_base.check_incoming_data())
 		{
-			cout << "new udp data \n";
-			robot.new_data_proceed(&udp_base);
-			cout << "aufnahme \n";
 
-			for (int i = 0; i < 6; i++) cap >> frame;
-			 
-			if (cap.read(frame))
-			{
-				cout << "aufgenommen \n";
-			}
-			else
+			//imshow("LK Demo", *udp_base.get_frame_pointer());
+			//waitKey(100);
+			cout << "new udp data " << udp_base.check_incoming_data() << endl;
+			robot.new_data_proceed(&udp_base);
+
+			while (!udp_base.transfer_busy) 
 			{
 				cout << "nicht aufgenommen \n";
 			}
-			
-			cvtColor(frame, gray, COLOR_BGR2GRAY);
+				cap >> frame;
+
+				cvtColor(frame, gray, COLOR_BGR2GRAY);
 
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
