@@ -425,7 +425,7 @@ void station::new_data_proceed(UDP_Base* udp_base)
 
 
 
-	udp_base->udp_data_received();
+	//udp_base->udp_data_received();
 
 	//send antwort an server 
 }

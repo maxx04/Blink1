@@ -48,6 +48,7 @@ class UDP_Base
 public:
 
 	static bool transfer_busy;
+	static bool imagegrab_ready;
 	exchange_data* udp_data;
 
 	UDP_Base(Mat* frame);

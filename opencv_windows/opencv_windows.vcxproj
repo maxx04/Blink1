@@ -64,7 +64,6 @@
     <ClCompile Include="..\histogram.cpp" />
     <ClCompile Include="..\keypoints.cpp" />
     <ClCompile Include="..\station.cpp" />
-    <ClCompile Include="..\UDP_Base.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\test1.mp4" />

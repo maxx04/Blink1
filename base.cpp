@@ -74,7 +74,7 @@ int main( int argc, char** argv )
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	sock.send("connect", 512);
+	sock.send("connect", 8);
 
 	Sleep(1000);
 
@@ -91,7 +91,7 @@ int main( int argc, char** argv )
 
     for(;;)
     {
-       cap >> frame;
+      // cap >> frame;
 
 		//if (frame.empty())
 		//{
@@ -101,11 +101,11 @@ int main( int argc, char** argv )
 		//	cap >> frame;
 		//}
 
-		std::cin >> wait_time;
+		std::cin >> _data.dt_udp.servo_position_y;
 
 		sock.send(_data.union_buff, 512);
 
-		int i = sock.recvfrom(_data.union_buff, 512, &ep);
+		int i = sock.recvfrom(_data.union_buff, 512, &ep); // 1. antwort
 
 		if (i == -1)	break;
 
@@ -128,6 +128,8 @@ int main( int argc, char** argv )
 
 		char* data_start = (char*)(ptr_in_Frame->data);
 
+		int64 start = getTickCount();
+
 		cout << "start transfer \t" << hex << int(data_start) << dec << endl;
 
 		while (n < n_blocks)
@@ -135,11 +137,12 @@ int main( int argc, char** argv )
 			//cout << n << "\r";
 			sock.recvfrom(data_start + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
 
-			sock.send("ready", 512);
+			sock.send("ready", 6);
 			n++;
 		}
 
-		cout << "end transfer " << n << " blocks" << endl;
+		cout << "end transfer " << n << " blocks " << 
+			(getTickCount() - start)/ getTickFrequency() << " s" << endl;
 	
 		imshow("LK", *ptr_in_Frame);
 		waitKey(100);

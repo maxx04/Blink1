@@ -62,7 +62,11 @@ follower::~follower()
 
 void follower::take_picture(Mat* frame)
 {
-	if (frame->empty())	return; //TODO Fehlerabarbeitung
+	if (frame->empty())
+	{
+		cerr << " Frame empty \n";
+		return; //TODO Fehlerabarbeitung
+	}
 
 	fokus.x = (float)(image.cols / 2);
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
