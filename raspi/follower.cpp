@@ -23,15 +23,13 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 
 follower::follower()
 {
-
-
 	s.test();
 
 	motor_r = new Motor(MOTOR_RECHTS_FW, MOTOR_RECHTS_BW);
 	motor_l = new Motor(MOTOR_LINKS_FW, MOTOR_LINKS_BW);
 
-	motor_r -> test();
-	motor_l -> test();
+	//motor_r -> test();
+	//motor_l -> test();
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
@@ -158,6 +156,10 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 	cout << "new servo-position: " << p << endl;
 
 	s.move_to_position(p);
+
+	s.wait_on_position(2000); //TODO funktioniert nicht
+
+	delay(5000);
 
 	udp_base->udp_data_received();
 

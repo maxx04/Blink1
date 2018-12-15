@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#define ENCODE_QUALITY 50
+
 #include "../UDP_Base.h"
 #include "follower.h"
 
@@ -62,12 +64,18 @@ int main(int argc, char** argv)
 
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
-	static Mat  frame, buff, gray;
+	static Mat  frame, gray;
+	
+	vector < int > compression_params;
+	int jpegqual = ENCODE_QUALITY; // Compression Parameter
+	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	compression_params.push_back(jpegqual);
+	
 
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame);
 
-	imwrite("test.jpg", frame);
+	//imwrite("test.jpg", frame);
 	cvtColor(frame, gray, COLOR_BGR2GRAY);
 
 
@@ -87,6 +95,7 @@ int main(int argc, char** argv)
 		if (udp_base.check_incoming_data())
 		{
 			cout << "new udp data \n";
+			robot.new_data_proceed(&udp_base);
 			cout << "aufnahme \n";
 
 			for (int i = 0; i < 6; i++) cap >> frame;
@@ -101,6 +110,7 @@ int main(int argc, char** argv)
 			}
 
 			cvtColor(frame, gray, COLOR_BGR2GRAY);
+			imencode(".jpg", frame, udp_base.encoded, compression_params);
 
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
@@ -111,7 +121,7 @@ int main(int argc, char** argv)
 			imshow("LK Demo", frame);
 			waitKey(200);
 
-			robot.new_data_proceed(&udp_base);
+
 
 			while (udp_base.transfer_busy)
 			{
