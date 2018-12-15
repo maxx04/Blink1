@@ -112,6 +112,8 @@ int main(int argc, char** argv)
 
 			//cvtColor(frame, gray, COLOR_BGR2GRAY);
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
+			cvtColor(frame, gray, COLOR_BGR2GRAY);
+			imencode(".jpg", frame, udp_base.encoded, compression_params);
 
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
@@ -121,6 +123,7 @@ int main(int argc, char** argv)
 			cout << "grab true \n";
 			//imshow("LK Demo", frame);
 			//waitKey(200);
+
 
 
 
