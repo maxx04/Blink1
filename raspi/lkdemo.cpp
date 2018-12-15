@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#define ENCODE_QUALITY 50
+
 #include "../UDP_Base.h"
 #include "follower.h"
 
@@ -44,14 +46,15 @@ int main(int argc, char** argv)
 	//if (input.size() == 1 && isdigit(input[0]))
 	//{
 	//	cap.open(0);
-	//	//cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-	//	//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
 	//	//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
 	//}
  //   else
  //       cap.open(input);
 
 	cap.open(0);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
 	cap.set(cv::CAP_PROP_FPS, 15);
 
 	if (!cap.isOpened())
@@ -62,12 +65,18 @@ int main(int argc, char** argv)
 
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
-	static Mat  frame, buff, gray;
+	static Mat  frame, gray;
+	
+	vector < int > compression_params;
+	int jpegqual = ENCODE_QUALITY; // Compression Parameter
+	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	compression_params.push_back(jpegqual);
+	
 
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame);
 
-	imwrite("test.jpg", frame);
+	//imwrite("test.jpg", frame);
 	cvtColor(frame, gray, COLOR_BGR2GRAY);
 
 
@@ -87,9 +96,10 @@ int main(int argc, char** argv)
 		if (udp_base.check_incoming_data())
 		{
 			cout << "new udp data \n";
+			robot.new_data_proceed(&udp_base);
 			cout << "aufnahme \n";
 
-			for (int i = 0; i < 6; i++) cap >> frame;
+			for (int i = 0; i < 8; i++) cap >> frame;
 
 			if (cap.read(frame))
 			{
@@ -100,7 +110,8 @@ int main(int argc, char** argv)
 				cout << "nicht aufgenommen \n";
 			}
 
-			cvtColor(frame, gray, COLOR_BGR2GRAY);
+			//cvtColor(frame, gray, COLOR_BGR2GRAY);
+			imencode(".jpg", frame, udp_base.encoded, compression_params);
 
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
@@ -108,10 +119,10 @@ int main(int argc, char** argv)
 
 			//imwrite("test.jpg", frame);
 			cout << "grab true \n";
-			imshow("LK Demo", frame);
-			waitKey(200);
+			//imshow("LK Demo", frame);
+			//waitKey(200);
 
-			robot.new_data_proceed(&udp_base);
+
 
 			while (udp_base.transfer_busy)
 			{

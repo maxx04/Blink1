@@ -10,6 +10,7 @@ bool UDP_Base::imagegrab_ready = false; //HACK make privat
 udata UDP_Base::dt;
 
 Mat* UDP_Base::ptrFrame = NULL;
+std::vector < uchar > UDP_Base::encoded(65536);
 
 
 std::string UDP_Base::buff;
@@ -96,17 +97,31 @@ void UDP_Base::start_Server(int args)
 		if (i == -1)	break;
 
 		//TODO wenn gibtes neues antwort dann senden
-		v6s.sendto(dt.union_buff, SOCKET_BLOCK_SIZE, ep); 
+		size_t n_blocks = 1 + (encoded.size() - 1) / SOCKET_BLOCK_SIZE;
+
+		union int_char
+		{
+			int nb;
+			char bf[sizeof(int)];
+		} tmp;
+
+
+		tmp.nb = n_blocks;
+
+		v6s.sendto(tmp.bf, sizeof(int), ep);
+
 		cout << "antwort gesendet \n";
 
 		//imagegrab_ready = false;
 		new_udp_data = true;
 
 		//Bild senden
-		char* start_picture = (char*)(ptrFrame->data);
+		//char* start_picture = (char*)(ptrFrame->data);
+		char* start_picture = (char*)(&encoded[0]);
 
 		int n = 0;
-		size_t n_blocks = ptrFrame->total() * ptrFrame->elemSize() / SOCKET_BLOCK_SIZE;
+		//size_t n_blocks = ptrFrame->total() * ptrFrame->elemSize() / SOCKET_BLOCK_SIZE;
+
 		//if (ptrFrame->isContinuous())
 		//{
 		//	cout << "image in Continuous memory" << endl;
@@ -115,24 +130,32 @@ void UDP_Base::start_Server(int args)
 		while (!imagegrab_ready)
 		{
 			cout << "waiting imagegrab \n"; //TODO Zeit einfügen
-			usleep(500000);
+			usleep(300000);
 		}
 
 		transfer_busy = true;
+		int64 start = getTickCount();
 
 		cout << "start transfer \t" << hex << int(start_picture) << dec << endl;
 
 		while (n < n_blocks)
 		{
-			//cout << n << "\r";
+			cout << n << "\r";
 
-			v6s.sendto(start_picture + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, ep);
+			v6s.sendto((char*)&encoded[ n * SOCKET_BLOCK_SIZE], SOCKET_BLOCK_SIZE, ep);
 			n++;
 
-			if (int i = v6s.recvfrom(dt.union_buff, 6, &ep) == -1)	break;
+			int i = v6s.recvfrom(dt.union_buff, 6, &ep);
+
+			if (i == -1)
+			{
+				cerr << "falsche antwort vom client \n";
+				break;
+			}
 		}
 
-		cout << "end transfer " << n << " blocks " << endl;
+		cout << "end transfer " << n << " blocks " <<
+			(getTickCount() - start) / getTickFrequency() << " s" << endl;
 
 		transfer_busy = false;
 		imagegrab_ready = false;

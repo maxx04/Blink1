@@ -7,7 +7,7 @@
 #include "xsocket.hpp"
 #include <opencv2/core.hpp>
 
-#define SOCKET_BLOCK_SIZE 512
+#define SOCKET_BLOCK_SIZE 4096
 
 using namespace cv;
 
@@ -42,6 +42,7 @@ class UDP_Base
 	static udata dt;
 	static Mat* ptrFrame;
 
+
 	static std::string buff;
 	static net::endpoint ep;
 	
@@ -49,6 +50,7 @@ public:
 
 	static bool transfer_busy;
 	static bool imagegrab_ready;
+	static std::vector < uchar > encoded;
 	exchange_data* udp_data;
 
 	UDP_Base(Mat* frame);

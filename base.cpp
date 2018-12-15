@@ -37,18 +37,8 @@ int main( int argc, char** argv )
 
     Mat  frame, im8u;
 
-
-	//cap.open(0);
-
-	//if (!cap.isOpened())
-	//{
-	//	cout << "Could not initialize capturing...\n";
-	//	return 0;
-	//}
-	
-
-
 	Mat* ptr_in_Frame = new Mat(480, 640, CV_8U);
+	static std::vector < uchar > encoded(65536);
 
 	std::string buff;
 	net::endpoint ep;
@@ -91,51 +81,50 @@ int main( int argc, char** argv )
 
     for(;;)
     {
-      // cap >> frame;
 
-		//if (frame.empty())
-		//{
-		//	// wenn videodatei in befehlzeile dann beenden.
-		//	if (input.size() != 0) break;
-		//	cap.open(0); //TODO fall mit video berücksichtigen
-		//	cap >> frame;
-		//}
+		cout << " x:"; cin >> _data.dt_udp.servo_position_x;
+		cout << " y:"; cin >> _data.dt_udp.servo_position_y;
 
-		std::cin >> _data.dt_udp.servo_position_y;
+		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);
 
-		sock.send(_data.union_buff, 512);
+		union int_char
+		{
+			int nb;
+			char bf[sizeof(int)];
+		} tmp;
 
-		int i = sock.recvfrom(_data.union_buff, 512, &ep); // 1. antwort
+		int i = sock.recvfrom(tmp.bf, sizeof(int), &ep); // 1. antwort
 
 		if (i == -1)	break;
 
 		std::cout << "packet from: " << ep.to_string() << std::endl;
-			//<< "DATA START" << std::endl <<
-			//buff
-			//<< std::endl
-			//<< "DATA END" << std::endl;
 
 		//Bild senden
 
 		int n = 0;
 
-		size_t n_blocks = ptr_in_Frame->total() * ptr_in_Frame->elemSize() / SOCKET_BLOCK_SIZE;
+		//size_t n_blocks = ptr_in_Frame->total() * ptr_in_Frame->elemSize() / SOCKET_BLOCK_SIZE;
+		size_t n_blocks = tmp.nb; // 1 + (_encoded.size() - 1) / SOCKET_BLOCK_SIZE;
+
+		cout << n_blocks << " blocks" << endl;
 
 		if (ptr_in_Frame->isContinuous())
 		{
 			cout << "is Continuous" << endl;
 		}
 
-		char* data_start = (char*)(ptr_in_Frame->data);
+		//char* data_start = (char*)(ptr_in_Frame->data);
+
+		char * longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
 
 		int64 start = getTickCount();
 
-		cout << "start transfer \t" << hex << int(data_start) << dec << endl;
+		cout << "start transfer \t" << hex << int(longbuf) << dec << endl;
 
 		while (n < n_blocks)
 		{
 			//cout << n << "\r";
-			sock.recvfrom(data_start + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
+			sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
 
 			sock.send("ready", 6);
 			n++;
@@ -143,8 +132,21 @@ int main( int argc, char** argv )
 
 		cout << "end transfer " << n << " blocks " << 
 			(getTickCount() - start)/ getTickFrequency() << " s" << endl;
+
+		
+
+		Mat rawData = Mat(1, 65536, CV_8UC1, longbuf);
+
+		Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+
+		if (frame.size().width == 0) {
+			cerr << "decode failure!" << endl;
+			continue;
+		}
+
+		imshow("recv", frame);
 	
-		imshow("LK", *ptr_in_Frame);
+		//imshow("LK", *ptr_in_Frame);
 		waitKey(100);
 
 //		if (PC.proceed_frame(ptr_in_Frame)) break;
