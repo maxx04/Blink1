@@ -1,34 +1,30 @@
 #include "UDP_Base.h"
 
-
-using namespace std;
+using namespace cv;
 
 bool UDP_Base::new_udp_data = false;
-bool UDP_Base::transfer_busy = false; //HACK make privat
-bool UDP_Base::imagegrab_ready = false; //HACK make privat
+bool UDP_Base::transfer_busy = false; 
+bool UDP_Base::imagegrab_ready = false; 
 
 udata UDP_Base::dt;
 
-Mat* UDP_Base::ptrFrame = NULL;
-std::vector < uchar > UDP_Base::encoded(65536);
+std::vector < uchar > UDP_Base::encoded(100);
 
-
-std::string UDP_Base::buff;
 net::endpoint UDP_Base::ep;
 
+#define WAIT_ON_CAM 20
 
-UDP_Base::UDP_Base(Mat* frame)
+
+UDP_Base::UDP_Base()
 {
 
-	cout << sizeof(exchange_data) << endl;
+//	cout << sizeof(exchange_data) << endl;
 
-	assert(sizeof(exchange_data) < 512);
-
-	ptrFrame = frame;
-
-	udp_thread = new thread(start_Server, 3);
+	assert(sizeof(exchange_data) < SOCKET_BLOCK_SIZE);
 
 	udp_data = &dt.dt_udp;
+
+	udp_thread = new thread(start_Server, 1);
 
 	cout << "Server thread started, Id: " << udp_thread->get_id() << endl;
 
@@ -50,21 +46,22 @@ bool UDP_Base::check_incoming_data()
 	return new_udp_data;
 }
 
-void UDP_Base::set_frame_pointer(Mat* frame)
-{
-	ptrFrame = frame;
-}
+//void UDP_Base::set_frame_pointer(Mat* frame)
+//{
+//	ptrFrame = frame;
+//}
 
-Mat * UDP_Base::get_frame_pointer()
-{
-	return ptrFrame;
-}
+//Mat * UDP_Base::get_frame_pointer()
+//{
+//	return ptrFrame;
+//}
 
 
 
 void UDP_Base::start_Server(int args)
 {
 
+	TickMeter tm;
 
 	//init only required for windows, no-op on *nix
 	net::init();
@@ -86,7 +83,7 @@ void UDP_Base::start_Server(int args)
 
 	//recv a packet up to 512 bytes and store the sender in endpoint ep
 	v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
-	std::cout << "erstes pack, buffer: " << buff << std::endl;
+	std::cout << "erstes pack, buffer: " << dt.union_buff << std::endl;
 	std::cout << ep.to_string() << std::endl;
 
 	while (true)
@@ -94,58 +91,61 @@ void UDP_Base::start_Server(int args)
 		//wartet auf inkommende hauptdaten
 		cout << "wartet auf client \n";
 		int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep);
-		if (i == -1)	break;
-
-		//TODO wenn gibtes neues antwort dann senden
-		size_t n_blocks = 1 + (encoded.size() - 1) / SOCKET_BLOCK_SIZE;
-
-		union int_char
+		if (i == -1) 
 		{
-			int nb;
-			char bf[sizeof(int)];
-		} tmp;
+			cerr << "Fehler beim warten \n";	break;
+		}
 
+		//imagegrab_ready = false;
+		new_udp_data = true;
+
+		//warten auf bild
+		tm.reset();
+		tm.start();
+
+		cout.precision(3);
+
+		while (!imagegrab_ready)
+		{
+			cout << "waiting on image " << tm.getTimeSec() << " s \n";
+			if (tm.getTimeSec() > WAIT_ON_CAM)
+			{
+				cerr << " bild nicht aufgenommen \n"; break;
+			}
+			usleep(300000);
+			tm.stop();
+			tm.start();
+		}
+
+		int n_blocks = 1 + ((encoded.size() - 1) / SOCKET_BLOCK_SIZE);
+
+		int_char tmp;
 
 		tmp.nb = n_blocks;
 
 		v6s.sendto(tmp.bf, sizeof(int), ep);
 
-		cout << "antwort gesendet \n";
-
-		//imagegrab_ready = false;
-		new_udp_data = true;
+		cout << "antwort gesendet " << n_blocks << " blocks \n";
 
 		//Bild senden
-		//char* start_picture = (char*)(ptrFrame->data);
-		char* start_picture = (char*)(&encoded[0]);
-
 		int n = 0;
-		//size_t n_blocks = ptrFrame->total() * ptrFrame->elemSize() / SOCKET_BLOCK_SIZE;
-
-		//if (ptrFrame->isContinuous())
-		//{
-		//	cout << "image in Continuous memory" << endl;
-		//}
-
-		while (!imagegrab_ready)
-		{
-			cout << "waiting imagegrab \n"; //TODO Zeit einfügen
-			usleep(300000);
-		}
 
 		transfer_busy = true;
-		int64 start = getTickCount();
 
-		cout << "start transfer \t" << hex << int(start_picture) << dec << endl;
+		cout << "start transfer \t" << hex << int((char*)(&encoded[0])) << dec << endl;
+
+		tm.reset();
+		tm.start();
 
 		while (n < n_blocks)
 		{
-			cout << n << "\r";
+			//cout << n << "\r";
 
 			v6s.sendto((char*)&encoded[ n * SOCKET_BLOCK_SIZE], SOCKET_BLOCK_SIZE, ep);
 			n++;
 
-			int i = v6s.recvfrom(dt.union_buff, 6, &ep);
+			//OPTI gibt es moeglichkeit zum erneutes senden
+			int i = v6s.recvfrom(tmp.bf, sizeof(int), &ep);
 
 			if (i == -1)
 			{
@@ -154,11 +154,14 @@ void UDP_Base::start_Server(int args)
 			}
 		}
 
-		cout << "end transfer " << n << " blocks " <<
-			(getTickCount() - start) / getTickFrequency() << " s" << endl;
+		tm.stop();
+
+		cout << "end transfer " << n << " blocks in " << tm << endl;
 
 		transfer_busy = false;
 		imagegrab_ready = false;
+
+		//OPTI wenn gibt es neues antwort dann senden
 
 	}
 

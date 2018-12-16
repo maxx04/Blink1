@@ -16,7 +16,6 @@
     <ClCompile Include="Servos.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SerialPort.h" />
     <ClInclude Include="..\UDP_Base.h" />
     <ClInclude Include="..\xsocket.hpp" />
     <ClInclude Include="camera_calibration.h" />
@@ -47,6 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
     <LocalRemoteCopySources>true</LocalRemoteCopySources>
+    <RemoteProjectDir>$(RemoteRootDir)/$(SolutionName)</RemoteProjectDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -59,7 +59,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <ObjectFileName>$(RemoteDebuggerWorkingDirectory)%(filename).o</ObjectFileName>
+      <ObjectFileName>$(RemoteProjectDir)/bin/$(Platform)/$(Configuration)/%(filename).o</ObjectFileName>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ARM;_DEBUG</PreprocessorDefinitions>
       <ThreadSafeStatics>No</ThreadSafeStatics>

@@ -10,17 +10,6 @@
 Point2f AimPoint;
 bool setAimPt = false;
 
-//fu
-
-static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
-{
-	if (event == EVENT_LBUTTONDOWN)
-	{
-		AimPoint = Point2f((float)x, (float)(y));
-		setAimPt = true;
-	}
-}
-
 follower::follower()
 {
 	s.test();
@@ -34,22 +23,6 @@ follower::follower()
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
-
-	/* Probeberechnung
-
-	Mat vec = Mat(3, 1, CV_32FC1, { 10.0, 12.0, 3.0 });
-
-	Mat n = cameraMatrix * vec;
-
-	cout << n << endl;
-
-	*/
-
-	//#ifndef _ARM
-	//namedWindow("LK Demo", 1);
-
-	//setMouseCallback("LK Demo", onMouse, 0);
-	//#endif
 }
 
 follower::~follower()

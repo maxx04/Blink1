@@ -1,7 +1,14 @@
 
 #include "camera_calibration.h"
 
-
+static void cal_help()
+{
+	cout << "This is a camera calibration sample." << endl
+		<< "Usage: camera_calibration [configuration_file -- default ./default.xml]" << endl
+		<< "Near the sample file you'll find the configuration file, which has detailed help of "
+		<< "e - escape, u - distort"
+		"how to edit it.  It may be any OpenCV supported file format XML/YAML." << endl;
+}
 
 Mat calibrate(int argc, char* argv[])
 {
@@ -256,13 +263,13 @@ static void calcBoardCornerPositions(Size boardSize, float squareSize, vector<Po
     case Settings::CIRCLES_GRID:
         for( int i = 0; i < boardSize.height; ++i )
             for( int j = 0; j < boardSize.width; ++j )
-                corners.push_back(Point3f(j*squareSize, i*squareSize, 0));
+                corners.push_back(Point3f((float)j*squareSize, (float)i*squareSize, 0));
         break;
 
     case Settings::ASYMMETRIC_CIRCLES_GRID:
         for( int i = 0; i < boardSize.height; i++ )
             for( int j = 0; j < boardSize.width; j++ )
-                corners.push_back(Point3f((2*j + i % 2)*squareSize, i*squareSize, 0));
+                corners.push_back(Point3f((float)(2*j + i % 2)*squareSize, (float)i*squareSize, 0));
         break;
     default:
         break;

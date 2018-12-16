@@ -1,5 +1,5 @@
 #include "Servos.h"
-#pragma warning(disable : 4996)
+//#pragma warning(disable : 4996)
 
 
 //TODO Fehlerbearbeitung realisieren

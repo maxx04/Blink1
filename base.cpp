@@ -37,10 +37,10 @@ int main( int argc, char** argv )
 
     Mat  frame, im8u;
 
-	Mat* ptr_in_Frame = new Mat(480, 640, CV_8U);
-	static std::vector < uchar > encoded(65536);
+	//Mat* ptr_in_Frame = new Mat(480, 640, CV_8U);
+	//static std::vector < uchar > encoded(65536);
 
-	std::string buff;
+	//std::string buff;
 	net::endpoint ep;
 
 	udata _data;
@@ -87,11 +87,7 @@ int main( int argc, char** argv )
 
 		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);
 
-		union int_char
-		{
-			int nb;
-			char bf[sizeof(int)];
-		} tmp;
+		int_char tmp;
 
 		int i = sock.recvfrom(tmp.bf, sizeof(int), &ep); // 1. antwort
 
@@ -103,37 +99,28 @@ int main( int argc, char** argv )
 
 		int n = 0;
 
-		//size_t n_blocks = ptr_in_Frame->total() * ptr_in_Frame->elemSize() / SOCKET_BLOCK_SIZE;
-		size_t n_blocks = tmp.nb; // 1 + (_encoded.size() - 1) / SOCKET_BLOCK_SIZE;
+		size_t n_blocks = tmp.nb; 
 
 		cout << n_blocks << " blocks" << endl;
-
-		if (ptr_in_Frame->isContinuous())
-		{
-			cout << "is Continuous" << endl;
-		}
-
-		//char* data_start = (char*)(ptr_in_Frame->data);
 
 		char * longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
 
 		int64 start = getTickCount();
 
-		cout << "start transfer \t" << hex << int(longbuf) << dec << endl;
+		cout << "start transfer \t" << hex << int(&longbuf) << dec << endl;
 
 		while (n < n_blocks)
 		{
 			//cout << n << "\r";
 			sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
 
-			sock.send("ready", 6);
+			sock.send(tmp.bf, sizeof(int));
 			n++;
 		}
 
 		cout << "end transfer " << n << " blocks " << 
 			(getTickCount() - start)/ getTickFrequency() << " s" << endl;
 
-		
 
 		Mat rawData = Mat(1, 65536, CV_8UC1, longbuf);
 

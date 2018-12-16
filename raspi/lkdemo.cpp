@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define ENCODE_QUALITY 50
+#define ENCODE_QUALITY 80
 
 #include "../UDP_Base.h"
 #include "follower.h"
@@ -16,14 +16,11 @@ using namespace std;
 static void help()
 {
 	// print a welcome message, and the OpenCV version
-	cout << "\nThis is a demo of Lukas-Kanade optical flow lkdemo(),\n"
+	cout << "\nRobot program start\n"
 		"Using OpenCV version " << CV_VERSION << endl;
 	cout << "\nIt uses camera by default, but you can provide a path to video as an argument.\n";
 	cout << "\nHot keys: \n"
 		"\tESC - quit the program\n"
-		"\tr - auto-initialize tracking\n"
-		"\tc - delete all the points\n"
-		"\ts - set aim point\n"
 		"\tk - calibrate camera\n"
 		<< endl;
 }
@@ -34,23 +31,8 @@ static void help()
 
 int main(int argc, char** argv)
 {
-
-	int wait_time = 0;
-
-	//   help();
-	   //cv::CommandLineParser parser(argc, argv, "{@input|0|}");
-	   //string input = parser.get<string>("@input");
-
+	help();
 	VideoCapture cap;
-
-	//if (input.size() == 1 && isdigit(input[0]))
-	//{
-	//	cap.open(0);
-
-	//	//cap.set(cv::CAP_PROP_FPS, 90); // OPTI
-	//}
- //   else
- //       cap.open(input);
 
 	cap.open(0);
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
@@ -85,7 +67,7 @@ int main(int argc, char** argv)
 	//imshow("LK Demo", gray);
 	//waitKey(100);
 
-	UDP_Base udp_base(&gray);
+	UDP_Base udp_base;
 	follower robot;
 
 	// Hauptzyclus
@@ -112,12 +94,7 @@ int main(int argc, char** argv)
 
 			//cvtColor(frame, gray, COLOR_BGR2GRAY);
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
-			cvtColor(frame, gray, COLOR_BGR2GRAY);
-			imencode(".jpg", frame, udp_base.encoded, compression_params);
-
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
-
-
 
 			//imwrite("test.jpg", frame);
 			cout << "grab true \n";
@@ -135,9 +112,6 @@ int main(int argc, char** argv)
 			if (robot.proceed_frame(&gray)) return 0;
 		}
 
-
-
-		//TODO skip frames
 
 	}
 

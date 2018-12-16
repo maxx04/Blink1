@@ -1,4 +1,4 @@
-#include "../SerialPort.h"
+#include "SerialPort_raspi.h"
 
 SerialPort::SerialPort(const char *portName)
 {
@@ -62,7 +62,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 	while (serialDataAvail(fd) > 0 || num >= MAX_DATA_LENGTH)
 	{
-		buffer[num++] = serialGetchar(fd);
+		buffer[num++] = (char)serialGetchar(fd);
 //		if (buffer[num - 1] == 'O' && buffer[num] == 'K') return num;
 	}
 	return num;
