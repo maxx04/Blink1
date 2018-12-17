@@ -11,25 +11,36 @@ using namespace cv;
 
 class Servos
 {
+	// nummer der servos
+	int number;
+	// anzahl der servos
+	static int amount;
+	TickMeter tm;
+	static SerialPort* sp;
+	static char m[100];
+	float max_position;
+	float min_position;
+
 public:
-	//int N = 0;
-	Point2f position;
-	Point2f max_position;
-	Point2f min_position;
-	float servo_delta;
-	const char* portName;
-	char m[100];
-	SerialPort* sp;
+	//aktuelle soll position 
+	float position;
+	float null_position;
+	float grad_to_step;
+
+	/// ???
+	//float servo_delta;
+
 	bool in_move;
 
-	Servos();
+	Servos(float max, float min, float null);
 	~Servos();
 	void test();
-	void read_udp_data(float x, float y);
-	void correction(Point2f p);
-	void move_to_position(Point2f p);
+	void read_udp_data(float x);
+	void move_to_angle(float a, int time = 300);
+	//void correction(Point2f p);
+	void move_to_position(float p, int time = 600);
 	bool wait_on_position(const int time);
-	void seek();
+	//void seek();
 };
 
 #endif // !_Servos

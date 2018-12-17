@@ -14,8 +14,8 @@ using namespace std;
 
 struct exchange_data 
 {
-	float servo_position_x;
-	float servo_position_y;
+	float angle_horizontal;
+	float angle_vertikal;
 };
 
 

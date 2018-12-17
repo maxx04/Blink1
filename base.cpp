@@ -82,8 +82,8 @@ int main( int argc, char** argv )
     for(;;)
     {
 
-		cout << " x:"; cin >> _data.dt_udp.servo_position_x;
-		cout << " y:"; cin >> _data.dt_udp.servo_position_y;
+		cout << " h:"; cin >> _data.dt_udp.angle_horizontal;
+		cout << " v:"; cin >> _data.dt_udp.angle_vertikal;
 
 		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);
 

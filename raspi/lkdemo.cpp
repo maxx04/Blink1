@@ -26,9 +26,6 @@ static void help()
 }
 
 
-
-
-
 int main(int argc, char** argv)
 {
 	help();
@@ -79,6 +76,7 @@ int main(int argc, char** argv)
 		{
 			cout << "new udp data \n";
 			robot.new_data_proceed(&udp_base);
+			delay(1000); // wegen schaerfe
 			cout << "aufnahme \n";
 
 			for (int i = 0; i < 8; i++) cap >> frame;

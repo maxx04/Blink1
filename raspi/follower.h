@@ -17,7 +17,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video/tracking.hpp>
 
-#include "Servos.h"
+#include "neck.h"
 #include "camera_calibration.h"
 #include "../UDP_Base.h"
 #include "Motor.h"
@@ -31,13 +31,13 @@ class follower
 	//TermCriteria termcrit;
 	//Size subPixWinSize, winSize;
 	
-	float pixel_pro_step = 8.0; // TODO Übertragen in Servo?
+	//float pixel_pro_step = 8.0; // TODO Übertragen in Servo?
 
-	Point2f fokus;
-	int number_aim_point = -1;
-	double frame_time = 0.0;
+	//Point2f fokus;
+	//int number_aim_point = -1;
+	//double frame_time = 0.0;
 
-	Servos s;
+	neck fneck;
 	Motor* motor_r;
 	Motor* motor_l;
 

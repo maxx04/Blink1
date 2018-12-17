@@ -11,18 +11,15 @@
 
 #define MAX_DATA_LENGTH 255
 
+#include <iostream>
 
 #include <errno.h>
-#include <string.h>
+//#include <string.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-
+//#include <stdio.h>
+//#include <stdlib.h>
 #include <fcntl.h>
 #include <termios.h>
-#include <errno.h>
 
 #include <wiringPi.h>
 #include <wiringSerial.h>

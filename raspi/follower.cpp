@@ -12,7 +12,7 @@ bool setAimPt = false;
 
 follower::follower()
 {
-	s.test();
+	fneck.test();
 
 	motor_r = new Motor(MOTOR_RECHTS_FW, MOTOR_RECHTS_BW);
 	motor_l = new Motor(MOTOR_LINKS_FW, MOTOR_LINKS_BW);
@@ -39,16 +39,6 @@ void follower::take_picture(Mat* frame)
 		return; //TODO Fehlerabarbeitung
 	}
 
-	fokus.x = (float)(image.cols / 2);
-	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
-
-	// swap();
-
-//	frame->copyTo(image);
-
-//	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
-
-//	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
 void follower::swap()
@@ -120,19 +110,14 @@ bool follower::proceed_frame(Mat* frame)
 void follower::new_data_proceed(UDP_Base* udp_base)
 {
 
-	s.read_udp_data(udp_base->udp_data->servo_position_x,
-		udp_base->udp_data->servo_position_y);
+	//fneck.read_udp_data(udp_base->udp_data->servo_position_x,
+	//	udp_base->udp_data->servo_position_y);
 
-	Point2f p(udp_base->udp_data->servo_position_x,
-		udp_base->udp_data->servo_position_y);
 
-	cout << "new servo-position: " << p << endl;
+	//cout << "new servo-position: " << p << endl;
 
-	s.move_to_position(p);
-
-	s.wait_on_position(2000); //TODO funktioniert nicht
-
-	delay(5000);
+	fneck.move_to(udp_base->udp_data->angle_horizontal,
+		udp_base->udp_data->angle_vertikal);
 
 	udp_base->udp_data_received();
 

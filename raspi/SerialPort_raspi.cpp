@@ -1,5 +1,7 @@
 #include "SerialPort_raspi.h"
 
+using namespace std;
+
 SerialPort::SerialPort(const char *portName)
 {
 	/*
@@ -34,13 +36,13 @@ SerialPort::SerialPort(const char *portName)
 
 	this->connected = false;
 
-	if ((fd = serialOpen("/dev/ttyAMA0", 9600)) < 0)
+	if ((fd = serialOpen(portName, 9600)) < 0)
 	{
-		fprintf(stderr, "Unable to open serial device: %s\n", strerror(errno));
+		cerr << "Unable to open serial device: " << errno << endl;
 		return;
 	}
 
-	fprintf(stderr, "serial device opened \n");
+	cout << "serial device opened \n";
 
 	this->connected = true;
 }
@@ -56,15 +58,11 @@ SerialPort::~SerialPort()
 
 int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 {
-
 	int num = 0;
-	//int data = serialDataAvail(fd);
 
 	while (serialDataAvail(fd) > 0 || num >= MAX_DATA_LENGTH)
-	{
 		buffer[num++] = (char)serialGetchar(fd);
-//		if (buffer[num - 1] == 'O' && buffer[num] == 'K') return num;
-	}
+
 	return num;
 }
 
@@ -80,7 +78,6 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 bool SerialPort::writeSerialPort(const char *buffer)
 {
 	serialPuts(fd, buffer);
-	//serialFlush(fd);
 
 	return true;
 }

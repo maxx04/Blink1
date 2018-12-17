@@ -12,6 +12,7 @@
     <ClCompile Include="follower.cpp" />
     <ClCompile Include="lkdemo.cpp" />
     <ClCompile Include="Motor.cpp" />
+    <ClCompile Include="neck.cpp" />
     <ClCompile Include="SerialPort_raspi.cpp" />
     <ClCompile Include="Servos.cpp" />
   </ItemGroup>
@@ -21,6 +22,7 @@
     <ClInclude Include="camera_calibration.h" />
     <ClInclude Include="follower.h" />
     <ClInclude Include="Motor.h" />
+    <ClInclude Include="neck.h" />
     <ClInclude Include="SerialPort_raspi.h" />
     <ClInclude Include="Servos.h" />
   </ItemGroup>
@@ -38,6 +40,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <RemoteRootDir>projects/$(SolutionName)</RemoteRootDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -46,7 +49,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
     <LocalRemoteCopySources>true</LocalRemoteCopySources>
-    <RemoteProjectDir>$(RemoteRootDir)/$(SolutionName)</RemoteProjectDir>
+    <RemoteProjectDir>$(RemoteRootDir)</RemoteProjectDir>
+    <OutDir>$(RemoteRootDir)/bin/</OutDir>
+    <IntDir>$(RemoteRootDir)/obj/</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -59,7 +64,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <ObjectFileName>$(RemoteProjectDir)/bin/$(Platform)/$(Configuration)/%(filename).o</ObjectFileName>
+      <ObjectFileName>obj/%(filename).o</ObjectFileName>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ARM;_DEBUG</PreprocessorDefinitions>
       <ThreadSafeStatics>No</ThreadSafeStatics>
@@ -68,6 +73,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>bin/$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
