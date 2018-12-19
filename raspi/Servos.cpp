@@ -23,8 +23,6 @@ Servos::Servos(float min, float max, float null)
 	
 	cout << "servo: " << number << " opened \n";
 
-
-
 }
 
 

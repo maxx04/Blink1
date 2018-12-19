@@ -37,14 +37,10 @@ int main( int argc, char** argv )
 
     Mat  frame, im8u;
 
-	//Mat* ptr_in_Frame = new Mat(480, 640, CV_8U);
-	//static std::vector < uchar > encoded(65536);
-
-	//std::string buff;
 	net::endpoint ep;
 
 	udata _data;
-	//	station PC;
+	station PC;
 
 	//we must call net::init() on windows, if not on windows it is a no-op
 	net::init();
@@ -64,26 +60,25 @@ int main( int argc, char** argv )
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	sock.send("connect", 8);
+//	sock.send("connect", 8);
 
 	Sleep(1000);
 
 
-	//const std::string videoStreamAddress = "rtsp://admin:xxxx@192.168.178.10/user=admin_password=xhwCY8sx_channel=1_stream=0.sdp?real_stream";
-	////open the video stream and make sure it's opened
-	//if (!cap.open(videoStreamAddress)) 
-	//{
-	//	std::cout << "Error opening video stream or file" << std::endl;
-	//	return -1;
-	//}
-
-	// Hauptzyclus
-
     for(;;)
     {
 
-		cout << " h:"; cin >> _data.dt_udp.angle_horizontal;
-		cout << " v:"; cin >> _data.dt_udp.angle_vertikal;
+		//cout << " h:"; cin >> _data.dt_udp.angle_horizontal;
+		//cout << " v:"; cin >> _data.dt_udp.angle_vertikal;
+		//cout << " dist:"; cin >> _data.dt_udp.move_stright;
+		//cout << " dir:"; cin >> _data.dt_udp.direction;
+
+
+		_data.dt_udp.angle_horizontal = 0;
+		_data.dt_udp.angle_vertikal = 0;
+		_data.dt_udp.move_stright = 500;
+		_data.dt_udp.direction = 0;
+
 
 		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);
 
@@ -95,7 +90,7 @@ int main( int argc, char** argv )
 
 		std::cout << "packet from: " << ep.to_string() << std::endl;
 
-		//Bild senden
+		//Bild empfangen
 
 		int n = 0;
 
@@ -131,14 +126,9 @@ int main( int argc, char** argv )
 			continue;
 		}
 
-		imshow("recv", frame);
-	
-		//imshow("LK", *ptr_in_Frame);
-		waitKey(100);
 
-//		if (PC.proceed_frame(ptr_in_Frame)) break;
+		if (PC.proceed_frame(&frame)) break;
 
-		//TODO skip frames
 
     }
 

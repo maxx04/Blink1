@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define ENCODE_QUALITY 80
+#define ENCODE_QUALITY 60
 
 #include "../UDP_Base.h"
 #include "follower.h"
@@ -18,7 +18,7 @@ static void help()
 	// print a welcome message, and the OpenCV version
 	cout << "\nRobot program start\n"
 		"Using OpenCV version " << CV_VERSION << endl;
-	cout << "\nIt uses camera by default, but you can provide a path to video as an argument.\n";
+
 	cout << "\nHot keys: \n"
 		"\tESC - quit the program\n"
 		"\tk - calibrate camera\n"
@@ -55,14 +55,7 @@ int main(int argc, char** argv)
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame);
 
-	//imwrite("test.jpg", frame);
 	cvtColor(frame, gray, COLOR_BGR2GRAY);
-
-
-	//for (int i = 0; i < 6; i++) cap >> frame;
-
-	//imshow("LK Demo", gray);
-	//waitKey(100);
 
 	UDP_Base udp_base;
 	follower robot;
@@ -94,20 +87,15 @@ int main(int argc, char** argv)
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
-			//imwrite("test.jpg", frame);
+
 			cout << "grab true \n";
-			//imshow("LK Demo", frame);
-			//waitKey(200);
-
-
-
 
 			while (udp_base.transfer_busy)
 			{
 				cout << "waiting transfer \r";
 			}
 
-			if (robot.proceed_frame(&gray)) return 0;
+			if (robot.proceed_frame(&frame)) return 0;
 		}
 
 

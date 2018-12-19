@@ -20,7 +20,7 @@ station::station()
 	winSize = Size(31, 31);
 
 	needToInit = true;
-	step_butch = 10;
+	step_butch = 3;
 	magnify_vektor_draw = 5;
 
 	namedWindow("LK Demo", 1);
@@ -51,15 +51,15 @@ void station::take_picture(Mat* frame)
 {
 	if (frame->empty())	return; //TODO Fehlerabarbeitung
 
-	//fokus.x = (float)(image.cols / 2);
-	//fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
-	//swap();
+	fokus.x = (float)(image.cols / 2);
+	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
+	swap();
 
 	frame->copyTo(image);
 
-	//kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
+	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 
-	//cvtColor(image, gray, COLOR_BGR2GRAY);
+	cvtColor(image, gray, COLOR_BGR2GRAY);
 }
 
 void station::check_for_followed_points()
@@ -147,7 +147,7 @@ void station::draw_calculated_points()
 
 void station::draw_main_points()
 {
-	for (size_t i = 0; i < kp.background_points.size(); i++) // TODO
+	for (size_t i = 0; i < kp.background_points.size(); i++) 
 	{
 		circle(image, (Point)kp.prev_points[kp.background_points[i]], 7, Scalar(0, 200, 0));
 	}
@@ -383,14 +383,14 @@ int station::collect_step_vectors()
 // Bearbeitet Frame in schritten
 bool station::proceed_frame(Mat* frame)
 {
-	// TODO: Fügen Sie hier Ihren Implementierungscode ein..
+
 	take_picture(frame);
 
 	imshow("LK Demo", *frame);
 
 	if (needToInit)
 	{
-//		find_keypoints();
+		find_keypoints();
 		needToInit = false;
 		kp.swap();
 		return false;
@@ -400,7 +400,7 @@ bool station::proceed_frame(Mat* frame)
 
 	check_for_followed_points();
 
-//	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
+	//	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.
 
 	collect_step_vectors(); 

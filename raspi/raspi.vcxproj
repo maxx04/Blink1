@@ -9,6 +9,7 @@
   <ItemGroup>
     <ClCompile Include="..\UDP_Base.cpp" />
     <ClCompile Include="camera_calibration.cpp" />
+    <ClCompile Include="driver.cpp" />
     <ClCompile Include="follower.cpp" />
     <ClCompile Include="lkdemo.cpp" />
     <ClCompile Include="Motor.cpp" />
@@ -20,6 +21,7 @@
     <ClInclude Include="..\UDP_Base.h" />
     <ClInclude Include="..\xsocket.hpp" />
     <ClInclude Include="camera_calibration.h" />
+    <ClInclude Include="driver.h" />
     <ClInclude Include="follower.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="neck.h" />

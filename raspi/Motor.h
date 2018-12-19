@@ -26,6 +26,7 @@ public:
 	~Motor();
 
 	void rotate(float speed);
+	void move(float distance);
 	void stop() { rotate(0); }
 	void test();
 };

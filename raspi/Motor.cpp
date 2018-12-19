@@ -77,6 +77,15 @@ void Motor::rotate(float speed)
 	delay_time[motor_number] = (int)(1/abs(speed)*1000); //TODO Abhaengigket ermitteln.
 }
 
+void Motor::move(float distance)
+{
+	//TODO ermitteln geschwindigkeit
+	float time = distance * 100;
+	rotate (distance *1000 / time);
+	delay((uint)time);
+	stop();
+}
+
 void Motor::test()
 {
 	rotate(1);
