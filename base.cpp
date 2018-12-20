@@ -60,7 +60,7 @@ int main( int argc, char** argv )
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-//	sock.send("connect", 8);
+	sock.send("connect", 8);
 
 	Sleep(1000);
 
@@ -76,7 +76,7 @@ int main( int argc, char** argv )
 
 		_data.dt_udp.angle_horizontal = 0;
 		_data.dt_udp.angle_vertikal = 0;
-		_data.dt_udp.move_stright = 500;
+		_data.dt_udp.move_stright = 200;
 		_data.dt_udp.direction = 0;
 
 

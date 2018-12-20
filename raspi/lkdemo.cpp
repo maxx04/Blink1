@@ -45,12 +45,12 @@ int main(int argc, char** argv)
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
 	static Mat  frame, gray;
-	
+
 	vector < int > compression_params;
 	int jpegqual = ENCODE_QUALITY; // Compression Parameter
 	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	compression_params.push_back(jpegqual);
-	
+
 
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame);
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
-
+		delay(200);
 		if (udp_base.check_incoming_data())
 		{
 			cout << "new udp data \n";
@@ -83,19 +83,22 @@ int main(int argc, char** argv)
 				cout << "nicht aufgenommen \n";
 			}
 
-			//cvtColor(frame, gray, COLOR_BGR2GRAY);
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
 
 			cout << "grab true \n";
 
-			while (udp_base.transfer_busy)
-			{
-				cout << "waiting transfer \r";
-			}
+			while (udp_base.transfer_busy)	cout << "waiting transfer \r";
 
-			if (robot.proceed_frame(&frame)) return 0;
+			robot.needToInit = true;
+
+			for (int n = 0; n < 4; n++)
+			{
+				for (int i = 0; i < 5; i++) cap >> frame;
+				if (robot.proceed_frame(&frame)) return 0;
+			}
+			
 		}
 
 

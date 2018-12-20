@@ -30,23 +30,42 @@ class follower
 {
 	int wait_time = 100;
 
+	TickMeter tm;
+
+	TermCriteria termcrit;
+	Size subPixWinSize, winSize;
+
+
+
 	neck fneck;
 	driver fdriver;
 
 	Mat image;
+	Mat prev_image;
 	Mat cameraMatrix;
+
+	vector<uchar> status; // status vom calcOpticalFlowPyrLK
+	vector<float> err; // error vom calcOpticalFlowPyrLK
+	vector<Point2f> kpt;
+	vector<Point2f> prev_kpt;
+	vector<Point2f> kpt_diff;
 
 
 public:
+
+	bool needToInit = false;
+
 	follower();
 	~follower();
 
 	void take_picture(Mat* frame);
-
 	bool key(int wait);
 
 	// Bearbeitet jedes frame
 	bool proceed_frame(Mat* frame);
+	void find_keypoints();
+	void find_diff_keypoints();
+	void calcOptFlow();
 	void new_data_proceed(UDP_Base* udp_base);
 };
 

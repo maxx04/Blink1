@@ -8,9 +8,15 @@ follower::follower()
 {
 	fneck.test();
 
+	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
+	subPixWinSize = Size(10, 10);
+	winSize = Size(31, 31);
+
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
 	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+
+	tm.reset();
 }
 
 follower::~follower()
@@ -27,6 +33,28 @@ void follower::take_picture(Mat* frame)
 		return; //TODO Fehlerabarbeitung
 	}
 
+	image.copyTo(prev_image);
+
+	cvtColor(*frame, image, COLOR_BGR2GRAY);
+
+}
+
+void follower::find_keypoints()
+{
+	//finde features
+	tm.reset();
+	tm.start();
+
+	kpt.clear();
+
+	goodFeaturesToTrack(image, kpt, 300, 0.02, 12, Mat(), 5, 5, 0, 0.04);
+
+	//refine position
+	cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
+
+	tm.stop();
+
+	cout << "Features compute " << tm << endl;
 }
 
 
@@ -55,12 +83,55 @@ bool follower::key(int wait)
 // Bearbeitet Frame in schritten
 bool follower::proceed_frame(Mat* frame)
 {
+
 	take_picture(frame);
+
+	if (needToInit)
+	{
+		find_keypoints();
+		needToInit = false;
+		// kp.swap();
+		return false;
+	}
+
+	if (prev_image.size().width != 0)
+	{
+		tm.reset();
+		tm.start();
+
+		calcOptFlow();
+
+		tm.stop();
+
+		cout << "optical Flow compute " << tm << endl;
+	}
+
 
 	if (key(wait_time)) return true;
 
 	return false;
 	
+}
+
+void follower::find_diff_keypoints()
+{
+
+
+
+}
+
+void follower::calcOptFlow()
+{
+
+	kpt.swap(prev_kpt);
+
+	if (prev_kpt.size() != 0)
+	{
+		calcOpticalFlowPyrLK(prev_image, image, /*prev*/ prev_kpt, /*next*/ kpt,
+			status, err, winSize, 3, termcrit, 0, 0.001);
+
+	}
+
 }
 
 void follower::new_data_proceed(UDP_Base* udp_base)

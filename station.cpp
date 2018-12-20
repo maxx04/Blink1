@@ -20,8 +20,8 @@ station::station()
 	winSize = Size(31, 31);
 
 	needToInit = true;
-	step_butch = 3;
-	magnify_vektor_draw = 5;
+	step_butch = 1;
+	magnify_vektor_draw = 1;
 
 	namedWindow("LK Demo", 1);
 
@@ -178,6 +178,12 @@ int station::draw_image()
 	//Draw die Punkte die entsprechen hintegrundvector
 	draw_main_points();
 
+	draw_prev_points();
+
+	draw_current_points();
+
+	draw_nearest_point();
+
 
 	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
 	{
@@ -188,15 +194,7 @@ int station::draw_image()
 
 		draw_step_vectors();
 
-		draw_prev_points();
-
-		draw_current_points();
-
-		draw_nearest_point();
-
 		//	draw_calculated_points();
-
-
 
 		time = 0; // und time 0 stop und warte auf tastatur
 
