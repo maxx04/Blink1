@@ -69,36 +69,22 @@ int main(int argc, char** argv)
 		{
 			cout << "new udp data \n";
 			robot.new_data_proceed(&udp_base);
-			delay(1000); // wegen schaerfe
-			cout << "aufnahme \n";
-
-			for (int i = 0; i < 8; i++) cap >> frame;
-
-			if (cap.read(frame))
-			{
-				cout << "aufgenommen \n";
-			}
-			else
-			{
-				cout << "nicht aufgenommen \n";
-			}
-
-			imencode(".jpg", frame, udp_base.encoded, compression_params);
-			udp_base.imagegrab_ready = true; // fuer thread mit Server
-
-
-			cout << "grab true \n";
-
-			while (udp_base.transfer_busy)	cout << "waiting transfer \r";
-
 			robot.needToInit = true;
 
 			for (int n = 0; n < 4; n++)
 			{
 				for (int i = 0; i < 5; i++) cap >> frame;
+
 				if (robot.proceed_frame(&frame)) return 0;
 			}
-			
+
+			delay(1000); // wegen schaerfe
+
+			imencode(".jpg", frame, udp_base.encoded, compression_params);
+			udp_base.imagegrab_ready = true; // fuer thread mit Server
+
+			while (udp_base.transfer_busy)	cout << "waiting transfer \r";
+		
 		}
 
 

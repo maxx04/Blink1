@@ -21,7 +21,7 @@ station::station()
 
 	needToInit = true;
 	step_butch = 1;
-	magnify_vektor_draw = 1;
+	magnify_vektor_draw = 5;
 
 	namedWindow("LK Demo", 1);
 

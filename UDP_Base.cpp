@@ -107,7 +107,7 @@ void UDP_Base::start_Server(int args)
 
 		while (!imagegrab_ready)
 		{
-			cout << "waiting on image " << tm.getTimeSec() << " s \n";
+			//cout << "waiting on image " << tm.getTimeSec() << " s \n";
 			if (tm.getTimeSec() > WAIT_ON_CAM)
 			{
 				cerr << " bild nicht aufgenommen \n"; break;

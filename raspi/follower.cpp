@@ -54,7 +54,7 @@ void follower::find_keypoints()
 
 	tm.stop();
 
-	cout << "Features compute " << tm << endl;
+	cout << "Features compute " << tm << " kp " << kpt.size() << endl;
 }
 
 
@@ -90,7 +90,6 @@ bool follower::proceed_frame(Mat* frame)
 	{
 		find_keypoints();
 		needToInit = false;
-		// kp.swap();
 		return false;
 	}
 
