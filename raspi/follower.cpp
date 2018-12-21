@@ -6,7 +6,7 @@ bool setAimPt = false;
 
 follower::follower()
 {
-	fneck.test();
+//	fneck.test();
 
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(10, 10);
@@ -41,6 +41,7 @@ void follower::take_picture(Mat* frame)
 
 void follower::find_keypoints()
 {
+	
 	//finde features
 	tm.reset();
 	tm.start();
@@ -55,6 +56,7 @@ void follower::find_keypoints()
 	tm.stop();
 
 	cout << "Features compute " << tm << " kp " << kpt.size() << endl;
+	
 }
 
 
@@ -88,7 +90,7 @@ bool follower::proceed_frame(Mat* frame)
 
 	if (needToInit)
 	{
-		find_keypoints();
+		//find_keypoints();
 		needToInit = false;
 		return false;
 	}
@@ -98,7 +100,7 @@ bool follower::proceed_frame(Mat* frame)
 		tm.reset();
 		tm.start();
 
-		calcOptFlow();
+	//	calcOptFlow();
 
 		tm.stop();
 
@@ -135,8 +137,6 @@ void follower::calcOptFlow()
 
 void follower::new_data_proceed(UDP_Base* udp_base)
 {
-
-
 
 	fneck.move_to(udp_base->udp_data->angle_horizontal,
 		udp_base->udp_data->angle_vertikal);

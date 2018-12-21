@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 				if (robot.proceed_frame(&frame)) return 0;
 			}
 
-			delay(1000); // wegen schaerfe
+			//delay(1000); // wegen schaerfe
 
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
 			udp_base.imagegrab_ready = true; // fuer thread mit Server

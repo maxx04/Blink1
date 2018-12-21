@@ -82,19 +82,21 @@ void UDP_Base::start_Server(int args)
 
 
 	//recv a packet up to 512 bytes and store the sender in endpoint ep
-	v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
-	std::cout << "erstes pack, buffer: " << dt.union_buff << std::endl;
-	std::cout << ep.to_string() << std::endl;
+	//v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
+	//std::cout << "erstes pack, buffer: " << dt.union_buff << std::endl;
+	//std::cout << ep.to_string() << std::endl;
 
 	while (true)
 	{
 		//wartet auf inkommende hauptdaten
 		cout << "wartet auf client \n";
 		int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep);
-		if (i == -1) 
+		if (i == -1)
 		{
 			cerr << "Fehler beim warten \n";	break;
 		}
+		cout << ep.to_string() << endl;
+
 
 		//imagegrab_ready = false;
 		new_udp_data = true;

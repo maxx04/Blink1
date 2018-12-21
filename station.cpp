@@ -21,7 +21,7 @@ station::station()
 
 	needToInit = true;
 	step_butch = 1;
-	magnify_vektor_draw = 5;
+	magnify_vektor_draw = 1;
 
 	namedWindow("LK Demo", 1);
 
@@ -178,7 +178,7 @@ int station::draw_image()
 	//Draw die Punkte die entsprechen hintegrundvector
 	draw_main_points();
 
-	draw_prev_points();
+	//draw_prev_points();
 
 	draw_current_points();
 
@@ -211,7 +211,7 @@ void station::draw_step_vectors() // batch
 	for (int i = 0; i < kp.prev_points.size(); i++)
 	{
 
-		p0 = kp.prev_points[i];
+		p0 = kp.current_points[i];
 
 		while (!kp.step_vector_empty(i))
 		{

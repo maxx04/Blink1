@@ -53,14 +53,15 @@ int main( int argc, char** argv )
 	//most calls in xsocket return the same value as there c counterparts
 	//like so if sock.bind returns -1 it failed
 	int r = sock.connect(ep);
-	if (r == -1) {
+	if (r == -1) 
+	{
 		perror("failed to connect");
 		return -1;
 	}
 
 	std::cout << "socket bound to: " << sock.getlocaladdr().to_string() << std::endl;
 
-	sock.send("connect", 8);
+	// sock.send("connect", 8);
 
 	Sleep(1000);
 
@@ -132,7 +133,7 @@ int main( int argc, char** argv )
 
     }
 
-	sock.close();
+//	sock.close();
 
     
 }
