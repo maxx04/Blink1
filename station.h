@@ -1,6 +1,8 @@
 #pragma once
 #pragma warning(disable : 4996)
 
+#define MIN_FOLLOWED_POINTS 50
+
 #include <iostream>
 //#include <sstream>
 #include <string>
@@ -21,6 +23,7 @@
 
 #include "keypoints.h"
 #include "histogram.h"
+
 
 using namespace cv;
 using namespace std;

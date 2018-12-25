@@ -13,7 +13,7 @@ using namespace cv;
 class keypoints
 {
 private:
-	;
+	
 public:
 	const int MAX_COUNT = 300;
 	queue<Point2f> summ_vector;

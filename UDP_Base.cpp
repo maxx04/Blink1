@@ -114,10 +114,12 @@ void UDP_Base::start_Server(int args)
 			{
 				cerr << " bild nicht aufgenommen \n"; break;
 			}
-			usleep(300000);
+			usleep(200000);
 			tm.stop();
 			tm.start();
 		}
+
+		transfer_busy = true;
 
 		int n_blocks = 1 + ((encoded.size() - 1) / SOCKET_BLOCK_SIZE);
 
@@ -131,8 +133,6 @@ void UDP_Base::start_Server(int args)
 
 		//Bild senden
 		int n = 0;
-
-		transfer_busy = true;
 
 		cout << "start transfer \t" << hex << int((char*)(&encoded[0])) << dec << endl;
 

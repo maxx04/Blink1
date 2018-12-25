@@ -25,7 +25,7 @@ void keypoints::clear(void)
 
 void keypoints::swap(void)
 {
-	std::swap(current_points, prev_points);
+	std::swap(current_points, prev_points); //HACK ob nummerierung passt
 }
 
 
@@ -75,7 +75,6 @@ vector<Point2f>* keypoints::get_next_points_addr(void)
 {
 	return &current_points;
 }
-
 
 Point2f keypoints::get_next_summ_vector()
 {

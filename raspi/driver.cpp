@@ -19,8 +19,8 @@ driver::~driver()
 
 void driver::move(float distance)
 {
-	motor_links->rotate(900);
-	motor_rechts->rotate(900);
+	motor_links->rotate(8000);
+	motor_rechts->rotate(8000);
 	delay((uint)distance);
 	motor_links->stop();
 	motor_rechts->stop();

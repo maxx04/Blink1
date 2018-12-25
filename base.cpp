@@ -77,7 +77,7 @@ int main( int argc, char** argv )
 
 		_data.dt_udp.angle_horizontal = 0;
 		_data.dt_udp.angle_vertikal = 0;
-		_data.dt_udp.move_stright = 200;
+		_data.dt_udp.move_stright = 500;
 		_data.dt_udp.direction = 0;
 
 
@@ -99,7 +99,7 @@ int main( int argc, char** argv )
 
 		cout << n_blocks << " blocks" << endl;
 
-		char * longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
+		char* longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
 
 		int64 start = getTickCount();
 
@@ -118,7 +118,7 @@ int main( int argc, char** argv )
 			(getTickCount() - start)/ getTickFrequency() << " s" << endl;
 
 
-		Mat rawData = Mat(1, 65536, CV_8UC1, longbuf);
+		Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
 
 		Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
 

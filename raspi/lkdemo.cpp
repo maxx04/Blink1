@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define ENCODE_QUALITY 60
+#define ENCODE_QUALITY 95
 
 #include "../UDP_Base.h"
 #include "follower.h"
@@ -64,9 +64,18 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
-		delay(200);
+
+
+		while (udp_base.transfer_busy)
+		{
+			cout << "waiting transfer \n";
+			delay(100);
+		}
+
+
 		if (udp_base.check_incoming_data())
 		{
+			cout << udp_base.transfer_busy << " transfer beschaeftigt \n";
 			cout << "new udp data \n";
 			robot.new_data_proceed(&udp_base);
 			robot.needToInit = true;
@@ -83,7 +92,7 @@ int main(int argc, char** argv)
 			imencode(".jpg", frame, udp_base.encoded, compression_params);
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
-			while (udp_base.transfer_busy)	cout << "waiting transfer \r";
+			cout << endl;
 		
 		}
 

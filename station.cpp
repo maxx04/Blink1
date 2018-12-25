@@ -20,7 +20,7 @@ station::station()
 	winSize = Size(31, 31);
 
 	needToInit = true;
-	step_butch = 1;
+	step_butch = 8;
 	magnify_vektor_draw = 1;
 
 	namedWindow("LK Demo", 1);
@@ -40,7 +40,7 @@ void station::find_keypoints()
 	kp.clear();
 
 	//finde features
-	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.02, 12, Mat(), 5, 5, 0, 0.04);
+	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.1, 25, Mat(), 5, 5, 0, 0.04);
 
 	//refine position
 	cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
@@ -72,7 +72,7 @@ void station::check_for_followed_points()
 		if (i == 1) number_followed_points++;
 	}
 	//wenn weniger als 100 Punkten dann neue Punkte erstellen.
-	if (number_followed_points < 200) needToInit = true; // TODO 100 als parameter
+	if (number_followed_points < MIN_FOLLOWED_POINTS) needToInit = true; 
 }
 
 void station::calcOptFlow()
@@ -117,22 +117,20 @@ void station::draw_aim_point()
 
 void station::draw_prev_points()
 {
-	for (size_t i = 0; i < kp.prev_points.size(); i++) // TODO
-	{
-		// draw berechnete features
-		if (kp.status[i] == 1)
-		{
-			circle(image, (Point)kp.prev_points[i], 3, Scalar(255, 0, 255));
-		}
-		else
-			circle(image, (Point)kp.prev_points[i], 3, Scalar(255, 0, 0));
-	}
+	for (Point2f p : kp.current_points)
+			circle(image, (Point)p, 3, Scalar(255, 0, 255));
+
 }
 
 void station::draw_current_points()
 {
+	int i = 0;
 	for (Point2f p : kp.current_points)
 	{
+
+		if (kp.err[i++] > 30)
+			circle(image, (Point)p, 8, Scalar(255, 0, 0));
+		else
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
 	}
 }
@@ -178,7 +176,7 @@ int station::draw_image()
 	//Draw die Punkte die entsprechen hintegrundvector
 	draw_main_points();
 
-	//draw_prev_points();
+	draw_prev_points();
 
 	draw_current_points();
 
@@ -230,7 +228,6 @@ void station::draw_step_vectors() // batch
 void station::draw_nearest_point()
 
 {
-
 	float* move = new float[kp.MAX_COUNT];
 
 	float dist = 0.0f;
@@ -261,13 +258,10 @@ void station::show_image()
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
-//#ifndef _ARM
-
 	setWindowTitle("LK Demo", text.str());
 
 	imshow("LK Demo", image);
 
-	//#endif
 }
 
 void station::calculate_move_vectors()
