@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
-
+		delay(200); //fuer andere Prozesse und Auslaustung notwendig
 
 		while (udp_base.transfer_busy)
 		{

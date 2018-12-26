@@ -141,7 +141,7 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 	fneck.move_to(udp_base->udp_data->angle_horizontal,
 		udp_base->udp_data->angle_vertikal);
 
-	fdriver.move(udp_base->udp_data->move_stright);
+	fdriver.move(udp_base->udp_data->move_stright, udp_base->udp_data->stright_velocity );
 
 	fdriver.change_direction(udp_base->udp_data->direction);
 

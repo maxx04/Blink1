@@ -76,8 +76,9 @@ int main( int argc, char** argv )
 
 
 		_data.dt_udp.angle_horizontal = 0;
-		_data.dt_udp.angle_vertikal = 0;
-		_data.dt_udp.move_stright = 500;
+		_data.dt_udp.angle_vertikal = 40.0f;
+		_data.dt_udp.move_stright = 300.0f;
+		_data.dt_udp.stright_velocity = 0.2f;
 		_data.dt_udp.direction = 0;
 
 

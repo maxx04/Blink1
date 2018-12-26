@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include "Motor.h"
 class driver
 {
@@ -9,7 +10,7 @@ public:
 	driver();
 	~driver();
 	// bewegt sich uengefer distance
-	void move(float distance);
+	void move(float distance, float duty);
 	void change_direction(float angle);
 };
 

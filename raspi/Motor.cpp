@@ -1,5 +1,7 @@
 #include "Motor.h"
 
+#define PERIOD 100 //ms zyclus
+
 using namespace std;
 
 int Motor::number_of_motors = 0;
@@ -48,6 +50,7 @@ void Motor::main_loop(int pin1, int pin2, int motor_number)
 	digitalWrite(pin2, LOW);
 
 	//TODO optimieren
+	//zyklus 300 ms duty 0 bis 100 %
 	
 	while (true)
 	{
@@ -56,11 +59,11 @@ void Motor::main_loop(int pin1, int pin2, int motor_number)
 		if (delay_time[motor_number] != 99)
 		{
 			digitalWrite(p, HIGH);	
-			delay(50);
+			delay(delay_time[motor_number]);
 		}
 
 		digitalWrite(p, LOW);	
-		delay(delay_time[motor_number]);
+		delay(PERIOD - delay_time[motor_number]);
 	}	
 }
 
@@ -74,7 +77,15 @@ void Motor::rotate(float speed)
 
 	direction[motor_number] = (speed > 0) ? true : false;
 
-	delay_time[motor_number] = (int)(1/abs(speed)*1000); //TODO Abhaengigket ermitteln.
+	float s = abs(speed);
+
+	s = (speed > 1.0f) ? 1.0f : speed;
+
+	// delay_time[motor_number] = (int)(1/abs(speed)*1000); //TODO Abhaengigket ermitteln.
+	delay_time[motor_number] = (int)(s*(float)PERIOD); //TODO Abhaengigket ermitteln.
+
+	cout << "delay " << delay_time[motor_number] << " motor " << motor_number  << endl;
+
 }
 
 void Motor::move(float distance)
@@ -88,11 +99,12 @@ void Motor::move(float distance)
 
 void Motor::test()
 {
-	rotate(1);
+	cout << " test started \n";
+	rotate(0.2f);
 	delay(3000);
-	rotate(10);
+	rotate(0.5f);
 	delay(3000);
-	rotate(-10);
+	rotate(1.0f);
 	delay(3000);
 	stop();
 }

@@ -40,7 +40,7 @@ void station::find_keypoints()
 	kp.clear();
 
 	//finde features
-	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.1, 25, Mat(), 5, 5, 0, 0.04);
+	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.04, 10, Mat(), 9, 5);
 
 	//refine position
 	cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
@@ -82,7 +82,7 @@ void station::calcOptFlow()
 		if (prevGray.empty()) gray.copyTo(prevGray);
 
 		calcOpticalFlowPyrLK(prevGray, gray, /*prev*/ kp.prev_points, /*next*/ kp.current_points,
-			kp.status, kp.err, winSize, 3, termcrit, 0, 0.001);
+			kp.status, kp.err, winSize, 5, termcrit, 0, 0.001);
 
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
@@ -129,7 +129,7 @@ void station::draw_current_points()
 	{
 
 		if (kp.err[i++] > 30)
-			circle(image, (Point)p, 8, Scalar(255, 0, 0));
+			circle(image, (Point)p, 8, Scalar(0, 0, 200));
 		else
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
 	}
@@ -174,7 +174,7 @@ int station::draw_image()
 	draw_aim_point();
 
 	//Draw die Punkte die entsprechen hintegrundvector
-	draw_main_points();
+	//draw_main_points();
 
 	draw_prev_points();
 

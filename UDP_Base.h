@@ -17,6 +17,7 @@ struct exchange_data
 	float angle_horizontal;
 	float angle_vertikal;
 	float move_stright;
+	float stright_velocity;
 	float direction;
 };
 
