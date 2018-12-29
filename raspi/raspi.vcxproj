@@ -11,7 +11,7 @@
     <ClCompile Include="camera_calibration.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="follower.cpp" />
-    <ClCompile Include="lkdemo.cpp" />
+    <ClCompile Include="robot.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="neck.cpp" />
     <ClCompile Include="SerialPort_raspi.cpp" />

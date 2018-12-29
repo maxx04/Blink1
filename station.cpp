@@ -16,11 +16,11 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 station::station()
 {
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
-	subPixWinSize = Size(10, 10);
-	winSize = Size(31, 31);
+	subPixWinSize = Size(6, 6);
+	winSize = Size(11, 11);
 
 	needToInit = true;
-	step_butch = 8;
+	step_butch = 1;
 	magnify_vektor_draw = 1;
 
 	namedWindow("LK Demo", 1);
@@ -40,7 +40,7 @@ void station::find_keypoints()
 	kp.clear();
 
 	//finde features
-	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.04, 10, Mat(), 9, 5);
+	goodFeaturesToTrack(gray, kp.prev_points, kp.MAX_COUNT, 0.03, 10, Mat(), 9, 5);
 
 	//refine position
 	cornerSubPix(gray, kp.prev_points, subPixWinSize, Size(-1, -1), termcrit);
@@ -117,7 +117,7 @@ void station::draw_aim_point()
 
 void station::draw_prev_points()
 {
-	for (Point2f p : kp.current_points)
+	for (Point2f p : kp.prev_points)
 			circle(image, (Point)p, 3, Scalar(255, 0, 255));
 
 }
@@ -128,10 +128,15 @@ void station::draw_current_points()
 	for (Point2f p : kp.current_points)
 	{
 
-		if (kp.err[i++] > 30)
+		if (kp.err[i] > 30)
 			circle(image, (Point)p, 8, Scalar(0, 0, 200));
 		else
+		if (kp.status[i] == 0)
+
+			circle(image, (Point)p, 8, Scalar(0, 200, 0));
+			else
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
+		i++;
 	}
 }
 
@@ -171,16 +176,16 @@ int station::draw_image()
 	int time = 10; //ms
 
 	// draw Zielpunkt wenn gibt es 
-	draw_aim_point();
+	//draw_aim_point();
 
 	//Draw die Punkte die entsprechen hintegrundvector
 	//draw_main_points();
 
-	draw_prev_points();
+	//draw_prev_points();
 
 	draw_current_points();
 
-	draw_nearest_point();
+	//draw_nearest_point();
 
 
 	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
@@ -206,7 +211,7 @@ void station::draw_step_vectors() // batch
 	Point2f p0, p1;
 	p1 = Point2f(0, 0);
 
-	for (int i = 0; i < kp.prev_points.size(); i++)
+	for (int i = 0; i < kp.current_points.size(); i++)
 	{
 
 		p0 = kp.current_points[i];

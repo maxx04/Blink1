@@ -9,8 +9,8 @@ follower::follower()
 //	fneck.test();
 
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
-	subPixWinSize = Size(10, 10);
-	winSize = Size(31, 31);
+	subPixWinSize = Size(6, 6);
+	winSize = Size(11, 11);
 
 	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
@@ -48,7 +48,7 @@ void follower::find_keypoints()
 
 	kpt.clear();
 
-	goodFeaturesToTrack(image, kpt, 300, 0.02, 12, Mat(), 5, 5, 0, 0.04);
+	goodFeaturesToTrack(image, kpt, 300, 0.03, 10, Mat(), 9, 5);
 
 	//refine position
 	cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
@@ -90,7 +90,7 @@ bool follower::proceed_frame(Mat* frame)
 
 	if (needToInit)
 	{
-		//find_keypoints();
+		find_keypoints();
 		needToInit = false;
 		return false;
 	}
@@ -100,7 +100,7 @@ bool follower::proceed_frame(Mat* frame)
 		tm.reset();
 		tm.start();
 
-	//	calcOptFlow();
+		calcOptFlow();
 
 		tm.stop();
 
@@ -129,7 +129,7 @@ void follower::calcOptFlow()
 	if (prev_kpt.size() != 0)
 	{
 		calcOpticalFlowPyrLK(prev_image, image, /*prev*/ prev_kpt, /*next*/ kpt,
-			status, err, winSize, 3, termcrit, 0, 0.001);
+			status, err, winSize, 3, termcrit, 0, 0.01);
 
 	}
 

@@ -69,17 +69,19 @@ int main( int argc, char** argv )
     for(;;)
     {
 
+		_data.dt_udp.angle_horizontal = 0.0f;
+		_data.dt_udp.angle_vertikal = 10.0f;
+		_data.dt_udp.move_stright = 100.0f;
+		_data.dt_udp.stright_velocity = 0.4f;
+		_data.dt_udp.direction = 0.0f;
+
 		//cout << " h:"; cin >> _data.dt_udp.angle_horizontal;
 		//cout << " v:"; cin >> _data.dt_udp.angle_vertikal;
 		//cout << " dist:"; cin >> _data.dt_udp.move_stright;
 		//cout << " dir:"; cin >> _data.dt_udp.direction;
 
 
-		_data.dt_udp.angle_horizontal = 0;
-		_data.dt_udp.angle_vertikal = 40.0f;
-		_data.dt_udp.move_stright = 300.0f;
-		_data.dt_udp.stright_velocity = 0.2f;
-		_data.dt_udp.direction = 0;
+
 
 
 		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);

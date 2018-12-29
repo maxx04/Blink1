@@ -2,7 +2,7 @@
 
 neck::neck()
 {
-	sh = new Servos(800, 2200, 1400);
+	sh = new Servos(800, 2200, 1350);
 	sv = new Servos(1200, 2200, 1700);
 }
 

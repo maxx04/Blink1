@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
 	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
 
-	static Mat  frame, gray;
+	static Mat  frame[5], gray;
 
 	vector < int > compression_params;
 	int jpegqual = ENCODE_QUALITY; // Compression Parameter
@@ -53,9 +53,9 @@ int main(int argc, char** argv)
 
 
 	cout << cap.grab() << " grab result \n";
-	cap.retrieve(frame);
+	cap.retrieve(frame[0]);
 
-	cvtColor(frame, gray, COLOR_BGR2GRAY);
+	cvtColor(frame[0], gray, COLOR_BGR2GRAY);
 
 	UDP_Base udp_base;
 	follower robot;
@@ -75,21 +75,20 @@ int main(int argc, char** argv)
 
 		if (udp_base.check_incoming_data())
 		{
-			cout << udp_base.transfer_busy << " transfer beschaeftigt \n";
 			cout << "new udp data \n";
 			robot.new_data_proceed(&udp_base);
 			robot.needToInit = true;
 
-			for (int n = 0; n < 4; n++)
+			for (int n = 0; n < 5; n++)
 			{
-				for (int i = 0; i < 5; i++) cap >> frame;
+				for (int i = 0; i < 5; i++) cap >> frame[n];
 
-				if (robot.proceed_frame(&frame)) return 0;
+				if (robot.proceed_frame(&frame[n])) return 0;
 			}
 
 			//delay(1000); // wegen schaerfe
 
-			imencode(".jpg", frame, udp_base.encoded, compression_params);
+			imencode(".jpg", frame[4], udp_base.encoded, compression_params);
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
 			cout << endl;

@@ -84,7 +84,7 @@ void Motor::rotate(float speed)
 	// delay_time[motor_number] = (int)(1/abs(speed)*1000); //TODO Abhaengigket ermitteln.
 	delay_time[motor_number] = (int)(s*(float)PERIOD); //TODO Abhaengigket ermitteln.
 
-	cout << "delay " << delay_time[motor_number] << " motor " << motor_number  << endl;
+	//cout << "delay " << delay_time[motor_number] << " motor " << motor_number  << endl;
 
 }
 
