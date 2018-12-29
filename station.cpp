@@ -65,11 +65,16 @@ void station::take_picture(Mat* frame)
 void station::check_for_followed_points()
 {
 	int number_followed_points = 0;
-
+	int kp_nummer = 0;
 	// die punkte die kann man volgen werden gezählt 
 	for (int i : kp.status)
 	{
 		if (i == 1) number_followed_points++;
+		else
+		{
+			//kp.current_points[kp_nummer].
+		}
+		kp_nummer++;
 	}
 	//wenn weniger als 100 Punkten dann neue Punkte erstellen.
 	if (number_followed_points < MIN_FOLLOWED_POINTS) needToInit = true; 
@@ -133,26 +138,26 @@ void station::draw_current_points()
 		else
 		if (kp.status[i] == 0)
 
-			circle(image, (Point)p, 8, Scalar(0, 200, 0));
+			circle(image, (Point)p, 8, Scalar(200, 0, 0));
 			else
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
 		i++;
 	}
 }
 
-void station::draw_calculated_points()
-{
-	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
-	{
-		circle(image, (Point)kp.calculated_points[0][i], 4, Scalar(0, 0, 250));
-	}
-}
+//void station::draw_calculated_points()
+//{
+//	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
+//	{
+//		circle(image, (Point)kp.calculated_points[0][i], 4, Scalar(0, 0, 250));
+//	}
+//}
 
 void station::draw_main_points()
 {
 	for (size_t i = 0; i < kp.background_points.size(); i++) 
 	{
-		circle(image, (Point)kp.prev_points[kp.background_points[i]], 7, Scalar(0, 200, 0));
+		circle(image, (Point)kp.current_points[kp.background_points[i]], 7, Scalar(0, 200, 0));
 	}
 }
 
@@ -179,7 +184,7 @@ int station::draw_image()
 	//draw_aim_point();
 
 	//Draw die Punkte die entsprechen hintegrundvector
-	//draw_main_points();
+	draw_main_points();
 
 	//draw_prev_points();
 
@@ -220,7 +225,10 @@ void station::draw_step_vectors() // batch
 		{
 			//p1 = p0 + magnif * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
 			p1 = p0 + magnify_vektor_draw * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
-			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 250));
+			if (kp.status[i] == 1 && kp.err[i] < 10 )
+				line(image, (Point)p0, (Point)(p1), Scalar(0, 250, 0));
+			else
+				line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 250));
 			//circle(image, (Point)p0, 2, Scalar(0, 255, 0), 1);
 
 			p0 = p1;
@@ -390,7 +398,7 @@ bool station::proceed_frame(Mat* frame)
 		find_keypoints();
 		needToInit = false;
 		kp.swap();
-		return false;
+		return false; // flow wird nicht gesucht
 	}
 
 	calcOptFlow();

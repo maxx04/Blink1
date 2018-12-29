@@ -57,13 +57,14 @@ public:
 	~station();
 	void find_keypoints();
 	void take_picture(Mat* frame);
+	// kontrolliert schlechte punkte und loescht die
 	void check_for_followed_points();
 	void calcOptFlow();
 	void transform_Affine();
 	void draw_aim_point();
 	void draw_prev_points();
 	void draw_current_points();
-	void draw_calculated_points();
+	//void draw_calculated_points();
 	void draw_main_points();
 	void draw_summ_vector();
 	int draw_image();

@@ -10,7 +10,6 @@ keypoints::keypoints()
 	hist_l = histogram(50, "length");
 }
 
-
 keypoints::~keypoints()
 {
 	//delete points_queue;
@@ -27,9 +26,6 @@ void keypoints::swap(void)
 {
 	std::swap(current_points, prev_points); //HACK ob nummerierung passt
 }
-
-
-///
 
 int keypoints::save_step_vectors(void)
 {
@@ -107,13 +103,18 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 #endif // !ARM
 
 
-	for (int i = 0; i < prev_points.size(); i++)
+	for (int i = 0; i < current_points.size(); i++)
 	{
-		p =  current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
+		//werden nur glaubhafte punkte verwendet
+		if (status[i] == 1 && err[i] < 10) //TODO 10 define
+		{
+			p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
 
-		double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
-		if (p.x != 0.0) 
-			hist.collect(point_satz{ i , (float)d}); // TODO assert
+			double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
+			if (p.x != 0.0)
+				hist.collect(point_satz{ i , (float)d }); // TODO assert
+		}
+
 
 	}
 
@@ -135,9 +136,13 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 	for (int i = 0; i < prev_points.size(); i++)
 	{
-		p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
-		l = length(p);
-		hist_l.collect(point_satz{ i , (float)l }); //
+		//werden nur glaubhafte punkte verwendet
+		if (status[i] == 1 && err[i] < 10) //TODO 10 define
+		{
+			p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
+			l = length(p);
+			hist_l.collect(point_satz{ i , (float)l }); //
+		}
 	}
 
 	hist_l.range_min = hist_l.mean - hist_l.mean * 0.9;

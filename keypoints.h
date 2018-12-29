@@ -20,7 +20,7 @@ public:
 	queue<double> frame_timestamp;
 	vector<Point2f> prev_points; // vorherige punkte
 	vector<Point2f> current_points; // aktuelle punkte
-	vector<Point2f> calculated_points[1]; // TODO entfernen? berechnete punkte von vorherigen durch Affine
+	//vector<Point2f> calculated_points[1]; // TODO entfernen? berechnete punkte von vorherigen durch Affine
 	vector<uchar> status; // status vom calcOpticalFlowPyrLK
 	vector<float> err; // error vom calcOpticalFlowPyrLK
 
