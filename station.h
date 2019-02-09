@@ -1,7 +1,7 @@
 #pragma once
 #pragma warning(disable : 4996)
 
-#define MIN_FOLLOWED_POINTS 50
+#define MIN_FOLLOWED_POINTS 400
 
 #include <iostream>
 //#include <sstream>
@@ -47,6 +47,7 @@ class station
 
 	Mat Affine;
 	Mat cameraMatrix;
+	Mat distCoeffs;
 	keypoints kp; // keypoints von init_points()
 	histogram  hist; // histogramm für step_vectors in batch
 	Point2f main_of_frame; //ergebnissvektor fur frame verschiebung

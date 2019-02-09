@@ -12,9 +12,20 @@ follower::follower()
 	subPixWinSize = Size(6, 6);
 	winSize = Size(11, 11);
 
-	float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
+	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
+	if (!ks.isOpened()) 
+	{
+		cout << " Camera Matrix frei" << endl;
+		float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
 
-	cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+		cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+	}
+	else
+	{
+		ks["Camera_Matrix"] >> cameraMatrix;
+		ks["Distortion_Coefficients"] >> distCoeffs; //TODO
+	}
+
 
 	tm.reset();
 }
@@ -69,14 +80,14 @@ bool follower::key(int wait)
 	switch (c)
 	{
 	case 'r':
-		//needToInit = true;
 		break;
 
 	case 'c':
 		break;
 
-		//case 'k':
-		//	cam_calibrate();
+		case 'k':
+		//	cam_calibrate(&cameraMatrix, &distCoeffs);
+			break;
 	}
 
 	return false;

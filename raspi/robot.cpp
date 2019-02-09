@@ -29,12 +29,15 @@ static void help()
 int main(int argc, char** argv)
 {
 	help();
-	VideoCapture cap;
 
-	cap.open(0);
+	VideoCapture cap;
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
 	cap.set(cv::CAP_PROP_FPS, 15);
+
+	follower robot;
+
+	cap.open(0);
 
 	if (!cap.isOpened())
 	{
@@ -58,7 +61,6 @@ int main(int argc, char** argv)
 	cvtColor(frame[0], gray, COLOR_BGR2GRAY);
 
 	UDP_Base udp_base;
-	follower robot;
 
 	// Hauptzyclus
 

@@ -10,19 +10,17 @@ static void cal_help()
 		"how to edit it.  It may be any OpenCV supported file format XML/YAML." << endl;
 }
 
-Mat calibrate(int argc, char* argv[])
+void cam_calibrate(Mat* cameraMatrix, Mat* distCoeffs)
 {
-    cal_help();
-	Mat cameraMatrix, distCoeffs;
 
     //! [file_read]
     Settings s;
-    const string inputSettingsFile = argc > 1 ? argv[1] : "../camera_calibration/default.xml";
+    const string inputSettingsFile = "../default.xml";
     FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
     if (!fs.isOpened())
     {
         cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"" << endl;
-        return cameraMatrix;
+        return;
     }
     fs["Settings"] >> s;
     fs.release();                                         // close Settings file
@@ -34,7 +32,7 @@ Mat calibrate(int argc, char* argv[])
     if (!s.goodInput)
     {
         cout << "Invalid input detected. Application stopping. " << endl;
-        return cameraMatrix;
+        return;
     }
 
     vector<vector<Point2f> > imagePoints;
@@ -56,7 +54,7 @@ Mat calibrate(int argc, char* argv[])
         //-----  If no more image, or got enough, then stop calibration and show result -------------
         if( mode == CAPTURING && imagePoints.size() >= (size_t)s.nrFrames )
         {
-          if( runCalibrationAndSave(s, imageSize,  cameraMatrix, distCoeffs, imagePoints))
+          if( runCalibrationAndSave(s, imageSize,  *cameraMatrix, *distCoeffs, imagePoints))
               mode = CALIBRATED;
           else
               mode = DETECTION;
@@ -65,7 +63,7 @@ Mat calibrate(int argc, char* argv[])
         {
             // if calibration threshold was not reached yet, calibrate now
             if( mode != CALIBRATED && !imagePoints.empty() )
-                runCalibrationAndSave(s, imageSize,  cameraMatrix, distCoeffs, imagePoints);
+                runCalibrationAndSave(s, imageSize,  *cameraMatrix, *distCoeffs, imagePoints);
             break;
         }
         //! [get_input]
@@ -152,9 +150,9 @@ Mat calibrate(int argc, char* argv[])
         {
             Mat temp = view.clone();
             if (s.useFisheye)
-              cv::fisheye::undistortImage(temp, view, cameraMatrix, distCoeffs);
+              cv::fisheye::undistortImage(temp, view, *cameraMatrix, *distCoeffs);
             else
-              undistort(temp, view, cameraMatrix, distCoeffs);
+              undistort(temp, view, *cameraMatrix, *distCoeffs);
         }
         //! [output_undistorted]
         //------------------------------ Show image and check for input commands -------------------
@@ -185,16 +183,16 @@ Mat calibrate(int argc, char* argv[])
         if (s.useFisheye)
         {
             Mat newCamMat;
-            fisheye::estimateNewCameraMatrixForUndistortRectify(cameraMatrix, distCoeffs, imageSize,
+            fisheye::estimateNewCameraMatrixForUndistortRectify(*cameraMatrix, *distCoeffs, imageSize,
                                                                 Matx33d::eye(), newCamMat, 1);
-            fisheye::initUndistortRectifyMap(cameraMatrix, distCoeffs, Matx33d::eye(), newCamMat, imageSize,
+            fisheye::initUndistortRectifyMap(*cameraMatrix, *distCoeffs, Matx33d::eye(), newCamMat, imageSize,
                                              CV_16SC2, map1, map2);
         }
         else
         {
             initUndistortRectifyMap(
-                cameraMatrix, distCoeffs, Mat(),
-                getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize,
+                *cameraMatrix, *distCoeffs, Mat(),
+                getOptimalNewCameraMatrix(*cameraMatrix, *distCoeffs, imageSize, 1, imageSize, 0), imageSize,
                 CV_16SC2, map1, map2);
         }
 
@@ -214,7 +212,10 @@ Mat calibrate(int argc, char* argv[])
 
 	//TODO close image
 
-    return cameraMatrix;
+	cvSave("cameraMatrix.xml", cameraMatrix);
+	cvSave("distCoeffs.xml", distCoeffs);
+
+    return;
 }
 
 //! [compute_errors]

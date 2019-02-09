@@ -42,13 +42,15 @@ class follower
 
 	Mat image;
 	Mat prev_image;
-	Mat cameraMatrix;
 
 	vector<uchar> status; // status vom calcOpticalFlowPyrLK
 	vector<float> err; // error vom calcOpticalFlowPyrLK
 	vector<Point2f> kpt;
 	vector<Point2f> prev_kpt;
 	vector<Point2f> kpt_diff;
+
+	Mat cameraMatrix;
+	Mat distCoeffs;
 
 
 public:

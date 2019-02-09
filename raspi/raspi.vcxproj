@@ -28,6 +28,10 @@
     <ClInclude Include="SerialPort_raspi.h" />
     <ClInclude Include="Servos.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\out_camera_data.xml" />
+    <Xml Include="default.xml" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>
     <Keyword>Linux</Keyword>
@@ -54,6 +58,7 @@
     <RemoteProjectDir>$(RemoteRootDir)</RemoteProjectDir>
     <OutDir>$(RemoteRootDir)/bin/</OutDir>
     <IntDir>$(RemoteRootDir)/obj/</IntDir>
+    <AdditionalSourcesToCopyMapping>$(RemoteRootDir)/bin/default.xml;$(AdditionalSourcesToCopyMapping)</AdditionalSourcesToCopyMapping>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>

@@ -23,6 +23,25 @@ station::station()
 	step_butch = 1;
 	magnify_vektor_draw = 1;
 
+	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
+	if (!ks.isOpened())
+	{
+		cout << " Camera Matrix frei" << endl;
+		float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
+
+		cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+
+		float data1[5] = { -4.1802327018241026e-001, 5.0715243805833121e-001, 0., 0.,
+			-5.7843596847939704e-001 };
+
+		distCoeffs = Mat(5, 1, CV_32FC1, data1); // rows, cols
+	}
+	else
+	{
+		ks["camera_matrix"] >> cameraMatrix;
+		ks["distortion_coefficients"] >> distCoeffs; //TODO
+	}
+
 	namedWindow("LK Demo", 1);
 
 	setMouseCallback("LK Demo", onMouse, 0);
@@ -55,7 +74,9 @@ void station::take_picture(Mat* frame)
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
 	swap();
 
-	frame->copyTo(image);
+	//bframe->copyTo(image);
+	// Umrechnen 
+	undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden
 
 	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 

@@ -115,7 +115,13 @@ public:
 					inputType = VIDEO_FILE;
 			}
 			if (inputType == CAMERA)
+			{
 				inputCapture.open(cameraID);
+				inputCapture.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
+				inputCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
+				inputCapture.set(cv::CAP_PROP_FPS, 15);
+				
+			}
 			if (inputType == VIDEO_FILE)
 				inputCapture.open(input);
 			if (inputType != IMAGE_LIST && !inputCapture.isOpened())
@@ -251,4 +257,4 @@ enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
 bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat& distCoeffs,
 	vector<vector<Point2f> > imagePoints);
 
-Mat calibrate(int argc, char* argv[]);
+void cam_calibrate(Mat* cameraMatrix, Mat* distCoeffs);

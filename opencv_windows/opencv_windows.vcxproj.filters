@@ -48,15 +48,4 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\test1.mp4">
-      <Filter>Ressourcendateien</Filter>
-    </Media>
-    <Media Include="C:\Users\maxx\Pictures\Camera Roll\Drehen.mp4">
-      <Filter>Ressourcendateien</Filter>
-    </Media>
-    <Media Include="..\tilt.mp4">
-      <Filter>Ressourcendateien</Filter>
-    </Media>
-  </ItemGroup>
 </Project>

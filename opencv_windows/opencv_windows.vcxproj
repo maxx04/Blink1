@@ -65,11 +65,6 @@
     <ClCompile Include="..\keypoints.cpp" />
     <ClCompile Include="..\station.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\test1.mp4" />
-    <Media Include="..\tilt.mp4" />
-    <Media Include="C:\Users\maxx\Pictures\Camera Roll\Drehen.mp4" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

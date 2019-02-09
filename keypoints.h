@@ -15,7 +15,7 @@ class keypoints
 private:
 	
 public:
-	const int MAX_COUNT = 300;
+	const int MAX_COUNT = 500;
 	queue<Point2f> summ_vector;
 	queue<double> frame_timestamp;
 	vector<Point2f> prev_points; // vorherige punkte
