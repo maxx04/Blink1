@@ -74,9 +74,9 @@ void station::take_picture(Mat* frame)
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
 	swap();
 
-	//bframe->copyTo(image);
+	frame->copyTo(image);
 	// Umrechnen 
-	undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden
+//	undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden
 
 	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 

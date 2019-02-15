@@ -35,7 +35,7 @@ int main( int argc, char** argv )
 
 	VideoCapture cap;
 
-    Mat  frame, im8u;
+    Mat  frame;
 
 	net::endpoint ep;
 
@@ -132,7 +132,9 @@ int main( int argc, char** argv )
 
 		Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
 
-		Mat frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+	
+
+		frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
 
 		if (frame.size().width == 0) {
 			cerr << "decode failure!" << endl;

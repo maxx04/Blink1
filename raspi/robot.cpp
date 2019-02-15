@@ -31,13 +31,14 @@ int main(int argc, char** argv)
 	help();
 
 	VideoCapture cap;
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
-	cap.set(cv::CAP_PROP_FPS, 15);
 
 	follower robot;
 
 	cap.open(0);
+
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
+	cap.set(cv::CAP_PROP_FPS, 15);
 
 	if (!cap.isOpened())
 	{
@@ -45,7 +46,11 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	cout << "capturing initialised: " << cap.get(cv::CAP_PROP_FPS) << "  \n";
+	cout << "capturing initialised: " << endl;
+
+	cout << cap.get(cv::CAP_PROP_FRAME_WIDTH) << endl <<
+		cap.get(cv::CAP_PROP_FRAME_HEIGHT) << endl <<
+		cap.get(cv::CAP_PROP_FPS) << endl;
 
 	static Mat  frame[5], gray;
 
@@ -84,6 +89,8 @@ int main(int argc, char** argv)
 			for (int n = 0; n < 5; n++)
 			{
 				for (int i = 0; i < 5; i++) cap >> frame[n];
+
+				cout << frame->cols << " . " << frame->rows << endl;
 
 				if (robot.proceed_frame(&frame[n])) return 0;
 			}

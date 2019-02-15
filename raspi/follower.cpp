@@ -11,22 +11,26 @@ follower::follower()
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(6, 6);
 	winSize = Size(11, 11);
-
+/*
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
 	if (!ks.isOpened()) 
 	{
-		cout << " Camera Matrix frei" << endl;
+		cout << " Camera matrix fixed" << endl;
 		float data[10] = { 700, 0, 320, 0, 700, 240, 0, 0, 1 };
-
 		cameraMatrix = Mat(3, 3, CV_32FC1, data); // rows, cols
+
+		float data1[5] = { -4.1802327018241026e-001, 5.0715243805833121e-001, 0., 0.,
+					-5.7843596847939704e-001 };
+
+		distCoeffs = Mat(5, 1, CV_32FC1, data1); // rows, cols
 	}
 	else
 	{
+		cout << "Camera matrix loaded" << endl;
 		ks["Camera_Matrix"] >> cameraMatrix;
 		ks["Distortion_Coefficients"] >> distCoeffs; //TODO
 	}
-
-
+*/
 	tm.reset();
 }
 
@@ -43,6 +47,8 @@ void follower::take_picture(Mat* frame)
 		cerr << " Frame empty \n";
 		return; //TODO Fehlerabarbeitung
 	}
+
+	cout << frame->cols << " b " << frame->rows << endl;
 
 	image.copyTo(prev_image);
 
