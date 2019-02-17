@@ -153,8 +153,6 @@ void station::draw_current_points()
 {
 	int i = 0;
 
-	
-
 	for (Point2f p : kp.current_points)
 	{
 
@@ -170,6 +168,7 @@ void station::draw_current_points()
 	}
 
 	int m = 0;
+
 	for (int n : kp.point_numb)
 	{
 		stringstream text;
@@ -179,7 +178,7 @@ void station::draw_current_points()
 
 		text << kp.dist[m];
 
-		if (kp.current_points[n].x < 1200)
+		if (kp.current_points[n].x < 1240)
 		{
 			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 200), 2);
 		}
