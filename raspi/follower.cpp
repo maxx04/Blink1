@@ -48,8 +48,6 @@ void follower::take_picture(Mat* frame)
 		return; //TODO Fehlerabarbeitung
 	}
 
-	cout << frame->cols << " b " << frame->rows << endl;
-
 	image.copyTo(prev_image);
 
 	cvtColor(*frame, image, COLOR_BGR2GRAY);

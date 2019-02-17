@@ -83,6 +83,7 @@ public:
 	// Bearbeitet jedes frame
 	bool proceed_frame(Mat* frame);
 	void new_data_proceed(UDP_Base* udp_base);
+
 };
 
 

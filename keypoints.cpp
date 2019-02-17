@@ -98,9 +98,7 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 {
 	Point2f p,main,tmp;
 
-#ifndef _ARM
-	const double M_PI = 3.14159265359;
-#endif // !ARM
+
 
 
 	for (int i = 0; i < current_points.size(); i++)
@@ -179,4 +177,47 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 	}
   	return 0;
+}
+
+void keypoints::calc_distances()
+{
+	float VFOV2 = 19.1 / 180.0 * M_PI;
+	float H = 97.0;
+	float alfa = 3.7 / 180.0 * M_PI;
+	float V = 360.0;
+	float U = 640.0;
+	float beta;
+	float gamma;
+	float v1; // umberechnete abstand zu Camera-Mittelachse 
+	float distance;
+
+	dist.clear();
+	point_numb.clear();
+
+	for (int i = 0; i < current_points.size(); i++)
+	{
+		float v = current_points[i].y;
+		float u = current_points[i].x;
+
+		if (v < V) continue;
+/*
+		gamma = atan((u - U) / (v - V)); //[Radian] vertikales Winkel
+
+		if (gamma > 3.14) // TODO korrigiere pi
+		{
+			cerr << " Gamma 90 grad" << endl;
+			continue;
+		}
+
+		v1 = v / cos(gamma);
+*/
+		beta = atan((v - V) / V * tan(VFOV2)); // OPTI tan_beta lassen
+
+		distance = H / cos(alfa) / (tan(alfa) + tan(beta)); // OPTI cos(alfa); tan(alfa) vorberechnen
+
+		dist.push_back(distance);
+		point_numb.push_back(i);
+	}
+
+	return;
 }

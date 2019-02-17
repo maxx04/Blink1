@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define ENCODE_QUALITY 95
+#define ENCODE_QUALITY 90
 
 #include "../UDP_Base.h"
 #include "follower.h"
@@ -89,8 +89,6 @@ int main(int argc, char** argv)
 			for (int n = 0; n < 5; n++)
 			{
 				for (int i = 0; i < 5; i++) cap >> frame[n];
-
-				cout << frame->cols << " . " << frame->rows << endl;
 
 				if (robot.proceed_frame(&frame[n])) return 0;
 			}

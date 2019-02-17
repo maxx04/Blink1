@@ -72,6 +72,7 @@ void station::take_picture(Mat* frame)
 
 	fokus.x = (float)(image.cols / 2);
 	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
+
 	swap();
 
 	frame->copyTo(image);
@@ -151,6 +152,9 @@ void station::draw_prev_points()
 void station::draw_current_points()
 {
 	int i = 0;
+
+	
+
 	for (Point2f p : kp.current_points)
 	{
 
@@ -164,6 +168,25 @@ void station::draw_current_points()
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
 		i++;
 	}
+
+	int m = 0;
+	for (int n : kp.point_numb)
+	{
+		stringstream text;
+
+		text.width(5);
+		text.precision(4);
+
+		text << kp.dist[m];
+
+		if (kp.current_points[n].x < 1200)
+		{
+			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 200), 2);
+		}
+
+		m++;
+	}
+
 }
 
 //void station::draw_calculated_points()
@@ -425,6 +448,8 @@ bool station::proceed_frame(Mat* frame)
 	calcOptFlow();
 
 	check_for_followed_points();
+
+	kp.calc_distances();
 
 	//	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.

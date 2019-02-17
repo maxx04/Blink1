@@ -3,9 +3,14 @@
 #include <iostream>
 #include <queue>
 #include <string.h>
+#include <math.h>
 
 #include "opencv2/core.hpp"
 #include "histogram.h"
+
+#ifndef _ARM
+const double M_PI = 3.14159265359;
+#endif // !ARM
 
 using namespace std;
 using namespace cv;
@@ -26,6 +31,9 @@ public:
 
 	vector<Point2f>* step_vector; // step_vector von prev_points zu current_points
 							// in vector geladen jedes mal nach aufruf load_step_vectors
+
+	std::vector<float> dist;
+	std::vector<int> point_numb;
 
 	histogram hist; //histogramm zum finden vom background move vector
 	histogram hist_l;
@@ -57,5 +65,6 @@ public:
 
 	// berechnet bewegugsvectoren pro schritt TODO Batch 
 	int calculate_move_vectors();
+	void calc_distances();
 };
 
