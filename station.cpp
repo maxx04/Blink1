@@ -180,7 +180,7 @@ void station::draw_current_points()
 
 		if (kp.current_points[n].x < 1240)
 		{
-			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 200), 2);
+			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0));
 		}
 
 		m++;

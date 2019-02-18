@@ -8,6 +8,7 @@ keypoints::keypoints()
 	step_vector = new vector<Point2f>[MAX_COUNT];
 	hist = histogram(120, "winkel");
 	hist_l = histogram(50, "length");
+	hist_w = histogram(30, "step");
 }
 
 keypoints::~keypoints()
@@ -186,13 +187,14 @@ void keypoints::calc_distances()
 	float alfa = 3.7 / 180.0 * M_PI;
 	float V = 360.0;
 	float U = 640.0;
-	float beta;
+	float beta, beta1;
 	float gamma;
 	float v1; // umberechnete abstand zu Camera-Mittelachse 
 	float distance;
 
 	dist.clear();
 	point_numb.clear();
+	w.clear();
 
 	for (int i = 0; i < current_points.size(); i++)
 	{
@@ -200,24 +202,28 @@ void keypoints::calc_distances()
 		float u = current_points[i].x;
 
 		if (v < V) continue;
-/*
-		gamma = atan((u - U) / (v - V)); //[Radian] vertikales Winkel
 
-		if (gamma > 3.14) // TODO korrigiere pi
-		{
-			cerr << " Gamma 90 grad" << endl;
-			continue;
-		}
-
-		v1 = v / cos(gamma);
-*/
 		beta = atan((v - V) / V * tan(VFOV2)); // OPTI tan_beta lassen
-
+		
 		distance = H / cos(alfa) / (tan(alfa) + tan(beta)); // OPTI cos(alfa); tan(alfa) vorberechnen
 
 		dist.push_back(distance);
 		point_numb.push_back(i);
+
+		float v1 = prev_points[i].y;
+		//float u1 = prev_points[i].x;
+
+		beta1 = atan((v1 - V) / V * tan(VFOV2)); // OPTI tan_beta lassen
+
+		float l = H / tan(alfa - beta) - H / tan(alfa - beta1);
+
+		hist_w.collect({ i, l }); //TODO grenzen ferfeinern
+
+		w.push_back(l);
+
 	}
+
+	hist_w.sort();
 
 	return;
 }
