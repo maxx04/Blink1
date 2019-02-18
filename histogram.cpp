@@ -27,6 +27,7 @@ histogram::histogram(int _bins, string _name, int _dims ):histogram()
 
 int histogram::collect(point_satz value)
 {
+
 	if (value.v > range_max) range_max = value.v;
 	if (value.v <= range_min) range_min = value.v;
 
@@ -40,6 +41,7 @@ int histogram::collect(point_satz value)
 
 int histogram::sort()
 {
+	
 
 	bins_borders.resize(bins+1);
 	bins_counters.resize(bins);
@@ -200,6 +202,7 @@ void histogram::plot_result(Point p)
 	}
 	
 	imshow(name, plotResult);
+	
 }
 
 

@@ -192,9 +192,11 @@ void keypoints::calc_distances()
 	float v1; // umberechnete abstand zu Camera-Mittelachse 
 	float distance;
 
-	dist.clear();
-	point_numb.clear();
-	w.clear();
+	distance_to_cam.clear();
+	numbers_of_downpoints.clear();
+	step_length.clear();
+	same_step_pt.clear();
+	hist_w.clear();
 
 	for (int i = 0; i < current_points.size(); i++)
 	{
@@ -207,8 +209,8 @@ void keypoints::calc_distances()
 		
 		distance = H / cos(alfa) / (tan(alfa) + tan(beta)); // OPTI cos(alfa); tan(alfa) vorberechnen
 
-		dist.push_back(distance);
-		point_numb.push_back(i);
+		distance_to_cam.push_back(distance);
+		numbers_of_downpoints.push_back(i);
 
 		float v1 = prev_points[i].y;
 		//float u1 = prev_points[i].x;
@@ -217,13 +219,19 @@ void keypoints::calc_distances()
 
 		float l = H / tan(alfa - beta) - H / tan(alfa - beta1);
 
-		hist_w.collect({ i, l }); //TODO grenzen ferfeinern
+		hist_w.collect({ i, l }); //TODO grenzen verfeinern
 
-		w.push_back(l);
+		step_length.push_back(l);
 
 	}
 
+	hist_w.range_max = 100;
+	hist_w.range_min = -100;
 	hist_w.sort();
+	
+	
+	float lr = hist_w.get_main_middle_value(&same_step_pt);
+
 
 	return;
 }

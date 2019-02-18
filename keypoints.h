@@ -32,9 +32,10 @@ public:
 	vector<Point2f>* step_vector; // step_vector von prev_points zu current_points
 									// in vector geladen jedes mal nach aufruf load_step_vectors
 
-	std::vector<float> dist;
-	std::vector<float> w;
-	std::vector<int> point_numb;
+	std::vector<float> distance_to_cam;
+	std::vector<float> step_length;
+	std::vector<int> numbers_of_downpoints;
+	std::vector<int> same_step_pt;
 
 	histogram hist; //histogramm zum finden vom background move vector
 	histogram hist_l;

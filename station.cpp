@@ -164,19 +164,21 @@ void station::draw_current_points()
 			circle(image, (Point)p, 8, Scalar(200, 0, 0));
 			else
 			circle(image, (Point)p, 3, Scalar(255, 250, 0));
+
+
 		i++;
 	}
 
 	int m = 0;
 
-	for (int n : kp.point_numb)
+	for (int n : kp.numbers_of_downpoints)
 	{
 		stringstream text;
 
 		text.width(5);
 		text.precision(4);
 
-		text << kp.dist[m];
+		text << kp.step_length[m];
 
 		if (kp.current_points[n].x < 1240)
 		{
@@ -184,6 +186,11 @@ void station::draw_current_points()
 		}
 
 		m++;
+	}
+
+	for (size_t i = 0; i < kp.same_step_pt.size(); i++)
+	{
+		circle(image, (Point)kp.current_points[kp.same_step_pt[i]], 10, Scalar(0, 0, 160));
 	}
 
 }
