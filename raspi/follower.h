@@ -69,6 +69,7 @@ public:
 	void find_diff_keypoints();
 	void calcOptFlow();
 	void new_data_proceed(UDP_Base* udp_base);
+	void clean();
 };
 
 

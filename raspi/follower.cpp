@@ -119,7 +119,7 @@ bool follower::proceed_frame(Mat* frame)
 
 		tm.stop();
 
-		cout << "optical Flow compute " << tm << endl;
+		cout << "optical Flow compute " << tm << " Keypoints: " << kpt.size() << endl;
 	}
 
 
@@ -138,7 +138,7 @@ void follower::find_diff_keypoints()
 
 void follower::calcOptFlow()
 {
-
+	Point2f p;
 	kpt.swap(prev_kpt);
 
 	if (prev_kpt.size() != 0)
@@ -146,7 +146,24 @@ void follower::calcOptFlow()
 		calcOpticalFlowPyrLK(prev_image, image, /*prev*/ prev_kpt, /*next*/ kpt,
 			status, err, winSize, 3, termcrit, 0, 0.01);
 
+		for (size_t i = 0; i < kpt.size(); i++)
+		{
+			if (kpt_diff.size() == kpt.size()) //OPTI nicht staendig vergleich
+			{
+				p = kpt_diff.back();
+				kpt_diff.pop_back();
+			}
+			else
+				p = Point2f{ 0.0, 0.0 };
+
+			kpt_diff.push_back(kpt[i] - prev_kpt[i] + p);
+		}
+
+		clean();
 	}
+
+
+
 
 }
 
@@ -163,6 +180,20 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 	udp_base->udp_data_received();
 
 	//send antwort an client 
+}
+
+void follower::clean()
+{
+	for (size_t i = 0; i < kpt.size(); i++)
+	{
+		if (status[i] != 1)
+		{
+			kpt.erase(kpt.begin() + i);
+			kpt_diff.erase(kpt_diff.begin() + i); //OPTI erase zu langsam
+		}
+	}
+
+	cout << "new size kpt: " << kpt.size() << endl;
 }
 
 
