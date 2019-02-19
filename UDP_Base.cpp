@@ -156,6 +156,16 @@ void UDP_Base::start_Server(int args)
 			}
 		}
 
+		// points Uebertragen
+		/*
+		tmp.nb = n_blocks;
+
+		v6s.sendto(tmp.bf, sizeof(int), ep);
+
+		cout << "antwort gesendet Daten" << n_blocks << " blocks \n";
+		*/
+		// 
+
 		tm.stop();
 
 		cout << "end transfer " << n << " blocks in " << tm << endl;

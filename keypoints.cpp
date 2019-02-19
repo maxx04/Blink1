@@ -229,9 +229,7 @@ void keypoints::calc_distances()
 	hist_w.range_min = -100;
 	hist_w.sort();
 	
-	
 	float lr = hist_w.get_main_middle_value(&same_step_pt);
-
 
 	return;
 }
