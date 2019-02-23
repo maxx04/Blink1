@@ -25,6 +25,7 @@
     <ClInclude Include="follower.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="neck.h" />
+    <ClInclude Include="robot.h" />
     <ClInclude Include="SerialPort_raspi.h" />
     <ClInclude Include="Servos.h" />
   </ItemGroup>

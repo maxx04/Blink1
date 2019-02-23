@@ -1,5 +1,6 @@
 #include "UDP_Base.h"
 
+using namespace std;
 using namespace cv;
 
 bool UDP_Base::new_udp_data = false;
@@ -8,9 +9,13 @@ bool UDP_Base::imagegrab_ready = false;
 
 udata UDP_Base::dt;
 
+net::socket* UDP_Base::ludp_socket;
+
 std::vector < uchar > UDP_Base::encoded(100);
+std::vector <keypoints_flow> UDP_Base::key_points;
 
 net::endpoint UDP_Base::ep;
+
 
 #define WAIT_ON_CAM 20
 
@@ -26,7 +31,7 @@ UDP_Base::UDP_Base()
 
 	udp_thread = new thread(start_Server, 1);
 
-	cout << "Server thread started, Id: " << udp_thread->get_id() << endl;
+	std::cout << "Server thread started, Id: " << udp_thread->get_id() << endl;
 
 }
 
@@ -46,6 +51,63 @@ bool UDP_Base::check_incoming_data()
 	return new_udp_data;
 }
 
+void UDP_Base::send_keypoints(int points_number)
+{
+
+	/*transfer_busy = true;*/
+
+	int points_nmb = key_points.size();
+
+	int n_blocks =  1 + ((points_nmb * sizeof(keypoints_flow) - 1) / SOCKET_BLOCK_SIZE);
+
+	cout << sizeof(key_points) << " - " << sizeof(keypoints_flow) << endl;
+
+	int_char tmp;
+
+	tmp.nb = points_nmb;
+
+	// Groesse senden
+	ludp_socket->sendto(tmp.bf, sizeof(int), ep);
+
+	cout << "anzahl gesendet " << n_blocks << " blocks \n";
+
+	//Data senden
+
+	cout << "start transfer keypoints \t " << sizeof(key_points) << " : "<< hex << int((char*)(&key_points[0])) << dec << endl;
+
+	//tm.reset();
+	//tm.start();
+
+	int n = 0;
+
+	size_t block_length = SOCKET_BLOCK_SIZE;
+
+	while (n < n_blocks)
+	{
+
+		//cout << ludp_socket-> sendto( (reinterpret_cast<char *>(key_points)) + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, ep) << endl;
+		cout << ludp_socket->sendto((char *)(&key_points[0]) + n * block_length, block_length, ep) << endl;
+		cout << n << endl;
+
+
+		//OPTI gibt es moeglichkeit zum erneutes senden
+		// Baestaetigung block war erfolgreich uebertragen
+		int i = ludp_socket->recvfrom(tmp.bf, sizeof(int), &ep);
+
+		cout << " receive " << n << endl;
+
+		if (i == -1)
+		{
+			cerr << "falsche antwort vom client \n";
+			break;
+		}
+
+		n++;
+	}
+
+	/*transfer_busy = false;*/
+}
+
 //void UDP_Base::set_frame_pointer(Mat* frame)
 //{
 //	ptrFrame = frame;
@@ -58,6 +120,10 @@ bool UDP_Base::check_incoming_data()
 
 
 
+void UDP_Base::receive_keypoints()
+{
+}
+
 void UDP_Base::start_Server(int args)
 {
 
@@ -67,9 +133,10 @@ void UDP_Base::start_Server(int args)
 	net::init();
 
 	//create an ipv4 udp socket, we can optionaly specify the port to bind to as the 3rd arg
-	net::socket v6s(net::af::inet, net::sock::dgram, 8080);
+	ludp_socket = new net::socket(net::af::inet, net::sock::dgram, 8080);
 
-	if (!v6s.good()) {
+
+	if (!ludp_socket->good()) {
 		std::cerr << "failed to create & bind ipv4 socket" << std::endl;
 		return;
 	}
@@ -77,12 +144,12 @@ void UDP_Base::start_Server(int args)
 	std::cout << "ipv4 socket created..." << std::endl;
 
 	//we can access a sockets local endpoint by getlocaladdr() && getremoteaddr() for tcp peers
-	std::cout << "listening at: " << v6s.getlocaladdr().to_string() << std::endl
-		<< "send a udp packet to :: " << v6s.getlocaladdr().get_port() << " to continue" << std::endl;
+	std::cout << "listening at: " << ludp_socket->getlocaladdr().to_string() << std::endl
+		<< "send a udp packet to :: " << ludp_socket->getlocaladdr().get_port() << " to continue" << std::endl;
 
 
 	//recv a packet up to 512 bytes and store the sender in endpoint ep
-	//v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
+	//ludp_socket.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep); //erste client aufgenommen 
 	//std::cout << "erstes pack, buffer: " << dt.union_buff << std::endl;
 	//std::cout << ep.to_string() << std::endl;
 
@@ -90,7 +157,7 @@ void UDP_Base::start_Server(int args)
 	{
 		//wartet auf inkommende hauptdaten
 		cout << "wartet auf client \n";
-		int i = v6s.recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep);
+		int i = ludp_socket->recvfrom(dt.union_buff, SOCKET_BLOCK_SIZE, &ep);
 		if (i == -1)
 		{
 			cerr << "Fehler beim warten \n";	break;
@@ -127,14 +194,14 @@ void UDP_Base::start_Server(int args)
 
 		tmp.nb = n_blocks;
 
-		v6s.sendto(tmp.bf, sizeof(int), ep);
+		ludp_socket->sendto(tmp.bf, sizeof(int), ep);
 
 		cout << "antwort gesendet " << n_blocks << " blocks \n";
 
 		//Bild senden
 		int n = 0;
 
-		cout << "start transfer \t" << hex << int((char*)(&encoded[0])) << dec << endl;
+		cout << "start transfer picture \t" << hex << int((char*)(&encoded[0])) << dec << endl;
 
 		tm.reset();
 		tm.start();
@@ -143,11 +210,12 @@ void UDP_Base::start_Server(int args)
 		{
 			//cout << n << "\r";
 
-			v6s.sendto((char*)&encoded[ n * SOCKET_BLOCK_SIZE], SOCKET_BLOCK_SIZE, ep);
+			ludp_socket->sendto((char*)&encoded[ n * SOCKET_BLOCK_SIZE], SOCKET_BLOCK_SIZE, ep);
 			n++;
 
 			//OPTI gibt es moeglichkeit zum erneutes senden
-			int i = v6s.recvfrom(tmp.bf, sizeof(int), &ep);
+			// Baestaetigung block war erfolgreich uebertragen
+			int i = ludp_socket->recvfrom(tmp.bf, sizeof(int), &ep);
 
 			if (i == -1)
 			{
@@ -160,7 +228,7 @@ void UDP_Base::start_Server(int args)
 		/*
 		tmp.nb = n_blocks;
 
-		v6s.sendto(tmp.bf, sizeof(int), ep);
+		ludp_socket.sendto(tmp.bf, sizeof(int), ep);
 
 		cout << "antwort gesendet Daten" << n_blocks << " blocks \n";
 		*/
@@ -168,7 +236,9 @@ void UDP_Base::start_Server(int args)
 
 		tm.stop();
 
-		cout << "end transfer " << n << " blocks in " << tm << endl;
+		cout << "end transfer picture" << n << " blocks in " << tm << endl;
+
+		send_keypoints(0);
 
 		transfer_busy = false;
 		imagegrab_ready = false;
@@ -177,8 +247,9 @@ void UDP_Base::start_Server(int args)
 
 	}
 
-	v6s.close();
+	ludp_socket->close();
 	cout << "socket closed" << endl;
 }
+
 
 

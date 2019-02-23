@@ -7,6 +7,12 @@
 
 
 #include "station.h"
+#include "UDP_Base.h"
+
+int receive_frame(net::socket &sock, net::endpoint &ep, cv::Mat &frame);
+int receive_keypoints(net::socket &sock, net::endpoint &ep);
+
+ std::vector <keypoints_flow> key_points;
 
 
 static void help()
@@ -39,7 +45,7 @@ int main( int argc, char** argv )
 
 	net::endpoint ep;
 
-	udata _data;
+
 	station PC;
 
 	//we must call net::init() on windows, if not on windows it is a no-op
@@ -65,6 +71,7 @@ int main( int argc, char** argv )
 
 	Sleep(1000);
 
+	udata _data;
 
     for(;;)
     {
@@ -89,52 +96,12 @@ int main( int argc, char** argv )
 		//cout << " dist:"; cin >> _data.dt_udp.move_stright;
 		//cout << " dir:"; cin >> _data.dt_udp.direction;
 
-
-
-
-
 		sock.send(_data.union_buff, SOCKET_BLOCK_SIZE);
 
-		int_char tmp;
 
-		int i = sock.recvfrom(tmp.bf, sizeof(int), &ep); // 1. antwort
+		if (receive_frame(sock, ep, frame) == 2) break;
+		if (receive_keypoints(sock, ep) == 2) break;
 
-		if (i == -1)	break;
-
-		std::cout << "packet from: " << ep.to_string() << std::endl;
-
-		//Bild empfangen
-
-		int n = 0;
-
-		size_t n_blocks = tmp.nb; 
-
-		cout << n_blocks << " blocks" << endl;
-
-		char* longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
-
-		int64 start = getTickCount();
-
-		cout << "start transfer \t" << hex << int(&longbuf) << dec << endl;
-
-		while (n < n_blocks)
-		{
-			//cout << n << "\r";
-			sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
-
-			sock.send(tmp.bf, sizeof(int));
-			n++;
-		}
-
-		cout << "end transfer " << n << " blocks " << 
-			(getTickCount() - start)/ getTickFrequency() << " s" << endl;
-
-
-		Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
-
-	
-
-		frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
 
 		if (frame.size().width == 0) {
 			cerr << "decode failure!" << endl;
@@ -150,4 +117,111 @@ int main( int argc, char** argv )
 //	sock.close();
 
     
+}
+
+int receive_frame(net::socket &sock, net::endpoint &ep, cv::Mat &frame)
+{
+
+	int_char tmp;
+
+	int i = sock.recvfrom(tmp.bf, sizeof(int), &ep); // 1. antwort
+
+	if (i == -1)  return 2; 
+
+	std::cout << "packet from: " << ep.to_string() << std::endl;
+
+	//Bild empfangen
+
+	int n = 0;
+
+	size_t n_blocks = tmp.nb;
+
+	std::cout << n_blocks << " blocks" << endl;
+
+	char* longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
+
+	int64 start = getTickCount();
+
+	std::cout << "start transfer \t" << hex << int(&longbuf) << dec << endl;
+
+	while (n < n_blocks)
+	{
+		//cout << n << "\r";
+		sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
+
+		sock.send(tmp.bf, sizeof(int));
+		n++;
+	}
+
+	std::cout << "end transfer frame" << n << " blocks " <<
+		(getTickCount() - start) / getTickFrequency() << " s" << endl;
+
+
+	Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
+
+	frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+
+	return 1;
+}
+
+int receive_keypoints(net::socket &sock, net::endpoint &ep)
+{
+
+	int_char tmp;
+
+	int i = sock.recvfrom(tmp.bf, sizeof(int), &ep); // 1. antwort
+
+	if (i == -1) {  return 2; };
+
+	std::cout << "packet from: " << ep.to_string() << std::endl;
+
+	//Bild empfangen
+
+	int points_nmb = tmp.nb;
+
+	cout << "points : " << points_nmb << endl;
+
+	int n_blocks = 1 + ((points_nmb * sizeof(keypoints_flow) - 1) / SOCKET_BLOCK_SIZE);
+
+	std::cout << n_blocks << " blocks" << endl;
+
+	char* longbuf = new char[SOCKET_BLOCK_SIZE * n_blocks];
+
+	int64 start = getTickCount();
+
+	std::cout << "start transfer keypoints \t" << hex << int(&longbuf) << dec << endl;
+
+	int n = 0;
+
+	while (n < n_blocks)
+	{
+		cout << n << "\n";
+		sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
+
+		cout << sock.send(tmp.bf, sizeof(int)) << endl;
+		n++;
+	}
+
+	std::cout << "end transfer keypoints" << n << " blocks " <<
+		(getTickCount() - start) / getTickFrequency() << " s" << endl;
+
+	keypoints_flow* p;
+
+	p = reinterpret_cast<keypoints_flow*>(longbuf);
+
+	for (size_t i = 0; i < points_nmb; i++)
+	{
+		cout << p[i].p << " - " << p[i].flow << endl;
+	}
+
+	//template<typename T>
+	//T deserialize(buffer const& buf) {
+	//	return *reinterpret_cast<const T*>(&buf[0]);
+
+
+	//Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
+
+	//frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+
+
 }

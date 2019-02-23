@@ -167,6 +167,17 @@ void follower::calcOptFlow()
 
 }
 
+void follower::copy_keypoints()
+{
+	UDP_Base::key_points.clear();
+
+	for (size_t i = 0; i < kpt.size(); i++) //TODO und weniger als 300
+	{
+		UDP_Base::key_points.push_back({ kpt[i], kpt_diff[i] });
+	}
+
+}
+
 void follower::new_data_proceed(UDP_Base* udp_base)
 {
 

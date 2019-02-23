@@ -21,6 +21,12 @@ struct exchange_data
 	float direction;
 };
 
+struct keypoints_flow
+{
+	cv::Point2f p;
+	cv::Point2f flow;
+};
+
 
 union udata
 {
@@ -45,16 +51,22 @@ class UDP_Base
 	
 public:
 
+	static net::socket* ludp_socket;
 	static bool transfer_busy;
 	static bool imagegrab_ready;
+	static bool keypoints_sendet;
 	static std::vector <uchar> encoded;
+	static std::vector <keypoints_flow> key_points;
 	exchange_data* udp_data;
 
 	UDP_Base();
 	~UDP_Base();
 	void udp_data_received();
-	bool check_incoming_data();
+	static bool check_incoming_data();
+	static void send_keypoints(int points_number);
+	static void receive_keypoints();
 	static void start_Server(int args);
+
 
 };
 

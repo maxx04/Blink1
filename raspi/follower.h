@@ -68,6 +68,7 @@ public:
 	void find_keypoints();
 	void find_diff_keypoints();
 	void calcOptFlow();
+	void copy_keypoints();
 	void new_data_proceed(UDP_Base* udp_base);
 	void clean();
 };

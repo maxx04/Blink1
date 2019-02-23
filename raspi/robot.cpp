@@ -8,6 +8,7 @@
 
 #include "../UDP_Base.h"
 #include "follower.h"
+#include "robot.h"
 
 using namespace cv;
 using namespace std;
@@ -25,6 +26,7 @@ static void help()
 		<< endl;
 }
 
+static UDP_Base udp_base;
 
 int main(int argc, char** argv)
 {
@@ -65,7 +67,7 @@ int main(int argc, char** argv)
 
 	cvtColor(frame[0], gray, COLOR_BGR2GRAY);
 
-	UDP_Base udp_base;
+
 
 	// Hauptzyclus
 
@@ -75,9 +77,10 @@ int main(int argc, char** argv)
 
 		while (udp_base.transfer_busy)
 		{
-			cout << "waiting transfer \n";
+			//cout << "waiting transfer \n";
 			delay(100);
 		}
+
 
 
 		if (udp_base.check_incoming_data())
@@ -96,10 +99,11 @@ int main(int argc, char** argv)
 			//delay(1000); // wegen schaerfe
 
 			imencode(".jpg", frame[4], udp_base.encoded, compression_params);
+
+			robot.copy_keypoints();
+
 			udp_base.imagegrab_ready = true; // fuer thread mit Server
 
-			cout << endl;
-		
 		}
 
 
