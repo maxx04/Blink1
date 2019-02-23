@@ -60,7 +60,7 @@ void UDP_Base::send_keypoints(int points_number)
 
 	int n_blocks =  1 + ((points_nmb * sizeof(keypoints_flow) - 1) / SOCKET_BLOCK_SIZE);
 
-	cout << sizeof(key_points) << " - " << sizeof(keypoints_flow) << endl;
+	//cout << sizeof(key_points) << " - " << sizeof(keypoints_flow) << endl;
 
 	int_char tmp;
 
@@ -86,15 +86,15 @@ void UDP_Base::send_keypoints(int points_number)
 	{
 
 		//cout << ludp_socket-> sendto( (reinterpret_cast<char *>(key_points)) + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, ep) << endl;
-		cout << ludp_socket->sendto((char *)(&key_points[0]) + n * block_length, block_length, ep) << endl;
-		cout << n << endl;
+		ludp_socket->sendto((char *)(&key_points[0]) + n * block_length, block_length, ep);
+		//cout << n << endl;
 
 
 		//OPTI gibt es moeglichkeit zum erneutes senden
 		// Baestaetigung block war erfolgreich uebertragen
 		int i = ludp_socket->recvfrom(tmp.bf, sizeof(int), &ep);
 
-		cout << " receive " << n << endl;
+		//cout << "receive " << n << endl;
 
 		if (i == -1)
 		{

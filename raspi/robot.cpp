@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define ENCODE_QUALITY 90
+#define ENCODE_QUALITY 80
 
 #include "../UDP_Base.h"
 #include "follower.h"
@@ -89,16 +89,17 @@ int main(int argc, char** argv)
 			robot.new_data_proceed(&udp_base);
 			robot.needToInit = true;
 
-			for (int n = 0; n < 5; n++)
+			for (int n = 0; n < 2; n++)
 			{
-				for (int i = 0; i < 5; i++) cap >> frame[n];
-
+				// entlehrehn buffer
+				for (int i = 0; i < 5; i++) cap >> frame[n]; 
+				delay(50);
 				if (robot.proceed_frame(&frame[n])) return 0;
 			}
 
 			//delay(1000); // wegen schaerfe
 
-			imencode(".jpg", frame[4], udp_base.encoded, compression_params);
+			imencode(".jpg", frame[1], udp_base.encoded, compression_params);
 
 			robot.copy_keypoints();
 

@@ -81,7 +81,7 @@ public:
 
 	int collect_step_vectors();
 	// Bearbeitet jedes frame
-	bool proceed_frame(Mat* frame);
+	bool proceed_frame(Mat* frame, std::vector <keypoints_flow>* key_points);
 	void new_data_proceed(UDP_Base* udp_base);
 
 };

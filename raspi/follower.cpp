@@ -11,6 +11,7 @@ follower::follower()
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(6, 6);
 	winSize = Size(11, 11);
+
 /*
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
 	if (!ks.isOpened()) 
@@ -63,7 +64,7 @@ void follower::find_keypoints()
 
 	kpt.clear();
 
-	goodFeaturesToTrack(image, kpt, 300, 0.03, 10, Mat(), 9, 5);
+	goodFeaturesToTrack(image, kpt, 500, 0.03, 10, Mat(), 9, 5);
 
 	//refine position
 	cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
@@ -105,6 +106,7 @@ bool follower::proceed_frame(Mat* frame)
 
 	if (needToInit)
 	{
+		cout << "find keypoints: " << endl;
 		find_keypoints();
 		needToInit = false;
 		return false;
@@ -140,23 +142,25 @@ void follower::calcOptFlow()
 {
 	Point2f p;
 	kpt.swap(prev_kpt);
+	kpt.clear();
+	kpt_diff.clear();
 
 	if (prev_kpt.size() != 0)
 	{
 		calcOpticalFlowPyrLK(prev_image, image, /*prev*/ prev_kpt, /*next*/ kpt,
-			status, err, winSize, 3, termcrit, 0, 0.01);
+			status, err, winSize, 5, termcrit, 0, 0.001);
 
 		for (size_t i = 0; i < kpt.size(); i++)
 		{
-			if (kpt_diff.size() == kpt.size()) //OPTI nicht staendig vergleich
-			{
-				p = kpt_diff.back();
-				kpt_diff.pop_back();
-			}
-			else
-				p = Point2f{ 0.0, 0.0 };
+			//if (kpt_diff.size() == kpt.size()) //OPTI nicht staendig vergleich
+			//{
+			//	p = kpt_diff.back();
+			//	kpt_diff.pop_back();
+			//}
+			//else
+			//	p = Point2f{ 0.0, 0.0 };
 
-			kpt_diff.push_back(kpt[i] - prev_kpt[i] + p);
+			kpt_diff.push_back(kpt[i] - prev_kpt[i]);
 		}
 
 		clean();
@@ -165,6 +169,20 @@ void follower::calcOptFlow()
 
 
 
+}
+
+void follower::clean()
+{
+	for (size_t i = 0; i < kpt.size(); i++)
+	{
+		if (status[i] != 1 && err[i] < 30.0)
+		{
+			kpt.erase(kpt.begin() + i);
+			kpt_diff.erase(kpt_diff.begin() + i); //OPTI erase zu langsam
+		}
+	}
+
+	cout << "new size kpt: " << kpt.size() << endl;
 }
 
 void follower::copy_keypoints()
@@ -193,18 +211,6 @@ void follower::new_data_proceed(UDP_Base* udp_base)
 	//send antwort an client 
 }
 
-void follower::clean()
-{
-	for (size_t i = 0; i < kpt.size(); i++)
-	{
-		if (status[i] != 1)
-		{
-			kpt.erase(kpt.begin() + i);
-			kpt_diff.erase(kpt_diff.begin() + i); //OPTI erase zu langsam
-		}
-	}
 
-	cout << "new size kpt: " << kpt.size() << endl;
-}
 
 

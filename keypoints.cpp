@@ -20,7 +20,6 @@ void keypoints::clear(void)
 {
 	prev_points.clear();
 	current_points.clear();
-
 }
 
 void keypoints::swap(void)
@@ -36,14 +35,9 @@ int keypoints::save_step_vectors(void)
 
 	for (size_t i = 0; i < prev_points.size(); i++) 
 	{
-		//if (status[i] == 1)
-		//{
-			//speichere in zeit nur gute punkte
-			step = (current_points[i] - prev_points[i]);
-			number++;
+			step = current_points[i] - prev_points[i];
 			step_vector[i].push_back(step); // step vektor beladen
-		//}
-
+			number++;
 	}
 
 	return number;

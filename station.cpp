@@ -180,10 +180,10 @@ void station::draw_current_points()
 
 		text << kp.step_length[m];
 
-		if (kp.current_points[n].x < 1240)
-		{
-			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0));
-		}
+		//if (kp.current_points[n].x < 1240)
+		//{
+		//	putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0));
+		//}
 
 		m++;
 	}
@@ -234,15 +234,17 @@ int station::draw_image()
 	//draw_aim_point();
 
 	//Draw die Punkte die entsprechen hintegrundvector
-	draw_main_points();
+	//draw_main_points();
 
-	//draw_prev_points();
+	// draw_prev_points();
 
 	draw_current_points();
 
 	//draw_nearest_point();
 
+	draw_step_vectors();
 
+/*
 	if (kp.summ_vector.size() == step_butch) // wenn anzahl frames wird erreicht dann abbilden 
 	{
 
@@ -250,13 +252,15 @@ int station::draw_image()
 
 		draw_summ_vector();
 
-		draw_step_vectors();
+
 
 		//	draw_calculated_points();
 
 		time = 0; // und time 0 stop und warte auf tastatur
 
 	}
+	*/
+	time = 0;
 
 	return time;
 }
@@ -275,6 +279,7 @@ void station::draw_step_vectors() // batch
 		{
 			//p1 = p0 + magnif * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
 			p1 = p0 + magnify_vektor_draw * kp.get_next_step_vector(i); //HACK entnahme aus queue vector
+
 			if (kp.status[i] == 1 && kp.err[i] < 10 )
 				line(image, (Point)p0, (Point)(p1), Scalar(0, 250, 0));
 			else
@@ -283,6 +288,9 @@ void station::draw_step_vectors() // batch
 
 			p0 = p1;
 		};
+
+
+
 
 	}
 
@@ -436,13 +444,13 @@ int station::collect_step_vectors()
 	return 0;
 }
 // Bearbeitet Frame in schritten
-bool station::proceed_frame(Mat* frame)
+bool station::proceed_frame(Mat* frame, std::vector <keypoints_flow>* key_points)
 {
 
 	take_picture(frame);
 
 	imshow("LK Demo", *frame);
-
+	/*
 	if (needToInit)
 	{
 		find_keypoints();
@@ -453,16 +461,30 @@ bool station::proceed_frame(Mat* frame)
 
 	calcOptFlow();
 
-	check_for_followed_points();
+	// punkte ersetzen
+	*/
+	kp.clear();
 
-	kp.calc_distances();
+
+	for (keypoints_flow p : *key_points)
+	{
+		kp.err.push_back(5.0);
+		kp.status.push_back(1);
+		kp.current_points.push_back(p.p);
+		kp.prev_points.push_back(p.p - p.flow);
+	}
+
+
+	// check_for_followed_points();
+
+//	kp.calc_distances();
 
 	//	check_for_followed_points(); //TODO zuerst finden die Punkte die gut sind (status) 
 	//nur dann collect step vectors.
 
-	collect_step_vectors(); 
+	collect_step_vectors();
 
-	transform_Affine();
+//	transform_Affine();
 
 	calculate_move_vectors();
 

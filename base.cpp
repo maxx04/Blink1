@@ -109,7 +109,7 @@ int main( int argc, char** argv )
 		}
 
 
-		if (PC.proceed_frame(&frame)) break;
+		if (PC.proceed_frame(&frame, &key_points)) break;
 
 
     }
@@ -198,7 +198,7 @@ int receive_keypoints(net::socket &sock, net::endpoint &ep)
 		cout << n << "\n";
 		sock.recvfrom(longbuf + n * SOCKET_BLOCK_SIZE, SOCKET_BLOCK_SIZE, &ep);
 
-		cout << sock.send(tmp.bf, sizeof(int)) << endl;
+		sock.send(tmp.bf, sizeof(int));
 		n++;
 	}
 
@@ -209,19 +209,13 @@ int receive_keypoints(net::socket &sock, net::endpoint &ep)
 
 	p = reinterpret_cast<keypoints_flow*>(longbuf);
 
+	key_points.clear(); // OPTI merfahes kopieren vermeiden
+
 	for (size_t i = 0; i < points_nmb; i++)
 	{
 		cout << p[i].p << " - " << p[i].flow << endl;
+
+		key_points.push_back(p[i]); //TODO gibt es negative Punkte! vorher bereinigen
 	}
-
-	//template<typename T>
-	//T deserialize(buffer const& buf) {
-	//	return *reinterpret_cast<const T*>(&buf[0]);
-
-
-	//Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
-
-	//frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
-
 
 }
