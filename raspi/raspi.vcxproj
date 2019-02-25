@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\UDP_Base.cpp" />
+    <ClCompile Include="camera_calibration.cpp" />
+    <ClCompile Include="driver.cpp" />
+    <ClCompile Include="follower.cpp" />
+    <ClCompile Include="robot.cpp" />
+    <ClCompile Include="Motor.cpp" />
+    <ClCompile Include="neck.cpp" />
+    <ClCompile Include="SerialPort_raspi.cpp" />
+    <ClCompile Include="Servos.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\UDP_Base.h" />
+    <ClInclude Include="..\xsocket.hpp" />
+    <ClInclude Include="camera_calibration.h" />
+    <ClInclude Include="driver.h" />
+    <ClInclude Include="follower.h" />
+    <ClInclude Include="Motor.h" />
+    <ClInclude Include="neck.h" />
+    <ClInclude Include="robot.h" />
+    <ClInclude Include="SerialPort_raspi.h" />
+    <ClInclude Include="Servos.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\out_camera_data.xml" />
+    <Xml Include="default.xml" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5883a6e6-555e-417e-91a7-298f74d2c66f}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>Blink1</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
+    <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+    <ProjectName>raspi</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <RemoteRootDir>projects/$(SolutionName)</RemoteRootDir>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely)</SourcesToCopyRemotelyOverride>
+    <LocalRemoteCopySources>true</LocalRemoteCopySources>
+    <RemoteProjectDir>$(RemoteRootDir)</RemoteProjectDir>
+    <OutDir>$(RemoteRootDir)/bin/</OutDir>
+    <IntDir>$(RemoteRootDir)/obj/</IntDir>
+    <AdditionalSourcesToCopyMapping>$(RemoteRootDir)/bin/default.xml;$(AdditionalSourcesToCopyMapping)</AdditionalSourcesToCopyMapping>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi;opencv_world</LibraryDependencies>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>gpio export 23 out &amp;&amp; gpio export 24 out &amp;&amp; gpio export 25 out &amp;&amp; gpio export 8 out</Command>
+      <Message>export pin 23 using the gpio utility so that we can execute the blink program without sudo</Message>
+    </RemotePostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <ObjectFileName>obj/%(filename).o</ObjectFileName>
+      <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories);$(OPENCV_BUILD)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_ARM;_DEBUG</PreprocessorDefinitions>
+      <ThreadSafeStatics>No</ThreadSafeStatics>
+      <AdditionalOptions>
+      </AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>bin/$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
