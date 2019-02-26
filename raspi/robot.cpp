@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
-	cap.set(cv::CAP_PROP_FPS, 90);
+	cap.set(cv::CAP_PROP_FPS, 120);
 
 	if (!cap.isOpened())
 	{
@@ -63,14 +63,14 @@ int main(int argc, char** argv)
 	int jpegqual = ENCODE_QUALITY; // Compression Parameter
 	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	compression_params.push_back(jpegqual);
-
+/*
 
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame[0]);
 
 	cvtColor(frame[0], gray, COLOR_BGR2GRAY);
 
-
+*/
 
 	// Hauptzyclus
 

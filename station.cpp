@@ -77,7 +77,7 @@ void station::take_picture(Mat* frame)
 
 	frame->copyTo(image);
 	// Umrechnen 
-//	undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden
+	//	undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden
 
 	kp.frame_timestamp.push((double)getTickCount()); //TODO wenn video berechnen frames pro sec
 
@@ -116,7 +116,7 @@ void station::calcOptFlow()
 		Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
 		//Was ich eigentlich tue
 
-//		cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
+		//cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
 	}
 }
 
@@ -128,7 +128,7 @@ void station::transform_Affine()
 
 		//Affine_x = Affine.at<double>(0, 2); //tx von Affinematrix row, col
 											// umrechnen feautures
-	//	transform(kp.prev_points, kp.calculated_points[0], Affine);
+		//	transform(kp.prev_points, kp.calculated_points[0], Affine);
 
 	}
 }
