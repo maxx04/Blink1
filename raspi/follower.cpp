@@ -172,7 +172,7 @@ void follower::calcOptFlow(int frame_index)
 				//bei mehrerer aufnahmen summieren flow
 				kpt_diff[i] += tmp;
 				// kopiere auch getrennt
-				UDP_Base::key_points[i].flow[frame_index-1] = tmp;
+				UDP_Base::key_points[i].flow[frame_index] = tmp;
 			}
 		}
 		else
@@ -203,10 +203,12 @@ void follower::clean_bad_keypoints(int frame_index)
 void follower::copy_keypoints()
 {
 	
+
 	for (size_t i = 0; i < kpt.size(); i++) //TODO und weniger als 300
 	{
+
 		UDP_Base::key_points[i].p = kpt[i];
-		UDP_Base::key_points[i].flow[ANZAHL_AUFNAHMEN-1] = kpt_diff[i];
+		UDP_Base::key_points[i].flow[0] = kpt_diff[i];
 	}
 
 }
