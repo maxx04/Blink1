@@ -53,6 +53,9 @@ bool follower::proceed_frame(Mat* frame, int frame_index)
 		kpt.clear();
 		kpt_diff.clear();
 
+		// Uebertragungspoints bereinigen
+		UDP_Base::key_points.clear();
+
 		find_keypoints();
 
 		needToInit = false;
@@ -165,19 +168,22 @@ void follower::calcOptFlow(int frame_index)
 		{
 			for (size_t i = 0; i < kpt.size(); i++)
 			{
+				Point2f tmp = kpt[i] - prev_kpt[i];
 				//bei mehrerer aufnahmen summieren flow
-				kpt_diff[i] += kpt[i] - prev_kpt[i];
+				kpt_diff[i] += tmp;
+				// kopiere auch getrennt
+				UDP_Base::key_points[i].flow[frame_index-1] = tmp;
 			}
 		}
 		else
 			cerr << "OptFlow mit erstem Bild" << endl;
 
-		clean_bad_keypoints();
+		clean_bad_keypoints(frame_index);
 	}
 
 }
 
-void follower::clean_bad_keypoints()
+void follower::clean_bad_keypoints(int frame_index)
 {
 	for (size_t i = 0; i < kpt.size(); i++)
 	{
@@ -185,19 +191,22 @@ void follower::clean_bad_keypoints()
 		{
 			kpt.erase(kpt.begin() + i);
 			kpt_diff.erase(kpt_diff.begin() + i); //OPTI erase zu langsam
+			// bereinige auch zwischenbilder (vollständiges punkt)
+			UDP_Base::key_points.erase(UDP_Base::key_points.begin() + i);
 		}
 	}
 
 	cout << "new size kpt: " << kpt.size() << endl;
 }
 
+//Am Ende die übertragungspunkte kopieren
 void follower::copy_keypoints()
 {
-	UDP_Base::key_points.clear();
-
+	
 	for (size_t i = 0; i < kpt.size(); i++) //TODO und weniger als 300
 	{
-		UDP_Base::key_points.push_back({ kpt[i], kpt_diff[i] });
+		UDP_Base::key_points[i].p = kpt[i];
+		UDP_Base::key_points[i].flow[ANZAHL_AUFNAHMEN-1] = kpt_diff[i];
 	}
 
 }

@@ -461,7 +461,7 @@ bool station::proceed_frame(Mat* frame, std::vector <keypoints_flow>* key_points
 		kp.err.push_back(5.0);
 		kp.status.push_back(1);
 		kp.current_points.push_back(p.p);
-		kp.prev_points.push_back(p.p - p.flow);
+		kp.prev_points.push_back(p.p - p.flow[0]);
 	}
 
 

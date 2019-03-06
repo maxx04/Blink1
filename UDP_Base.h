@@ -9,6 +9,8 @@
 #include <opencv2/core/utility.hpp>
 
 #define SOCKET_BLOCK_SIZE 4096
+#define ENCODE_QUALITY 90
+#define ANZAHL_AUFNAHMEN 5
 
 using namespace std;
 
@@ -24,7 +26,7 @@ struct exchange_data
 struct keypoints_flow
 {
 	cv::Point2f p;
-	cv::Point2f flow;
+	cv::Point2f flow[ANZAHL_AUFNAHMEN];
 };
 
 
