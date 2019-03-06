@@ -35,8 +35,8 @@ void driver::move(float distance, float duty)
 
 void driver::start_move(float duty)
 {
-	ramp(200, duty);
-	motor_links->rotate(duty - 0.05);
+//	ramp(200, duty);
+	motor_links->rotate(duty);
 	motor_rechts->rotate(duty);
 }
 

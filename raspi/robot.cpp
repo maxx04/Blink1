@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
-	cap.set(cv::CAP_PROP_FPS, 120);
+	cap.set(cv::CAP_PROP_FPS, 15);
 
 	if (!cap.isOpened())
 	{
@@ -96,12 +96,14 @@ int main(int argc, char** argv)
 			robot.new_data_proceed(&udp_base);
 			robot.needToInit = true;
 
-			robot.start_move(&udp_base);
+			
 
 			// serie von bildern aufnehmen
 			for (int n = 0; n < ANZAHL_AUFNAHMEN; n++)
 			{
+				robot.stop_move(&udp_base);
 				//  buffer entlehren
+				delay(500);
 				for (int i = 0; i < 5; i++) cap >> frame[n];
 
 				cap >> frame[n];
@@ -111,6 +113,8 @@ int main(int argc, char** argv)
 				tm.reset();
 				tm.start();
 				delay(10);
+
+				robot.start_move(&udp_base);
 			}
 
 			robot.stop_move(&udp_base);
@@ -123,9 +127,7 @@ int main(int argc, char** argv)
 					return 11;
 				}
 
-			//delay(1000); // wegen schaerfe
-
-
+			
 
 			imencode(".jpg", frame[ANZAHL_AUFNAHMEN-1], udp_base.encoded, compression_params);
 
