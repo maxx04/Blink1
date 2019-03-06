@@ -72,7 +72,7 @@ public:
 	void new_data_proceed(UDP_Base* udp_base);
 	void start_move(UDP_Base * udp_base);
 	void stop_move(UDP_Base * udp_base);
-	void clean_bad_keypoints();
+	void clean_bad_keypoints(int frame_index);
 };
 
 

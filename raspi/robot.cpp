@@ -1,11 +1,5 @@
 #include <iostream>
 #include <string>
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define ENCODE_QUALITY 90
-#define ANZAHL_AUFNAHMEN 5
 
 #include "../UDP_Base.h"
 #include "follower.h"
