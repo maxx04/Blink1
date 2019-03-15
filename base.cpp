@@ -211,9 +211,24 @@ int receive_keypoints(net::socket &sock, net::endpoint &ep)
 
 	key_points.clear(); // OPTI merfahes kopieren vermeiden
 
+	cout.fixed;
+
 	for (size_t i = 0; i < points_nmb; i++)
 	{
-		cout << p[i].p << " - " << p[i].flow << endl;
+		//cout.precision(6);
+		//cout.width(6);
+		//cout << p[i].p << " - ";
+		//
+		////cout.precision(3);
+		//cout.width(4);
+		//for (size_t n = 0; n < ANZAHL_AUFNAHMEN; n++)
+		//{
+		//	cout << p[i].flow[n] << ":";
+		//}
+		//
+		//cout << endl;
+
+		//TODO alle zwischenpunkten aufnehmen
 
 		key_points.push_back(p[i]); //TODO gibt es negative Punkte! vorher bereinigen
 	}

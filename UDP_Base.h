@@ -57,6 +57,7 @@ public:
 	static bool imagegrab_ready;
 	static bool keypoints_sendet;
 	static std::vector <uchar> encoded;
+	static int keypoints_number;
 	static std::vector <keypoints_flow> key_points;
 	exchange_data* udp_data;
 

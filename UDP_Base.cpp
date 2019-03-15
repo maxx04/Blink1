@@ -12,7 +12,8 @@ udata UDP_Base::dt;
 net::socket* UDP_Base::ludp_socket;
 
 std::vector < uchar > UDP_Base::encoded(100);
-std::vector <keypoints_flow> UDP_Base::key_points;
+int UDP_Base::keypoints_number = 0;
+std::vector <keypoints_flow> UDP_Base::key_points(500); //TODO 500
 
 net::endpoint UDP_Base::ep;
 
@@ -56,20 +57,19 @@ void UDP_Base::send_keypoints(int points_number)
 
 	/*transfer_busy = true;*/
 
-	int points_nmb = key_points.size();
+	int n_blocks =  1 + ((keypoints_number * sizeof(keypoints_flow) - 1) / SOCKET_BLOCK_SIZE);
 
-	int n_blocks =  1 + ((points_nmb * sizeof(keypoints_flow) - 1) / SOCKET_BLOCK_SIZE);
-
-	//cout << sizeof(key_points) << " - " << sizeof(keypoints_flow) << endl;
+	cout << sizeof(key_points) << " - " << sizeof(keypoints_flow) << endl;
 
 	int_char tmp;
 
-	tmp.nb = points_nmb;
+	// sende anzahl punkten
+	tmp.nb = keypoints_number;
 
 	// Groesse senden
 	ludp_socket->sendto(tmp.bf, sizeof(int), ep);
 
-	cout << "anzahl gesendet " << n_blocks << " blocks \n";
+	cout << "punktenanzahl gesendet " << keypoints_number << " - " << n_blocks << " bloks" << endl;
 
 	//Data senden
 

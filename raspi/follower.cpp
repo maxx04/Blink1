@@ -66,6 +66,8 @@ bool follower::proceed_frame(Mat* frame, int frame_index)
 
 	if (prev_image.size().width != 0)
 	{
+		cout << "optical Flow compute... ";
+
 		tm.reset();
 		tm.start();
 
@@ -73,7 +75,7 @@ bool follower::proceed_frame(Mat* frame, int frame_index)
 
 		tm.stop();
 
-		cout << "optical Flow compute " << tm << " Keypoints: " << kpt.size() << endl;
+		cout << tm << " Keypoints: " << kpt.size() << endl;
 	}
 
 
@@ -185,6 +187,7 @@ void follower::calcOptFlow(int frame_index)
 
 void follower::clean_bad_keypoints(int frame_index)
 {
+	cout << "size kpt: " << kpt.size() << endl;
 	for (size_t i = 0; i < kpt.size(); i++)
 	{
 		if (status[i] != 1 && err[i] < 10.0)
@@ -210,6 +213,8 @@ void follower::copy_keypoints()
 		UDP_Base::key_points[i].p = kpt[i];
 		UDP_Base::key_points[i].flow[0] = kpt_diff[i];
 	}
+
+	UDP_Base::keypoints_number = kpt.size();
 
 }
 

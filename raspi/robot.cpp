@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 
 		while (udp_base.transfer_busy)
 		{
-			//cout << "waiting transfer \n";
+		//	cout << "waiting transfer \n";
 			delay(100);
 		}
 
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 			{
 				robot.stop_move(&udp_base);
 				//  buffer entlehren
-				delay(500);
+				delay(800);
 				for (int i = 0; i < 5; i++) cap >> frame[n];
 
 				cap >> frame[n];
@@ -113,14 +113,19 @@ int main(int argc, char** argv)
 
 			robot.stop_move(&udp_base);
 
+		
 			//bearbeiten
 			for (int n = 0; n < ANZAHL_AUFNAHMEN; n++)
+			{
 				// wenn alles in ordnung weiter
 				if (robot.proceed_frame(&frame[n], n))
 				{
 					return 11;
 				}
+				cout << "Frame " << n << endl; ;
+			}
 
+			
 			
 
 			imencode(".jpg", frame[ANZAHL_AUFNAHMEN-1], udp_base.encoded, compression_params);
