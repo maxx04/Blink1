@@ -60,13 +60,14 @@
     <OutDir>$(RemoteRootDir)/bin/</OutDir>
     <IntDir>$(RemoteRootDir)/obj/</IntDir>
     <AdditionalSourcesToCopyMapping>$(RemoteRootDir)/bin/default.xml;$(AdditionalSourcesToCopyMapping)</AdditionalSourcesToCopyMapping>
+    <RemoteTargetPath>/home/pi/Desktop/$(TargetName)</RemoteTargetPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <LibraryDependencies>wiringPi;opencv_world</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 23 out &amp;&amp; gpio export 24 out &amp;&amp; gpio export 25 out &amp;&amp; gpio export 8 out</Command>
+      <Command>gpio export 23 out &amp;&amp; gpio export 24 out &amp;&amp; gpio export 25 out &amp;&amp; gpio export 8 out </Command>
       <Message>export pin 23 using the gpio utility so that we can execute the blink program without sudo</Message>
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
@@ -81,7 +82,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
-      <OutputFile>bin/$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>/home/pi/Desktop/$(TargetName)</OutputFile>
     </Link>
     <PostBuildEvent>
       <Command>
