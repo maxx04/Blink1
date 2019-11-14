@@ -1,5 +1,5 @@
 #pragma once
-#include <wiringPi.h>
+#include "i2c.h"
 #include <iostream>
 #include <thread>
 #include <assert.h>

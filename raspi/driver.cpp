@@ -14,8 +14,8 @@ driver::driver()
 
 	cout << "driver started \n";
 
-	//motor_links->test();
-	//motor_rechts->test();
+	motor_links->test();
+	motor_rechts->test();
 
 }
 
