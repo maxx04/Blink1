@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <opencv2/core.hpp>
-#include "SerialPort_raspi.h"
+#include "SerialPort_nano.h"
 
 using namespace std;
 using namespace cv;

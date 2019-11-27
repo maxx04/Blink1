@@ -11,6 +11,7 @@ follower::follower()
 	termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
 	subPixWinSize = Size(6, 6);
 	winSize = Size(11, 11);
+   
 
 /*
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings

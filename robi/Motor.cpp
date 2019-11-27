@@ -1,4 +1,5 @@
 #include "Motor.h"
+#include <cstddef>
 
 #define PERIOD 100 //ms zyclus
 
@@ -7,6 +8,13 @@ using namespace std;
 int Motor::number_of_motors = 0;
 int* Motor::delay_time = NULL; 
 bool* Motor::direction = NULL;
+
+void delay(int ms)
+{
+	std::chrono::duration<int, std::milli> timespan(ms);
+	std::this_thread::sleep_for(timespan);
+}
+
 
 Motor::Motor(int p1, int p2)
 {
@@ -26,7 +34,7 @@ Motor::Motor(int p1, int p2)
 	delay_time[motor_number] = 99;
 	direction[motor_number] = true;
 
-	wiringPiSetupSys();
+
 
 	pinMode(pin1, OUTPUT);
 	pinMode(pin2, OUTPUT);

@@ -1,12 +1,14 @@
 #pragma once
-#include "i2c.h"
+//#include "stddef.h"
 #include <iostream>
+#include <chrono>
 #include <thread>
 #include <assert.h>
 #include <math.h>
+#include "gpio_control.h"
+#include "i2c.h"
 
 #define MAX_MOTORS 2
-
 
 class Motor
 {

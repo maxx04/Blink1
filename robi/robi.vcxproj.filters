@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="driver.cpp" />
+    <ClCompile Include="follower.cpp" />
+    <ClCompile Include="gpio_controll.cpp" />
+    <ClCompile Include="Motor.cpp" />
+    <ClCompile Include="neck.cpp" />
+    <ClCompile Include="robot.cpp" />
+    <ClCompile Include="SerialPort_nano.cpp" />
+    <ClCompile Include="Servos.cpp" />
+    <ClCompile Include="UDP_Base.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="camera_calibration.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="driver.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="follower.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="gpio_control.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Motor.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="robot.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="neck.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="SerialPort_nano.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Servos.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="default.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{f29a6918-6b58-4ad6-8eed-b94572c25423}</UniqueIdentifier>
+      <Extensions>*.h;*.hpp</Extensions>
+    </Filter>
+  </ItemGroup>
+</Project>

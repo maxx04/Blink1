@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4b9ba057-1f37-4486-821f-35bc27f5adda}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>robi</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <SourcePath>~/i2clib</SourcePath>
+    <ProjectPublicIncludePath>~/JetsonGPIO/include</ProjectPublicIncludePath>
+    <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);</SourcesToCopyRemotelyOverride>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="driver.cpp" />
+    <ClCompile Include="follower.cpp" />
+    <ClCompile Include="gpio_controll.cpp" />
+    <ClCompile Include="Motor.cpp" />
+    <ClCompile Include="neck.cpp" />
+    <ClCompile Include="robot.cpp" />
+    <ClCompile Include="SerialPort_nano.cpp" />
+    <ClCompile Include="Servos.cpp" />
+    <ClCompile Include="UDP_Base.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="camera_calibration.h" />
+    <ClInclude Include="driver.h" />
+    <ClInclude Include="follower.h" />
+    <ClInclude Include="gpio_control.h">
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
+    <ClInclude Include="Motor.h" />
+    <ClInclude Include="neck.h" />
+    <ClInclude Include="robot.h" />
+    <ClInclude Include="SerialPort_nano.h" />
+    <ClInclude Include="Servos.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="default.xml" />
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Link>
+      <LibraryDependencies>pthread;i2c;JetsonGPIO;opencv_core;opencv_highgui;opencv_calib3d;opencv_imgproc;opencv_imgcodecs;opencv_tracking;opencv_features2d;opencv_videoio;opencv_video</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

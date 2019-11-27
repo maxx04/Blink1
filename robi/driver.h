@@ -1,6 +1,14 @@
 #pragma once
 #include <iostream>
+#include <unistd.h>
+
+inline void delay(int ms) { usleep (1000 * ms); }
+
 #include "Motor.h"
+#include "gpio_control.h"
+
+
+
 class driver
 {
 	Motor* motor_links;
