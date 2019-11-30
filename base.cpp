@@ -159,7 +159,7 @@ int receive_frame(net::socket &sock, net::endpoint &ep, cv::Mat &frame)
 
 	Mat rawData = Mat(1, n * SOCKET_BLOCK_SIZE, CV_8UC1, longbuf);
 
-	frame = imdecode(rawData, CV_LOAD_IMAGE_COLOR);
+	frame = imdecode(rawData, IMREAD_COLOR);
 
 	return 1;
 }
