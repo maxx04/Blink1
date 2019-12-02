@@ -9,6 +9,9 @@
 #include "i2c.h"
 
 #define MAX_MOTORS 2
+#include <unistd.h>
+
+inline void delay(int ms) { usleep(1000 * ms); }
 
 class Motor
 {

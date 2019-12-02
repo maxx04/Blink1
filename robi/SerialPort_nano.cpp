@@ -132,15 +132,17 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 	ssize_t       rx_length;
 	int           nread = 0;
 
-	tcflush(fd, TCIOFLUSH);
+	//tcflush(fd, TCIOFLUSH);
 
 	usleep(1000);   // .001 sec delay
 
-	printf("Ready to receive message.\n");
+	//printf("Ready to receive message.\n");
 
 	int ii;
 
 	for (ii = 0; ii < NSERIAL_CHAR; ii++)  serial_message[ii] = ' ';
+
+	nread = 0;
 
 
 	while (pickup && fd != -1)
@@ -149,7 +151,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 		rx_length = read(fd, (void*)rx_buffer, VMINX);   // Filestream, buffer to store in, number of bytes to read (max)
 
-		printf("Event %d, rx_length=%d, Read=%s\n", nread, rx_length, rx_buffer);
+		//printf("Event %d, rx_length=%d, Read=%s\n", nread, rx_length, rx_buffer);
 
 		if (rx_length < 0)
 		{
@@ -165,7 +167,9 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 		{
 			if (nread <= NSERIAL_CHAR)   serial_message[nread - 1] = rx_buffer[0];   // Build message 1 character at a time
 
-			if (rx_buffer[0] == '#')   pickup = false;                               // # symbol is terminator
+			if (rx_buffer[0] == '\n')   pickup = false; // \n symbol is terminator
+
+			if (nread > NSERIAL_CHAR) return -1;
 		}
 	}
 
@@ -180,7 +184,7 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 	// TRANSMITTING BYTES
 	//--------------------------------------------------------------
 
-	printf("fd 1 = %d\n", fd);
+	//printf("fd 1 = %d\n", fd);
 
 	if (fd != -1)
 	{
@@ -188,7 +192,7 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 
 		usleep(1000);   // .001 sec delay
 
-		printf("Count = %d\n", count);
+		//printf("Count = %d\n", count);
 
 		if (count < 0)
 		{

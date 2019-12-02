@@ -7,7 +7,7 @@
 
 #define     NSERIAL_CHAR   MAX_DATA_LENGTH
 #define     VMINX          1
-#define     BAUDRATE       B115200
+#define     BAUDRATE       B9600
 
 #include <iostream>
 #include <errno.h>

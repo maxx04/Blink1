@@ -19,5 +19,10 @@ int pinMode(int pin, int direction)
 
 void digitalWrite(int pin, int status)
 {
-	GPIO::output(pin, ((status == 1) ? GPIO::HIGH : GPIO::LOW));
+	//GPIO::output(pin, ((status == 1) ? GPIO::HIGH : GPIO::LOW));
+}
+
+void close_gpio()
+{
+	GPIO::cleanup();
 }

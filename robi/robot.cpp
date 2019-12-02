@@ -28,16 +28,25 @@ int main(int argc, char** argv)
 	help();
 
 	TickMeter tm;
-
-	VideoCapture cap;
-
 	follower robot;
 
-	cap.open(0);
+	//VideoCapture cap;
 
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
-	cap.set(cv::CAP_PROP_FPS, 15);
+	//cap.open(0);
+
+	//cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //1280
+	//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
+	////cap.set(cv::CAP_PROP_FPS, 15);
+
+	 //std::cout << cv::getBuildInformation() << std::endl; 
+
+	const char* gst = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, width=(int)1280, height=(int)720, framerate=(fraction)30/1 ! \
+			nvvidconv         ! video/x-raw,              format=(string)BGRx ! \
+			videoconvert      ! video/x-raw,              format=(string)BGR  ! \
+			appsink";
+
+	cv::VideoCapture cap(gst);
+
 
 	if (!cap.isOpened())
 	{
@@ -55,8 +64,11 @@ int main(int argc, char** argv)
 
 	vector < int > compression_params;
 	int jpegqual = ENCODE_QUALITY; // Compression Parameter
-	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-	compression_params.push_back(jpegqual);
+	//compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	//compression_params.push_back(jpegqual);				   //TODO
+
+	cout << "waiting transfer" << endl;
+
 /*
 
 	cout << cap.grab() << " grab result \n";
@@ -72,10 +84,10 @@ int main(int argc, char** argv)
 	{
 		delay(200); //fuer andere Prozesse und Auslaustung notwendig
 
+
 		while (udp_base.transfer_busy)
 		{
-		//	cout << "waiting transfer \n";
-			delay(100);
+			delay(200);
 		}
 
 
@@ -139,5 +151,6 @@ int main(int argc, char** argv)
 
 	}
 
+	cap.release();
 	return 0;
 }

@@ -14,3 +14,5 @@ int pinMode(int pin, int direction);
 
 void digitalWrite(int pin, int status);
 
+void close_gpio();
+

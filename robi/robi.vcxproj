@@ -65,6 +65,7 @@
     <ProjectPublicIncludePath>~/JetsonGPIO/include</ProjectPublicIncludePath>
     <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);</SourcesToCopyRemotelyOverride>
+    <IncludePath>/usr/local/include/opencv4;~/libi2c</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="driver.cpp" />

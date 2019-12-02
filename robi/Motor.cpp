@@ -9,11 +9,11 @@ int Motor::number_of_motors = 0;
 int* Motor::delay_time = NULL; 
 bool* Motor::direction = NULL;
 
-void delay(int ms)
-{
-	std::chrono::duration<int, std::milli> timespan(ms);
-	std::this_thread::sleep_for(timespan);
-}
+//void delay(int ms)
+//{
+//	std::chrono::duration<int, std::milli> timespan(ms);
+//	std::this_thread::sleep_for(timespan);
+//}
 
 
 Motor::Motor(int p1, int p2)

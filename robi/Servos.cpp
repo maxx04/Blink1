@@ -16,12 +16,14 @@ Servos::Servos(float min, float max, float null)
 
 	if (sp == NULL)
 	{
-		sp = new SerialPort("/dev/ttyAMA0");
+		sp = new SerialPort("/dev/ttyTHS1");
 	}
 
 	number = ++amount;
 	
 	cout << "servo: " << number << " opened \n";
+
+	test();
 
 }
 

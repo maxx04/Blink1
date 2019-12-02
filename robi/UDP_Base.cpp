@@ -39,7 +39,7 @@ UDP_Base::UDP_Base()
 
 UDP_Base::~UDP_Base()
 {
-
+	std::cout << "Server thread closed, Id: " << udp_thread->get_id() << endl;
 }
 
 void UDP_Base::udp_data_received()

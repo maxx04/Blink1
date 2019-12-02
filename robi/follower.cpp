@@ -113,8 +113,13 @@ void follower::find_keypoints()
 	goodFeaturesToTrack(image, kpt, 500, 0.03, 10, Mat(), 9, 5);
 
 	//refine position
-	cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
-
+	try {
+		cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
+	}
+	catch (Exception e) {
+		cout << "calc subpix fault " << tm << " kp " << kpt.size() << endl;
+		exit(3);
+	}
 	tm.stop();
 
 	cout << "Features compute " << tm << " kp " << kpt.size() << endl;

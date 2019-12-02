@@ -54,7 +54,7 @@ int main( int argc, char** argv )
 	//create a socket without binding in the ctor
 	net::socket sock(net::af::inet, net::sock::dgram, 4010);
 
-	ep = net::endpoint("192.168.178.41", 8080);
+	ep = net::endpoint("192.168.178.47", 8080);
 
 	//most calls in xsocket return the same value as there c counterparts
 	//like so if sock.bind returns -1 it failed
