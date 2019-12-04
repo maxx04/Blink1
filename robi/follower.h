@@ -17,7 +17,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video/tracking.hpp>
 
-#include "UDP_Base.h"
+#include "../UDP_Base.h"
 #include "camera_calibration.h"
 #include "neck.h"
 #include "driver.h"
@@ -35,9 +35,7 @@ class follower
 	TermCriteria termcrit;
 	Size subPixWinSize, winSize;
 
-
-
-	neck fneck;
+  	neck fneck;
 	driver fdriver;
 
 	Mat image;

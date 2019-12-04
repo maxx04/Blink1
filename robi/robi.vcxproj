@@ -63,7 +63,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <SourcePath>~/i2clib</SourcePath>
     <ProjectPublicIncludePath>~/JetsonGPIO/include</ProjectPublicIncludePath>
-    <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
+    <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)UDP_Base.cpp:=$(RemoteProjectDir)/UDP_Base.cpp;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);</SourcesToCopyRemotelyOverride>
     <IncludePath>/usr/local/include/opencv4;~/libi2c</IncludePath>
   </PropertyGroup>

@@ -70,8 +70,8 @@ void station::take_picture(Mat* frame)
 {
 	if (frame->empty())	return; //TODO Fehlerabarbeitung
 
-	fokus.x = (float)(image.cols / 2);
-	fokus.y = (float)(image.rows / 2); //TODO nur einmal machen
+	fokus.x = (float)(frame->cols / 2);
+	fokus.y = (float)(frame->rows / 2); //TODO nur einmal machen
 
 	swap();
 
@@ -454,7 +454,6 @@ bool station::proceed_frame(Mat* frame, std::vector <keypoints_flow>* key_points
 	imshow("LK Demo", *frame);
 
 	kp.clear();
-
 
 	for (keypoints_flow p : *key_points)
 	{
