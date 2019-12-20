@@ -21,7 +21,7 @@ station::station()
 
 	needToInit = true;
 	step_butch = 1;
-	magnify_vektor_draw = 1;
+	magnify_vektor_draw = 5;
 
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
 	if (!ks.isOpened())
@@ -175,14 +175,14 @@ void station::draw_current_points()
 	{
 		stringstream text;
 
-		text.width(5);
-		text.precision(4);
+		//text.width(5);
+		//text.precision(4);
 
-		text << kp.step_length[m];
+		text << format("%.0f",kp.step_length[m]);
 
-		if (kp.current_points[n].x < 1240)
+		if (kp.current_points[n].x <  (gray.cols - 40))
 		{
-			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0));
+			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 0.8f, Scalar(200, 200, 200));
 		}
 
 		m++;

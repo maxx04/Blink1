@@ -10,7 +10,7 @@
 
 #define SOCKET_BLOCK_SIZE 4096
 #define ENCODE_QUALITY 90
-#define ANZAHL_AUFNAHMEN 7
+#define ANZAHL_AUFNAHMEN 5
 
 using namespace std;
 

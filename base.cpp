@@ -126,9 +126,9 @@ int main(int argc, char** argv)
 		bool needToInit = true;
 		vector<Point2f> kpt, prev_kpt;
 		vector<Point2f> kpt_diff;
-		TermCriteria termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
+		TermCriteria termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 6, 0.3);
 		Size subPixWinSize = Size(9, 9);
-		Size winSize = Size(17, 17);
+		Size winSize = Size(21, 21);
 		vector<uchar> status; // status vom calcOpticalFlowPyrLK
 		vector<float> err; // error vom calcOpticalFlowPyrLK
 
@@ -176,15 +176,13 @@ int main(int argc, char** argv)
 
 				if (prev_image.size().width != 0)
 				{
-					cout << "optical Flow compute... ";
-
 					if (kpt.size() != 0)
 					{
 						// kpt muss nicht leer sein
 						kpt.swap(prev_kpt);
 
 						calcOpticalFlowPyrLK(prev_image, gray, /*prev*/ prev_kpt, /*next*/ kpt,
-							status, err, winSize, 5, termcrit, 0, 0.001);
+							status, err, winSize, 5, termcrit, 0, 1e-5);
 
 						if (kpt_diff.size() == 0) kpt_diff.resize(kpt.size()); // OPTI immer pruefen?
  
@@ -199,7 +197,7 @@ int main(int argc, char** argv)
 
  						//bereinigung kp
 
-						cout << "size kpt: " << kpt.size() << endl;
+						cout << kpt.size();
 
 						for (size_t i = 0; i < kpt.size(); i++)
 						{
@@ -212,11 +210,9 @@ int main(int argc, char** argv)
 							}
 						}
 
-						cout << "new size kpt: " << kpt.size() << endl;
+						cout << " new size kpt: " << kpt.size() << endl;
 					}
 
-
-					cout << " Keypoints: " << kpt.size() << endl;
 				}
 			}
 
