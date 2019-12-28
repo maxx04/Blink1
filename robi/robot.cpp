@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "UDP_Base.h"
+#include "../UDP_Base.h"
 #include "follower.h"
 #include "robot.h"
 
@@ -40,10 +40,10 @@ int main(int argc, char** argv)
 
 	 //std::cout << cv::getBuildInformation() << std::endl; 
 
-	const char* gst = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, width=(int)1280, height=(int)720, framerate=(fraction)30/1 ! \
+	const char* gst = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12,  \
+		width=(int)1280, height=(int)720, framerate=(fraction)30/1 ! \
 			nvvidconv         ! video/x-raw,              format=(string)BGRx ! \
-			videoconvert      ! video/x-raw,              format=(string)BGR  ! \
-			appsink";
+			videoconvert      ! video/x-raw,              format=(string)BGR  ! appsink";
 
 	cv::VideoCapture cap(gst);
 

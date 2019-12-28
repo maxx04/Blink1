@@ -6,7 +6,8 @@ using namespace GPIO;
 
 void init_gpio()
 {
-	setmode(BOARD);
+	// Ausgangsnummerierung auf dem Board
+	setmode(GPIO::BOARD);
 
 	std::string info = GPIO::JETSON_INFO;
 }
@@ -19,7 +20,7 @@ int pinMode(int pin, int direction)
 
 void digitalWrite(int pin, int status)
 {
-	//GPIO::output(pin, ((status == 1) ? GPIO::HIGH : GPIO::LOW));
+	GPIO::output(pin, ((status == 1) ? GPIO::HIGH : GPIO::LOW));
 }
 
 void close_gpio()

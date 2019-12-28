@@ -1,4 +1,4 @@
-#include "UDP_Base.h"
+#include "../UDP_Base.h"
 
 using namespace std;
 using namespace cv;
@@ -133,7 +133,7 @@ void UDP_Base::start_Server(int args)
 	net::init();
 
 	//create an ipv4 udp socket, we can optionaly specify the port to bind to as the 3rd arg
-	ludp_socket = new net::socket(net::af::inet, net::sock::dgram, 8080);
+	ludp_socket = new net::socket(net::af::inet, net::sock::dgram, 4010);
 
 
 	if (!ludp_socket->good()) {

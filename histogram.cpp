@@ -11,17 +11,17 @@ histogram::histogram()
 	//namedWindow("Vectorhistogramm", 1);
 	plotResult.create(windows_high + windows_h_offset, window_width, CV_8UC3);
 	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
+
+	range_min = 1e10;
+	range_max = -1e10;
 }
 
-histogram::histogram(int _bins, string _name, int _dims ):histogram()
+histogram::histogram(int _bins, string _name, int _dims ) : histogram()
 {
 	bins = _bins;
 	dims = _dims;
 	name = _name;
 	
-	range_min = 1e10;
-	range_max = -1e10;
-
 	bins_group = new vector<point_satz>[bins];
 }
 
@@ -31,22 +31,25 @@ int histogram::collect(point_satz value)
 	if (value.v > range_max) range_max = value.v;
 	if (value.v <= range_min) range_min = value.v;
 
-	values.push_back(value); // index == punkt_nr
+	values.push_back(value);
+
 	values_index++;
+
 	mean = ((mean*(values_index - 1)) + value.v) / values_index;
 		// ('previous mean' * '(count -1)') + 'new value') / 'count'
 	
 	return values_index;
 }
-
+		   
 int histogram::sort()
 {
-	
+	assert(bins < 300 && bins != 0);
 
-	bins_borders.resize(bins+1);
+	bins_borders.resize(bins + 1);
 	bins_counters.resize(bins);
 
 	bins_borders[0] = range_min;
+
 	float step = (range_max - range_min) / (float)bins;
 
 	//if (step == 0.0) return 0;
@@ -56,20 +59,20 @@ int histogram::sort()
 		bins_borders[n] = step * (float)n + range_min;
 	}
 
-	for  (int i = 0; i < values_index; i++) //HACK nicht alle werte von values werden verwendet
+
+	for (point_satz p : values)
 	{
 		for (int n = 0; n < bins; n++)
 		{
-			if (values[i].v > bins_borders[n] && values[i].v <= bins_borders[n + 1])
+			if (p.v > bins_borders[n] && p.v <= bins_borders[n + 1])
 			{
 				bins_counters[n]++;
-				bins_group[n].push_back(values[i]); // punkt nummer und wert speichern
+				bins_group[n].push_back(p);
 				break;
 			}
 		}
 
 	}
-
 
 	plot_result(Point(0, 0));
 
@@ -83,14 +86,15 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 	int max_counter = 0;
 	main_points->clear();
 
+	// Finden maximalen Strahl
 	for (int n = 1; n < bins; n++)
 	{
 		if (bins_counters[max_counter] < bins_counters[n]) max_counter = n; // HACK n-1
 	}
 
-	int sum = 0;
-
-	int max_bins[3];
+	int sum = 0; // Anzahl Treffer in 3 Strahlen
+						 
+	int max_bins[3]; // Nummer maximalen Strahl und Nachbarn
 
 	if (max_counter == bins - 1)
 	{
@@ -115,7 +119,7 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 		+ bins_group[max_bins[1]].size()
 		+ bins_group[max_bins[2]].size();
 
-	if ((float)sum/(float)values_index < 0.1) //TODO Assert value index
+	if ((float)sum/(float)values.size() < 0.1) //TODO Assert value index
 	{
 		return 0.0;
 	}
@@ -125,9 +129,10 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 		double result = 0.0;
 		for (int i = 0; i < 3; i++)
 		{
-			for (point_satz s : bins_group[max_bins[i]]) // 
+			for (point_satz s : bins_group[max_bins[i]]) 
 			{
 				result += s.v;
+				// 
 				main_points->push_back(s.n);
 				++n; //HACK 2 Grad + 358 Grad Mitte gibt 180 Grad
 			}
@@ -173,7 +178,7 @@ void histogram::plot_result(Point p)
 		return;
 	}
 
-	int max = 0;
+	int max = 0; // Längste Strahl 
 
 	for (int i = 0; i < bins; i++)
 	{
@@ -191,15 +196,25 @@ void histogram::plot_result(Point p)
 
 	int step = window_width / bins;
 	int top = windows_high - windows_h_offset;
-	float magnification = (float)max / (float)top; //TODO assert
-	
-	//HACK window Koordinaten oben_links
 
+	assert(top != 0.0);
+
+	float magnification = (float)max / (float)top; 
+	
+	//window Koordinaten oben_links
+
+	//Zeichne Strahlen
 	for (int i = 0; i < bins; i++)
 	{
 		int hi = (int)((float)(bins_counters[i]) / magnification); 
 		rectangle(plotResult, Rect(i*step, top - hi, step, hi), Scalar(0,200,0),-5);
 	}
+
+	stringstream Titel;
+
+	Titel << name << format(" %.1f - %.1f", range_min, range_max);
+
+	setWindowTitle(name, Titel.str());
 	
 	imshow(name, plotResult);
 	

@@ -39,6 +39,7 @@
     <ClInclude Include="Servos.h">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="..\UDP_Base.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="default.xml" />

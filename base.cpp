@@ -14,6 +14,8 @@ int receive_keypoints(net::socket& sock, net::endpoint& ep);
 
 std::vector <keypoints_flow> key_points(500);
 
+std::string robi_ip = "192.168.178.20";
+
 static void help()
 {
 	// print a welcome message, and the OpenCV version
@@ -26,8 +28,6 @@ static void help()
 		"\tc - delete all the points\n"
 		<< endl;
 }
-
-
 
 int main(int argc, char** argv)
 {
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
 	station PC;
 
-	if (input == "")
+	if (input.size() == 1)
 	{
 		VideoCapture cap;
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 		//create a socket without binding in the ctor
 		net::socket sock(net::af::inet, net::sock::dgram, 4010);
 
-		ep = net::endpoint("192.168.178.47", 8080);
+		ep = net::endpoint(robi_ip, 4010);
 
 		//most calls in xsocket return the same value as there c counterparts
 		//like so if sock.bind returns -1 it failed
@@ -100,6 +100,7 @@ int main(int argc, char** argv)
 
 
 			if (receive_frame(sock, ep, frame) == 2) break;
+		
 			if (receive_keypoints(sock, ep) == 2) break;
 
 

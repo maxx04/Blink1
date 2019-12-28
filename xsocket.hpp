@@ -332,7 +332,7 @@ struct socket {
 
 	std::size_t recv( std::string* buf, std::size_t len )	{
 		std::vector<char> buffer( len );
-		int r = recv( buffer );
+		int r = (int)recv( buffer );
 		if( r > 0 )
 			*buf = std::string( buffer.data(), r );
 		return r;

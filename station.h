@@ -30,18 +30,18 @@ using namespace std;
 
 class station
 {
+	const string main_window_name = "Frame"; // Name für die Fenster die aktuelles Frame darstellt
 	int step_butch; // anzahl frames die auf block werden bearbeitet.
-	TermCriteria termcrit;
-	Size subPixWinSize, winSize;
-	
-	float pixel_pro_step = 8.0; // TODO Übertragen in Servo?
+	TermCriteria termcrit; // Terminate Kriterium für die LukasKande
+	Size subPixWinSize, winSize;  // SubWindow für LukasKande
+	//float pixel_pro_step = 8.0; // TODO Übertragen in Servo?
 
-	Point2f fokus;
+	Point2f fokus;	// Mittelpunkt vom Bild
 	int number_aim_point = -1;
 	double frame_time = 0.0;
 
 	bool needToInit = false;
-	bool nightMode = false;
+	//bool nightMode = false;
 
 	Mat gray, prevGray, image;
 
@@ -49,7 +49,7 @@ class station
 	Mat cameraMatrix;
 	Mat distCoeffs;
 	keypoints kp; // keypoints von init_points()
-	histogram  hist; // histogramm für step_vectors in batch
+	//histogram  hist; // histogramm für step_vectors in batch
 	Point2f main_of_frame; //ergebnissvektor fur frame verschiebung
 	float magnify_vektor_draw;
 

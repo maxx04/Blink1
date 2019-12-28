@@ -6,9 +6,9 @@ using namespace std;
 keypoints::keypoints()
 {
 	step_vector = new vector<Point2f>[MAX_COUNT];
-	hist = histogram(120, "winkel");
-	hist_l = histogram(50, "length");
-	hist_w = histogram(30, "step");
+	hist_angle = histogram(120, "versatzwinkel");
+	hist_length = histogram(50, "versatzlaenge");
+	hist_distance = histogram(50, "abstand");
 }
 
 keypoints::~keypoints()
@@ -105,22 +105,22 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 			double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
 			if (p.x != 0.0)
-				hist.collect(point_satz{ i , (float)d }); // TODO assert
+				hist_angle.collect(point_satz{ i , (float)d }); // TODO assert
 		}
 
 
 	}
 
-	hist.range_min = 0;
-	hist.range_max = 360;
+	hist_angle.range_min = 0;
+	hist_angle.range_max = 360;
 
-	hist.sort(); 
+	hist_angle.sort(); 
 	
 
 	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
-	double d = hist.get_main_middle_value(&background_points);
-	hist.clear();
+	double d = hist_angle.get_main_middle_value(&background_points);
+	hist_angle.clear();
 
 	//TODO nach histogram vectorlaenge finden hauptvector laenge
 	// dabei gut zu markieren die punkten die gehoeren mein backraund bewegung
@@ -134,18 +134,18 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 		{
 			p = current_points[i] - prev_points[i]; //OPTI mehrmals woanders durchgefuehrt
 			l = length(p);
-			hist_l.collect(point_satz{ i , (float)l }); //
+			hist_length.collect(point_satz{ i , (float)l }); //
 		}
 	}
 
-	hist_l.range_min = hist_l.mean - hist_l.mean * 0.9;
-	hist_l.range_max = hist_l.mean + hist_l.mean * 0.9;
+	hist_length.range_min = hist_length.mean - hist_length.mean * 0.9;
+	hist_length.range_max = hist_length.mean + hist_length.mean * 0.9;
 
-	hist_l.sort();
+	hist_length.sort();
 
-	double v = hist_l.get_main_middle_value(&background_points);
+	double v = hist_length.get_main_middle_value(&background_points);
 
-	hist_l.clear();
+	hist_length.clear();
 
 	main.y = cos(d * M_PI * 2.0 / 360.0 )*v;
 	main.x = sin(d * M_PI * 2.0 / 360.0 )*v; //HACK 90 Grad verdreht
@@ -176,32 +176,32 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 
 void keypoints::calc_distances()
 {
-	float VFOV2 = 19.1 / 180.0 * M_PI;
-	float H = 97.0;
-	float alfa = 3.7 / 180.0 * M_PI;
-	float V = 360.0;
-	float U = 640.0;
-	float beta, beta1;
+	float VFOV2 = 19.1 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
+	float H = 1097.0; // Kameraabstand vom Boden [mm]
+	float alfa = 38.0 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+	float V = 720.0; // Anzahl Pixeln vom Bild in vertikale Richtung
+	float U = 1280.0; // Anzahl Pixeln vom Bild in horizontaleale Richtung
+	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
 	float gamma;
-	float v1; // umberechnete abstand zu Camera-Mittelachse 
-	float distance;
+	float v1;  //Bild koordinate y für vorherige Position
+	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
 
 	distance_to_cam.clear();
 	numbers_of_downpoints.clear();
 	step_length.clear();
 	same_step_pt.clear();
-	hist_w.clear();
+	hist_distance.clear();
 
 	for (int i = 0; i < current_points.size(); i++)
 	{
-		float v = current_points[i].y;
-		float u = current_points[i].x;
+		float v = current_points[i].y; // Bildkoordinaten vom Schlüsselpunkt y
+		float u = current_points[i].x; // Bildkoordinaten vom Schlüsselpunkt x
 
-		if (v < V) continue;
+		if (v < V/2) continue; // wenn obere Bildhälfte dan nicht berechnen
 
-		beta = atan((v - V) / V * tan(VFOV2)); // OPTI tan_beta lassen
+		beta = atan((2.0*v / V - 1.0) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
 		
-		distance = H / cos(alfa) / (tan(alfa) + tan(beta)); // OPTI cos(alfa); tan(alfa) vorberechnen
+		distance = H / tan(alfa + beta); // OPTI cos(alfa); tan(alfa) vorberechnen
 
 		distance_to_cam.push_back(distance);
 		numbers_of_downpoints.push_back(i);
@@ -209,21 +209,23 @@ void keypoints::calc_distances()
 		float v1 = prev_points[i].y;
 		//float u1 = prev_points[i].x;
 
-		beta1 = atan((v1 - V) / V * tan(VFOV2)); // OPTI tan_beta lassen
+		beta1 = atan((2*v1 - V) * tan(VFOV2)); // OPTI tan_beta lassen
 
-		float l = H / tan(alfa - beta) - H / tan(alfa - beta1);
+		float l = H / tan(alfa - beta) - H / tan(alfa - beta1);	 // Weg für den Schlüsselpunkt zwischen Frames
 
-		hist_w.collect({ i, l }); //TODO grenzen verfeinern
+		hist_distance.collect({ i, l }); //TODO grenzen verfeinern
 
 		step_length.push_back(l);
 
 	}
 
-	hist_w.range_max = 100;
-	hist_w.range_min = -100;
-	hist_w.sort();
+	//hist_distance.range_max = 100;
+	//hist_distance.range_min = -100;
+	hist_distance.sort();
 	
-	float lr = hist_w.get_main_middle_value(&same_step_pt);
+	float lr = hist_distance.get_main_middle_value(&same_step_pt);	// Mittelwert für Weg
+
+	// float hr = 
 
 	return;
 }

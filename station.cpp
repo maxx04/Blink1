@@ -20,8 +20,10 @@ station::station()
 	winSize = Size(11, 11);
 
 	needToInit = true;
-	step_butch = 1;
+	step_butch = 3;
 	magnify_vektor_draw = 5;
+
+	//hist =  histogram(10, "Steps");
 
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
 	if (!ks.isOpened())
@@ -42,9 +44,9 @@ station::station()
 		ks["distortion_coefficients"] >> distCoeffs; //TODO
 	}
 
-	namedWindow("LK Demo", 1);
+	namedWindow(main_window_name, WINDOW_NORMAL | WINDOW_KEEPRATIO );
 
-	setMouseCallback("LK Demo", onMouse, 0);
+	setMouseCallback(main_window_name, onMouse, 0);
 
 }
 
@@ -175,19 +177,18 @@ void station::draw_current_points()
 	{
 		stringstream text;
 
-		//text.width(5);
-		//text.precision(4);
-
 		text << format("%.0f",kp.step_length[m]);
 
 		if (kp.current_points[n].x <  (gray.cols - 40))
 		{
-			putText(image, text.str(), kp.current_points[n], FONT_HERSHEY_PLAIN, 0.8f, Scalar(200, 200, 200));
+			putText(image, text.str(), kp.current_points[n] + Point2f(3,-3), 
+				FONT_HERSHEY_PLAIN, 1.0f, Scalar(200, 200, 200));
 		}
 
 		m++;
 	}
 
+	// Markierung den Punkten mit gleichem Schritt
 	for (size_t i = 0; i < kp.same_step_pt.size(); i++)
 	{
 		circle(image, (Point)kp.current_points[kp.same_step_pt[i]], 10, Scalar(0, 0, 160));
@@ -331,9 +332,9 @@ void station::show_image()
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
-	setWindowTitle("LK Demo", text.str());
+	setWindowTitle(main_window_name, text.str());
 
-	imshow("LK Demo", image);
+	imshow(main_window_name, image);
 
 }
 
@@ -451,7 +452,7 @@ bool station::proceed_frame(Mat* frame, std::vector <keypoints_flow>* key_points
 
 	take_picture(frame);
 
-	imshow("LK Demo", *frame);
+	imshow(main_window_name, *frame);
 
 	kp.clear();
 

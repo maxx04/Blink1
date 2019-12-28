@@ -3,7 +3,7 @@
 #define MOTOR_RECHTS_FW 16
 #define MOTOR_RECHTS_BW 18
 #define MOTOR_LINKS_FW 22
-#define MOTOR_LINKS_BW 24
+#define MOTOR_LINKS_BW 13
 
 using namespace std;
 
