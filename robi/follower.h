@@ -69,7 +69,9 @@ public:
 	void copy_keypoints();
 	void new_data_proceed(UDP_Base* udp_base);
 	void start_move(UDP_Base * udp_base);
+	void start_move(float power);  // Bewegung gerade, power - Geschwindigkeit [0.0...1.0]
 	void stop_move(UDP_Base * udp_base);
+	void stop_move();
 	void clean_bad_keypoints(int frame_index);
 };
 

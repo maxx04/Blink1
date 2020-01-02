@@ -1,9 +1,13 @@
 #include <iostream>
 #include <string>
+#include <time.h>
+#include <stdlib.h>
+
 
 #include "../UDP_Base.h"
 #include "follower.h"
 #include "robot.h"
+
 
 using namespace cv;
 using namespace std;
@@ -27,7 +31,7 @@ int main(int argc, char** argv)
 {
 	help();
 
-	TickMeter tm;
+	TickMeter tkm;
 	follower robot;
 
 	//VideoCapture cap;
@@ -38,15 +42,39 @@ int main(int argc, char** argv)
 	//cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //720
 	////cap.set(cv::CAP_PROP_FPS, 15);
 
-	 //std::cout << cv::getBuildInformation() << std::endl; 
+	tm tim;
 
-	const char* gst = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12,  \
-		width=(int)1280, height=(int)720, framerate=(fraction)30/1 ! \
-			nvvidconv         ! video/x-raw,              format=(string)BGRx ! \
-			videoconvert      ! video/x-raw,              format=(string)BGR  ! appsink";
+	unsigned long t = mktime(&tim);
 
-	cv::VideoCapture cap(gst);
+	char command[512];
 
+	sprintf(command, " gst-launch-1.0 nvarguscamerasrc sensor-id=0 num-buffers=300 ! \
+    'video/x-raw(memory:NVMM), width=1280, height=720, framerate=120/1' ! nvtee ! \
+	omxh264enc bitrate=20000000 ! qtmux ! filesink location=video_%ul.mp4", t);
+
+	robot.start_move(0.7f);
+
+	system(command);
+
+	sleep(10);
+
+	robot.stop_move();
+
+	cout << "Video done" << endl;
+
+	 //std::cout << cv::getBuildInformation() << std::endl;
+
+	const char gst[] = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, \
+		width=(int)1280, height=(int)720, framerate=(fraction)120/1 ! \
+			nvvidconv ! video/x-raw, format=(string)BGRx ! \
+			videoconvert ! video/x-raw, format=(string)BGR  ! appsink";
+
+	const char gst_1[] = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, \
+		width=(int)1280, height=(int)720, framerate=(fraction)120/1 ! \
+		nvvidconv ! video/x-raw, format=(string)BGRx ! 	\
+		videoconvert ! video/x-raw, format=(string)BGR  ! appsink";
+
+	cv::VideoCapture cap(gst_1);
 
 	if (!cap.isOpened())
 	{
@@ -62,20 +90,18 @@ int main(int argc, char** argv)
 
 	static Mat  frame[ANZAHL_AUFNAHMEN], gray;
 
-	vector < int > compression_params;
+	vector <int> compression_params;
 	int jpegqual = ENCODE_QUALITY; // Compression Parameter
-	//compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-	//compression_params.push_back(jpegqual);				   //TODO
+	compression_params.push_back(cv::ImwriteFlags::IMWRITE_JPEG_QUALITY);
+	compression_params.push_back(jpegqual);	 //TODO
 
 	cout << "waiting transfer" << endl;
 
 /*
-
 	cout << cap.grab() << " grab result \n";
 	cap.retrieve(frame[0]);
 
 	cvtColor(frame[0], gray, COLOR_BGR2GRAY);
-
 */
 
 	// Hauptzyclus
@@ -90,19 +116,15 @@ int main(int argc, char** argv)
 			delay(200);
 		}
 
-
-
 		if (udp_base.check_incoming_data())
 		{
 			cout << "new udp data \n";
 			// start der bewegung
-			tm.reset();
-			tm.start();
+			tkm.reset();
+			tkm.start();
 
 			robot.new_data_proceed(&udp_base);
 			robot.needToInit = true;
-
-			
 
 			// serie von bildern aufnehmen
 			for (int n = 0; n < ANZAHL_AUFNAHMEN; n++)
@@ -113,11 +135,11 @@ int main(int argc, char** argv)
 				for (int i = 0; i < 5; i++) cap >> frame[n];
 
 				cap >> frame[n];
-				tm.stop();
+				tkm.stop();
 
-				cout << "aufnahmen abstand " << tm << " s" << endl;
-				tm.reset();
-				tm.start();
+				cout << "aufnahmen abstand " << tkm << " s" << endl;
+				tkm.reset();
+				tkm.start();
 				delay(10);
 
 				robot.start_move(&udp_base);

@@ -90,7 +90,7 @@ SerialPort::SerialPort(const char *portName)
 	else
 	{
 		this->connected = true;
-		printf("\nSERIAL Port Good to Go.\n");
+		printf("\nSERIAL Port ready.\n");
 	}
 
 	// Flush Buffers
@@ -134,7 +134,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 	//tcflush(fd, TCIOFLUSH);
 
-	usleep(1000);   // .001 sec delay
+	//usleep(1000);   // .001 sec delay
 
 	//printf("Ready to receive message.\n");
 
@@ -173,7 +173,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 		}
 	}
 
-	printf("\nMessage Received: %s", serial_message);
+	//printf("\nMessage Received: %s", serial_message);
 
 	return nread;
 }
@@ -190,7 +190,9 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 	{
 		ssize_t count = write(fd, buffer, buf_size);		//Filestream, bytes to write, number of bytes to write
 
-		usleep(1000);   // .001 sec delay
+		//tcflush(fd, TCIOFLUSH);
+
+		//usleep(1000);   // .001 sec delay
 
 		//printf("Count = %d\n", count);
 
@@ -210,6 +212,7 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
 bool SerialPort::writeSerialPort(const char *buffer)
 {
 	this->writeSerialPort((char*)buffer, (unsigned int)strlen(buffer));
+
 	return true;
 }
 

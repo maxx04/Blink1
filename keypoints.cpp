@@ -177,8 +177,8 @@ int keypoints::calculate_move_vectors() // wird jedes frame bearbeitet
 void keypoints::calc_distances()
 {
 	float VFOV2 = 19.1 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
-	float H = 1097.0; // Kameraabstand vom Boden [mm]
-	float alfa = 38.0 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+	float H = 118.0; // Kameraabstand vom Boden [mm]
+	float alfa = 5.1 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
 	float V = 720.0; // Anzahl Pixeln vom Bild in vertikale Richtung
 	float U = 1280.0; // Anzahl Pixeln vom Bild in horizontaleale Richtung
 	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
@@ -201,7 +201,7 @@ void keypoints::calc_distances()
 
 		beta = atan((2.0*v / V - 1.0) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
 		
-		distance = H / tan(alfa + beta); // OPTI cos(alfa); tan(alfa) vorberechnen
+		distance = H / tan(alfa + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
 
 		distance_to_cam.push_back(distance);
 		numbers_of_downpoints.push_back(i);
@@ -211,7 +211,7 @@ void keypoints::calc_distances()
 
 		beta1 = atan((2*v1 - V) * tan(VFOV2)); // OPTI tan_beta lassen
 
-		float l = H / tan(alfa - beta) - H / tan(alfa - beta1);	 // Weg für den Schlüsselpunkt zwischen Frames
+		float l = distance - H / tan(alfa + beta1);	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
 
 		hist_distance.collect({ i, l }); //TODO grenzen verfeinern
 

@@ -20,7 +20,7 @@ station::station()
 	winSize = Size(11, 11);
 
 	needToInit = true;
-	step_butch = 3;
+	step_butch = 5;
 	magnify_vektor_draw = 5;
 
 	//hist =  histogram(10, "Steps");

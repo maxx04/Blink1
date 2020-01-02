@@ -23,6 +23,7 @@ Servos::Servos(float min, float max, float null)
 	
 	cout << "servo: " << number << " opened \n";
 
+	move_to_position(null_position, 2000);
 	//test();
 
 }
@@ -36,11 +37,9 @@ Servos::~Servos()
 void Servos::test()
 {
 	move_to_position(max_position, 2000);
-	wait_on_position(10000);
 	move_to_position(min_position, 2000);
-	wait_on_position(10000);
 	move_to_position(null_position, 2000);
-	wait_on_position(10000);
+
 }
 
 void Servos::read_udp_data(float x)
@@ -69,6 +68,9 @@ void Servos::move_to_position(float p, int time)
 	cout << m << endl;
 
 	sp->writeSerialPort(m);
+
+	wait_on_position(time);
+
 	in_move = true;
 }
 
@@ -77,7 +79,7 @@ bool Servos::wait_on_position(const int time)
 	tm.reset();
 	tm.start();
 
-	cout << "waiting on servo ";
+	//cout << "waiting on servo ";
 
 	while (sp->readSerialPort(m) == 0) // Antwort "OK"
 	{
@@ -91,7 +93,7 @@ bool Servos::wait_on_position(const int time)
 		tm.start();
 	}
 
-	 cout << tm.getTimeMilli() << " serial : " << m[0] << m[1] << endl;
+	 //cout << tm.getTimeMilli() << " serial : " << m[0] << m[1] << endl;
 	 m[0] = 0;
 	 m[1] = 0;
 	return true;

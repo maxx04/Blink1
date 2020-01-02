@@ -240,9 +240,20 @@ void follower::start_move(UDP_Base* udp_base)
 {
 	fdriver.start_move( udp_base->udp_data->stright_velocity);
 }
+
+void follower::start_move(float power)
+{
+	fdriver.start_move(power);
+}
+
 void follower::stop_move(UDP_Base* udp_base)
 {
 	fdriver.stop_move(udp_base->udp_data->stright_velocity);
+}
+
+void follower::stop_move()
+{
+	fdriver.stop_move(0.0);
 }
 
 

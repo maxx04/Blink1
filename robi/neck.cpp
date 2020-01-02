@@ -3,7 +3,9 @@
 neck::neck()
 {
 	sh = new Servos(800, 1900, 1350);
-	sv = new Servos(1200, 1900, 1700);
+	sv = new Servos(1200, 2100, 1950);
+
+	test();
 }
 
 
@@ -14,10 +16,8 @@ neck::~neck()
 void neck::move_to(float a, float b)
 {
 	sh->move_to_angle(a,1000);
-	sh->wait_on_position(3000);
 	//OPTI Bewegung zusammen realisieren
 	sv->move_to_angle(b,1000);
-	sv->wait_on_position(3000); 
 }
 
 //void neck::move_to()
