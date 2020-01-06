@@ -259,7 +259,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-/6.mp4
-/video_1.mp4
-/video_3.mp4
-/video_2.mp4
+/*.mp4
+/videos

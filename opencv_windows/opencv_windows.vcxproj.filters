@@ -15,36 +15,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="..\odometry.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\histogram.h">
+    <ClInclude Include="keypoint.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\keypoints.h">
+    <ClInclude Include="histogram.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\station.h">
+    <ClInclude Include="keypoints.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\UDP_Base.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xsocket.hpp">
+    <ClInclude Include="odometry.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\histogram.cpp">
+    <ClCompile Include="keypoint.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\keypoints.cpp">
+    <ClCompile Include="base.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\base.cpp">
+    <ClCompile Include="histogram.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\station.cpp">
+    <ClCompile Include="keypoints.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="odometry.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

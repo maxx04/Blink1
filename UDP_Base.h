@@ -8,6 +8,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/utility.hpp>
 
+
+
 #define SOCKET_BLOCK_SIZE 4096
 #define ENCODE_QUALITY 90
 #define ANZAHL_AUFNAHMEN 5
@@ -23,6 +25,8 @@ struct exchange_data
 	float direction;
 };
 
+
+// Struktur für letzte Punkt und Zwischenpunkte als Zwischenpunkte
 struct keypoints_flow
 {
 	cv::Point2f p;
@@ -36,6 +40,7 @@ union udata
 	char union_buff[SOCKET_BLOCK_SIZE];	
 }; 
 
+// Umwandlung int 4 x char
 union int_char
 {
 	int nb;
