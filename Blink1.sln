@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Doc\Berechnung.odt = Doc\Berechnung.odt
 		Doc\HG7881C_EN.pdf = Doc\HG7881C_EN.pdf
+		out_camera_data.xml = out_camera_data.xml
 		UDP_Base.cpp = UDP_Base.cpp
 		UDP_Base.h = UDP_Base.h
 		xsocket.hpp = xsocket.hpp

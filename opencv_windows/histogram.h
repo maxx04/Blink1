@@ -55,7 +55,8 @@ public:
 	
 	int collect(point_satz v);	// Werte sammeln
 
-	int sort();	 // Werte einsortieren und Zeichnen	die mitgehen
+	int sort(float range_min, float range_max);	 // Werte einsortieren und Zeichnen	die mitgehen
+	int sort();
 
 	// Histogramm-Mittelwert ausgeben
 	// main_points - verweis auf vektor für punkte d

@@ -65,7 +65,7 @@ void Servos::move_to_position(float p, int time)
 	//sprintf(m, "#1P%04.0f#2P%04.0fT%04.0f\r\n", position.x, position.y, (float)time);
 	sprintf(m, "#%1iP%04.0fT%04.0f\r\n", number, position, (float)time);
 
-	cout << m << endl;
+	std::cout << m << endl;
 
 	sp->writeSerialPort(m);
 

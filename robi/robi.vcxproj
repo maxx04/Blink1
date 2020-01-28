@@ -68,6 +68,7 @@
     <IncludePath>/usr/local/include/opencv4;~/libi2c</IncludePath>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="camera_calibration.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="follower.cpp" />
     <ClCompile Include="gpio_controll.cpp" />
@@ -94,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="default.xml" />
+    <Xml Include="out_camera_data.xml" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>

@@ -41,9 +41,12 @@ int histogram::collect(point_satz value)
 	return values_index;
 }
 		   
-int histogram::sort()
+int histogram::sort(float rmn, float rmx)
 {
-	assert(bins < 300 && bins != 0);
+	range_min = rmn;
+	range_max = rmx;
+
+	assert(bins < 300 && bins != 0);   // TODO begründen
 
 	bins_borders.resize(bins + 1);
 	bins_counters.resize(bins);
@@ -77,6 +80,11 @@ int histogram::sort()
 	plot_result(Point(0, 0));
 
 	return 0;
+}
+
+int histogram::sort()
+{
+	return sort(range_min, range_max);
 }
 
 double histogram::get_main_middle_value(vector<int>* main_points)

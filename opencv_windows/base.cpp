@@ -11,7 +11,7 @@ using namespace std;
 using namespace cv;
 
 int receive_frame(net::socket& sock, net::endpoint& ep, cv::Mat& frame);
-void proceed_video(std::string& input, odometry& PC);
+void proceed_video(std::string& input);
 int proceed_udp(odometry& PC, bool& retflag);
 int receive_keypoints(net::socket& sock, net::endpoint& ep);
 
@@ -38,17 +38,19 @@ int main(int argc, char** argv)
 	cv::CommandLineParser parser(argc, argv, "{@input|0|}");
 	string input = parser.get<string>("@input");
 
-	odometry PC;
+
 
 	if (input.size() == 1)
 	{
-		bool retflag;
-		int retval = proceed_udp(PC, retflag);
-		if (retflag) return retval;
+		//odometry PC;
+
+		//bool retflag;
+		//int retval = proceed_udp(PC, retflag);
+		//if (retflag) return retval;
 	}
 	else
-	{
-		proceed_video(input, PC);
+	{		
+		proceed_video(input);
 	}
 
 	//	sock.close();
@@ -116,7 +118,7 @@ int proceed_udp(odometry& PC, bool& retflag)
 	return 0;
 }
 
-void proceed_video(std::string& input, odometry& PC)
+void proceed_video(std::string& input)
 {
 	Mat  vframe;
 
@@ -127,6 +129,14 @@ void proceed_video(std::string& input, odometry& PC)
 		std::cout << " Datei " << input << " nicht geoeffnet" << endl;
 		exit(4);
 	}
+
+
+	cap.read(vframe);
+
+	odometry PC(&vframe);
+
+		//cap.get(cv::CAP_PROP_FRAME_WIDTH); //1280
+		//cap.get(cv::CAP_PROP_FRAME_HEIGHT); //720
 
 
 	while (true)

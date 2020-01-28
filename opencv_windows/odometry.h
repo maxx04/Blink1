@@ -26,7 +26,7 @@
 using namespace cv;
 using namespace std;
 
-#define MIN_FOLLOWED_POINTS 300
+#define MIN_FOLLOWED_POINTS 50
 
 
 // Klass odometry ermittelt Bewegung des Robots und Abstand zu Schlüsselpunkten
@@ -47,10 +47,13 @@ class odometry
 	float magnify_vektor_draw;
 
 public:
-	odometry();
+	odometry(Mat* frame);
 	~odometry();
+	void set_fokus(Mat* frame);
 	void take_picture(Mat* frame);	// Bildvorbereitung
 	void find_keypoints();
+
+	void find_keypoints_FAST();
 
 	// kontrolliert auf schlechte Punkte und loescht die
 	// status - vector vom LukasKande
@@ -60,7 +63,7 @@ public:
 	void find_follow_points();
 	//void transform_Affine();
 	void draw_prev_points();
-	void draw_current_points();
+	void draw_keypoints();
 	//	void draw_calculated_points();
 	void draw_main_points();
 	void draw_summ_vector();
@@ -70,6 +73,7 @@ public:
 	void show_image();
 	//	void cam_calibrate();
 	void kompensate_jitter(vector<int>* points_number);
+	void kompensate_roll(vector<int>* points_number);
 	void swap();
 	bool key(int wait);
 	int find_nearest_point(Point2f pt);

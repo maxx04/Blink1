@@ -10,6 +10,7 @@
     <ClCompile Include="SerialPort_nano.cpp" />
     <ClCompile Include="Servos.cpp" />
     <ClCompile Include="UDP_Base.cpp" />
+    <ClCompile Include="camera_calibration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera_calibration.h">
@@ -43,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="default.xml" />
+    <Xml Include="out_camera_data.xml" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="header">

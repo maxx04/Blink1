@@ -48,9 +48,13 @@ int main(int argc, char** argv)
 
 	char command[512];
 
+	//sprintf(command, " gst-launch-1.0 nvarguscamerasrc sensor-id=0 num-buffers=500 ! \
+ //   'video/x-raw(memory:NVMM), width=1920, height=1080, framerate=30/1' ! nvtee ! \
+	//omxh264enc bitrate=20000000 ! qtmux ! filesink location=video_%u.mp4", t);
+
 	sprintf(command, " gst-launch-1.0 nvarguscamerasrc sensor-id=0 num-buffers=500 ! \
-    'video/x-raw(memory:NVMM), width=1280, height=720, framerate=120/1' ! nvtee ! \
-	omxh264enc bitrate=20000000 ! qtmux ! filesink location=video_%u.mp4", t);
+    'video/x-raw(memory:NVMM), width=1920, height=1080, framerate=10/1' ! nvtee ! \
+	 omxh264enc bitrate=10000000 ! qtmux ! filesink location=video_%u.mp4", t);
 
 	robot.start_move(1.0f);
 

@@ -13,8 +13,9 @@ follower::follower()
 	winSize = Size(11, 11);
    
 
-/*
+
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
+
 	if (!ks.isOpened()) 
 	{
 		cout << " Camera matrix fixed" << endl;
@@ -32,7 +33,7 @@ follower::follower()
 		ks["Camera_Matrix"] >> cameraMatrix;
 		ks["Distortion_Coefficients"] >> distCoeffs; //TODO
 	}
-*/
+
 	tm.reset();
 }
 
@@ -142,7 +143,7 @@ bool follower::key(int wait)
 		break;
 
 		case 'k':
-		//	cam_calibrate(&cameraMatrix, &distCoeffs);
+		cam_calibrate(&cameraMatrix, &distCoeffs);
 			break;
 	}
 
