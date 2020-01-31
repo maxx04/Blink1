@@ -52,7 +52,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\odometry.h" />
     <ClInclude Include="histogram.h" />
     <ClInclude Include="keypoint.h" />
     <ClInclude Include="keypoints.h" />

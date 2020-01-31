@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\odometry.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="keypoint.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>

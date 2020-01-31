@@ -8,7 +8,6 @@ histogram::histogram()
 	windows_high = 120;
 	mean = 0;
 	windows_h_offset = 10; //base Histogramm
-	//namedWindow("Vectorhistogramm", 1);
 	plotResult.create(windows_high + windows_h_offset, window_width, CV_8UC3);
 	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
 
@@ -87,12 +86,11 @@ int histogram::sort()
 	return sort(range_min, range_max);
 }
 
-double histogram::get_main_middle_value(vector<int>* main_points)
+double histogram::get_main_middle_value(const vector<int>* main_points)
 {
 	// Bedinnungen zu finden: max und daneben 70% punkten, mittelwert finden.
 	// TODO verfinern kriterien
 	int max_counter = 0;
-	main_points->clear();
 
 	// Finden maximalen Strahl
 	for (int n = 1; n < bins; n++)
@@ -141,7 +139,7 @@ double histogram::get_main_middle_value(vector<int>* main_points)
 			{
 				result += s.v;
 				// 
-				main_points->push_back(s.n);
+				//main_points->push_back(s.n);
 				++n; //HACK 2 Grad + 358 Grad Mitte gibt 180 Grad
 			}
 

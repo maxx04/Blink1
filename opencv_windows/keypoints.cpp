@@ -2,14 +2,13 @@
 
 keypoints::keypoints()
 {
-	//step_vector = new vector<Point2f>[MAX_COUNT];
 	frame_center = Point2f(0, 0);
 
 	hist_angle = histogram(120, "versatzwinkel");
 	hist_length = histogram(50, "versatzlaenge");
 	hist_roll = histogram(50, "roll");
 
-	for (size_t i = 0; i < point.size(); i++)
+	for (size_t i = 0; i < point.size(); i++)	 //OPTI
 	{
 		point[i].set_flow(Point2f(0, 0));
 	}
@@ -23,14 +22,7 @@ keypoints::~keypoints()
 void keypoints::clear(void)
 {
 	point.clear();
-
-	prev_points.clear();
-	current_points.clear();
-}
-
-void keypoints::swap(void)
-{
-	std::swap(current_points, prev_points); //HACK ob nummerierung passt
+	background_points.clear();
 }
 
 float keypoints::distance(Point2f a, Point2f b)
@@ -43,11 +35,6 @@ float keypoints::length(Point2f a)
 	return sqrt(pow((a.x), 2) + pow((a.y), 2));
 }
 
-vector<Point2f>* keypoints::get_next_points_addr(void)
-{
-	return &current_points;
-}
-
 Point2f keypoints::get_next_summ_vector()
 {
 	Point2f sum;
@@ -58,28 +45,23 @@ Point2f keypoints::get_next_summ_vector()
 	return sum;
 }
 
-Point2f keypoints::get_mainmove_background_vector()
-{
-	return Point2f();
-}
-
-int keypoints::kompensate_roll(vector<int>* points_number) // wird jedes frame bearbeitet
+int keypoints::kompensate_roll() // wird jedes frame bearbeitet
 {
 
 	Point2f p, main, tmp;
 	Point2f a_hat, ba, fokus(640, 480);  // TODO
 	float l;
 
-	int i = 0;
+	//int i = 0;
 
-	for (int n : *points_number)
+	for (int n : background_points)
 	{
 
 		p = point[n].get_flow(0); //OPTI mehrmals woanders durchgefuehrt
 
 		if (length(p) == 0.0)
 		{
-			hist_roll.collect(point_satz{ i, 0.0 });
+			hist_roll.collect(point_satz{ n, 0.0 });
 		}
 		else
 		{
@@ -98,13 +80,13 @@ int keypoints::kompensate_roll(vector<int>* points_number) // wird jedes frame b
 
 				float h = ba.y / l;  // Moment
 
-				hist_roll.collect(point_satz{ i, h }); // TODO assert
+				hist_roll.collect(point_satz{ n, h }); // TODO assert
 			}
 			else
-				hist_roll.collect(point_satz{ i, 0.0 });
+				hist_roll.collect(point_satz{ n, 0.0 });
 		}
 
-		i++;
+		//i++;
 	}
 
 
@@ -134,13 +116,13 @@ int keypoints::kompensate_roll(vector<int>* points_number) // wird jedes frame b
 
 }
 
-int keypoints::kompensate_jitter(vector<int>* points_number) // wird jedes frame bearbeitet
+int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 {
 	Point2f p, main, tmp;
 
-	int i = 0;
+	//int i = 0;
 
-	for (int n : *points_number)
+	for (int n : background_points)
 	{
 		p = point[n].get_flow(0); //OPTI mehrmals woanders durchgefuehrt
 
@@ -151,9 +133,9 @@ int keypoints::kompensate_jitter(vector<int>* points_number) // wird jedes frame
 
 		double d = fmodf((atan2(p.x, p.y) * (180.0 / M_PI)) + 360, 360);
 
-		if (p.x != 0.0)	hist_angle.collect(point_satz{ i, (float)d }); // TODO assert
+		if (p.x != 0.0)	hist_angle.collect(point_satz{ n, (float)d }); // TODO assert
 
-		i++;
+		//i++;
 	}
 
 	hist_angle.sort(0, 360);
@@ -164,15 +146,15 @@ int keypoints::kompensate_jitter(vector<int>* points_number) // wird jedes frame
 
 	hist_angle.clear();
 
-	for (int n : *points_number)
+	for (int n : background_points)
 	{
 		p = point[n].get_flow(0);
 
 		double l = length(p);
 
-		hist_length.collect(point_satz{ i, (float)l });
+		hist_length.collect(point_satz{ n, (float)l });
 
-		i++;
+		//i++;
 	}
 
 	//TODO nach histogram vectorlaenge finden hauptvector laenge
@@ -200,6 +182,7 @@ int keypoints::kompensate_jitter(vector<int>* points_number) // wird jedes frame
 
 	//TODO rausnehmen den hauptvector aus punktenbewegung dabei wird man sehen eigene bewegung von punkten
 
+	// Wenn bewegung ist 0
 	if (v == 0.0)
 	{
 		main_jitter.push(Point2f(0, 0));
@@ -235,10 +218,10 @@ void keypoints::calc_distances()
 	//same_step_pt.clear();
 	hist_roll.clear();
 
-	for (int i = 0; i < current_points.size(); i++)
+	for (int i = 0; i < point.size(); i++)
 	{
-		float v = current_points[i].y; // Bildkoordinaten vom Schlüsselpunkt y
-		float u = current_points[i].x; // Bildkoordinaten vom Schlüsselpunkt x
+		float v = point[i].get_position().y; // Bildkoordinaten vom Schlüsselpunkt y
+		float u = point[i].get_position().x; // Bildkoordinaten vom Schlüsselpunkt x
 
 		if (v < V / 2) continue; // wenn obere Bildhälfte dan nicht berechnen
 
@@ -249,7 +232,7 @@ void keypoints::calc_distances()
 		//distance_to_cam.push_back(distance);
 		numbers_of_downpoints.push_back(i);
 
-		float v1 = prev_points[i].y;
+		float v1 = point[i].get_position().y;
 		//float u1 = prev_points[i].x;
 
 		beta1 = atan((2 * v1 - V) * tan(VFOV2)); // OPTI tan_beta lassen
@@ -288,6 +271,14 @@ void keypoints::draw(cv::Mat* image)
 		i++;
 	}
 
+}
+
+void keypoints::draw_background_points(cv::Mat* image)
+{
+	for (int n : background_points)
+	{
+		circle(*image, (Point)point[n].position, 8, Scalar(255, 0, 0), 2);
+	}
 }
 
 // berechnen geteilte radiale un transitionale Bewegung

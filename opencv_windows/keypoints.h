@@ -32,19 +32,8 @@ private:
 public:
 	const int MAX_COUNT = 800; // Maksimale Anzahl den Punkten die werden berücksichtigt
 	queue<Point2f> main_jitter;	// Reihe für 2d Vektors den resultierendes Bildverschiebung
-	vector<Point2f> prev_points; // vorherige punkte
-	vector<Point2f> current_points; // aktuelle punkte
-
 	vector<keypoint> point; // Schlüsselpunkte selber
-
-	// step_vector von prev_points zu current_points
-	// in vector geladen jedes mal nach aufruf load_step_vectors
-	//vector<Point2f>* step_vector; 
-
-	//vector<float> distance_to_cam;	// Abstände zu Kamera (Robot) [mm]
-	//vector<float> step_length;	// Berechnete Verschiebung zu Kamera (Schritt pro Frame)
 	vector<int> numbers_of_downpoints;	// Die Nummern den unteren (Boden) punkten
-	//vector<int> same_step_pt;	// Die Nummern den Punkten mit dem gleichem Schritt
 	vector<int> background_points; // die Punkte die zum Hintergrund gehoeren
 
 	histogram hist_angle; // Histogram zum Finden vom "background move vector" Winkel
@@ -52,8 +41,6 @@ public:
 	histogram hist_roll;  // zur Analyse den Abständen
 	//TODO spaeter soll man gruppieren punkte und zuordnen zu bewegungsteilen
 
-
-					
 	keypoints();
 	~keypoints();
 
@@ -62,25 +49,16 @@ public:
 	//int save_step_vectors(void);
 	float distance (Point2f a, Point2f b);
 	float length(Point2f a);  // Vektorlänge
-	vector <Point2f> * get_next_points_addr(void);
 
 	Point2f get_next_summ_vector();
 
 	// gibt aus ob keine summand vektoren mehr gibts
 	bool summ_queue_empty() { return main_jitter.empty(); }
-
-	//Point2f get_next_step_vector(int i);
-
-	// gibt aus ob keine summand vektoren mehr gibts
-	//inline bool step_vector_empty(int i) { return step_vector[i].empty(); }
-
-	Point2f get_mainmove_background_vector();
-
-	int kompensate_roll(vector<int>* points_number);
-
-	int kompensate_jitter(vector<int>* points_number);
+ 	int kompensate_roll();
+	int kompensate_jitter();
 	void calc_distances_1(Point2f frame_center);
 	void calc_distances();
 	void draw(cv::Mat* image);
+	void draw_background_points(cv::Mat* image);
 };
 

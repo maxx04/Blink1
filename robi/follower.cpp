@@ -1,8 +1,7 @@
 #include "follower.h"
 
-
-Point2f AimPoint;
-bool setAimPt = false;
+//Point2f AimPoint;
+//bool setAimPt = false;
 
 follower::follower()
 {
@@ -13,7 +12,7 @@ follower::follower()
 	winSize = Size(11, 11);
    
 
-
+ /*
 	FileStorage ks("out_camera_data.xml", FileStorage::READ); // Read the settings
 
 	if (!ks.isOpened()) 
@@ -33,6 +32,8 @@ follower::follower()
 		ks["Camera_Matrix"] >> cameraMatrix;
 		ks["Distortion_Coefficients"] >> distCoeffs; //TODO
 	}
+
+	*/
 
 	tm.reset();
 }
@@ -111,16 +112,28 @@ void follower::find_keypoints()
 
 	kpt.clear();
 
-	goodFeaturesToTrack(image, kpt, 500, 0.03, 10, Mat(), 9, 5);
+	//goodFeaturesToTrack(image, kpt, 500, 0.03, 10, Mat(), 9, 5);
+
+
+	vector<KeyPoint> keypoints_1;
+	//vector<Point2f> key_points;
+
+	int fast_threshold = 10;
+	bool nonmaxSuppression = true;
+
+	AGAST(image, keypoints_1, fast_threshold, nonmaxSuppression, AgastFeatureDetector::OAST_9_16);
+	//FAST(gray, keypoints_1, fast_threshold, nonmaxSuppression);
+
+	KeyPoint::convert(keypoints_1, kpt, vector<int>());
 
 	//refine position
-	try {
-		cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
-	}
-	catch (Exception e) {
-		cout << "calc subpix fault " << tm << " kp " << kpt.size() << endl;
-		exit(3);
-	}
+	//try {
+	//	cornerSubPix(image, kpt, subPixWinSize, Size(-1, -1), termcrit);
+	//}
+	//catch (Exception e) {
+	//	cout << "calc subpix fault " << tm << " kp " << kpt.size() << endl;
+	//	exit(3);
+	//}
 	tm.stop();
 
 	cout << "Features compute " << tm << " kp " << kpt.size() << endl;
@@ -143,7 +156,7 @@ bool follower::key(int wait)
 		break;
 
 		case 'k':
-		cam_calibrate(&cameraMatrix, &distCoeffs);
+		//cam_calibrate(&cameraMatrix, &distCoeffs);
 			break;
 	}
 

@@ -111,7 +111,7 @@ int proceed_udp(odometry& PC, bool& retflag)
 			continue;
 		}
 
-		if (PC.proceed_keypointsset(&frame, &key_points)) break;
+		//if (PC.proceed_keypointsset(&frame, &key_points)) break;
 
 	}
 	//retflag = false;

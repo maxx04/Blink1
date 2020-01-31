@@ -60,7 +60,7 @@ public:
 
 	// Histogramm-Mittelwert ausgeben
 	// main_points - verweis auf vektor für punkte d
-	double get_main_middle_value( vector<int>* main_points);
+	double get_main_middle_value(const vector<int>* main_points);
 
 	void clear();  // Werte löschen
 

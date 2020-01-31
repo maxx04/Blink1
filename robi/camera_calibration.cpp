@@ -214,8 +214,8 @@ void cam_calibrate(Mat* cameraMatrix, Mat* distCoeffs)
 
 	//TODO close image
 
-	cvSave("cameraMatrix.xml", cameraMatrix);
-	cvSave("distCoeffs.xml", distCoeffs);
+	//cvSave("cameraMatrix.xml", cameraMatrix);
+	//cvSave("distCoeffs.xml", distCoeffs);
 
     return;
 }

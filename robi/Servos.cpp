@@ -86,7 +86,7 @@ bool Servos::wait_on_position(const int time)
 
 		if (tm.getTimeMilli() > (double)time)
 		{
-			cerr << format("Kein Antwort Servo - position %f \n", position);
+			//cerr << format("Kein Antwort Servo - position %f \n", position);
 			return false;
 		}
 		tm.stop();

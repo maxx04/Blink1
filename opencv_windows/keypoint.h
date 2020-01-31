@@ -4,6 +4,8 @@
 
 const int ANZAHL_VORPOSITIONS = 5;
 
+using namespace cv;
+
 // Verwaltet einziges Schlüsselpunkt
 class keypoint
 {
@@ -18,14 +20,18 @@ class keypoint
 public:
 
 	keypoint();
-	keypoint(cv::Point2f p) { position = p; }
-	inline void set_position(cv::Point2f p) { position = p; }
-	inline cv::Point2f get_position() { return position; }
+	inline keypoint(Point2f p) 
+	{
+		position = p; 
+		for (size_t i = 0; i < ANZAHL_VORPOSITIONS; i++) flow[i++] = Point2f(0.0f, 0.0f);
+	}
+	inline void set_position(Point2f p) { position = p; }
+	inline Point2f get_position() { return position; }
 	inline float get_distance() { return d; }
 	inline void shift_flow() { for (int i = ANZAHL_VORPOSITIONS-1; i > 0; i--) flow[i] = flow[i - 1]; }
-	inline void set_flow(cv::Point2f d) { flow[0] = d; }
-	inline cv::Point2f get_flow(int i) { CV_Assert(i >= 0 && i < ANZAHL_VORPOSITIONS); return flow[i]; }
-	inline void correct_flow(cv::Point2f d) { flow[0] += d; }
+	inline void set_flow(Point2f d) { flow[0] = d; }
+	inline Point2f get_flow(int i) { CV_Assert(i >= 0 && i < ANZAHL_VORPOSITIONS); return flow[i]; }
+	inline void correct_flow(Point2f d) { flow[0] += d; }
 
 };
 

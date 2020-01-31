@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 	//omxh264enc bitrate=20000000 ! qtmux ! filesink location=video_%u.mp4", t);
 
 	sprintf(command, " gst-launch-1.0 nvarguscamerasrc sensor-id=0 num-buffers=500 ! \
-    'video/x-raw(memory:NVMM), width=1920, height=1080, framerate=10/1' ! nvtee ! \
+    'video/x-raw(memory:NVMM), width=1240, height=720, framerate=10/1' ! nvtee ! \
 	 omxh264enc bitrate=10000000 ! qtmux ! filesink location=video_%u.mp4", t);
 
 	robot.start_move(1.0f);
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 			nvvidconv ! video/x-raw, format=(string)BGRx ! \
 			videoconvert ! video/x-raw, format=(string)BGR  ! appsink";
 
-	const char gst_1[] = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, \
+	char gst_1[] = "nvarguscamerasrc  ! video/x-raw(memory:NVMM), format=(string)NV12, \
 		width=(int)1280, height=(int)720, framerate=(fraction)120/1 ! \
 		nvvidconv ! video/x-raw, format=(string)BGRx ! 	\
 		videoconvert ! video/x-raw, format=(string)BGR  ! appsink";
@@ -166,7 +166,7 @@ int main(int argc, char** argv)
 			
 			
 
-			imencode(".jpg", frame[ANZAHL_AUFNAHMEN-1], udp_base.encoded, compression_params);
+			cv::imencode(".jpg", frame[ANZAHL_AUFNAHMEN-1], udp_base.encoded, compression_params);
 
 			robot.copy_keypoints();
 

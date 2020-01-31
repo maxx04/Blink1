@@ -66,9 +66,9 @@
     <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)UDP_Base.cpp:=$(RemoteProjectDir)/UDP_Base.cpp;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);</SourcesToCopyRemotelyOverride>
     <IncludePath>/usr/local/include/opencv4;~/libi2c</IncludePath>
+    <RemoteLinkLocalCopyOutput>false</RemoteLinkLocalCopyOutput>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="camera_calibration.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="follower.cpp" />
     <ClCompile Include="gpio_controll.cpp" />
@@ -99,7 +99,12 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
-      <LibraryDependencies>pthread;i2c;JetsonGPIO;opencv_core;opencv_highgui;opencv_calib3d;opencv_imgproc;opencv_imgcodecs;opencv_tracking;opencv_features2d;opencv_videoio;opencv_video</LibraryDependencies>
+      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;opencv_imgcodecs;opencv_tracking;opencv_features2d;opencv_videoio;opencv_video;pthread;i2c;JetsonGPIO</LibraryDependencies>
+      <VerboseOutput>false</VerboseOutput>
+      <PrintMap>false</PrintMap>
+      <ShowProgress>true</ShowProgress>
+      <UnresolvedSymbolReferences>true</UnresolvedSymbolReferences>
+      <Trace>true</Trace>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
