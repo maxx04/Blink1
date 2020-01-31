@@ -82,7 +82,7 @@ void odometry::find_keypoints()
 	Size subPixWinSize = Size(18, 18);
 
 	//finde features
-	goodFeaturesToTrack(gray, key_points, kp.MAX_COUNT, 0.03, 20, Mat(), 15, 5);
+	goodFeaturesToTrack(gray, key_points, kp.MAX_COUNT, 0.03, 10, Mat(), 15, 5);
 
 	//refine position
 	cornerSubPix(gray, key_points, subPixWinSize, Size(-1, -1), termcrit);
@@ -284,7 +284,7 @@ void odometry::draw_summ_vector()
 
 int odometry::draw_image()
 {
-	int time = 50; //ms
+	int time = 30000; //ms
 
 	// draw Zielpunkt wenn gibt es 
 	//draw_aim_point();
@@ -318,7 +318,7 @@ void odometry::show_image()
 	text.width(5);
 	text.precision(3);
 
-	text << "calc " << kp.point.size() << " | " ;
+	text << "calc " << kp.point.size() << " | " << frame_number;
 
 	//putText(image, text.str(), Point(100, 100), FONT_HERSHEY_PLAIN, 2.0f, Scalar(0, 0, 0), 2);
 
@@ -446,7 +446,7 @@ void odometry::find_backround_points()
 	{
 		d = p.get_position();
 
-		if (d.y > fokus.y - l && d.y < fokus.y && d.x < fokus.x + l && d.x > fokus.x - l)
+		if (d.y < l  && d.x < fokus.x + l && d.x > fokus.x - l)
 		{
 			kp.background_points.push_back(index);
 		}
@@ -475,6 +475,8 @@ void odometry::draw_flow()
 
 			p0 = p1;
 		};
+
+		line(image, (Point)p.get_position(), (Point)(p.get_position() + magnify_vektor_draw * p.get_full_flow()), Scalar(250, 0, 0), 2);
 
 	}
 
@@ -522,6 +524,8 @@ bool odometry::proceed_video(Mat* frame)
 {
 	take_picture(frame);
 
+	frame_number++;
+
 	imshow(main_window_name, *frame);
 
 	if (needToInitKeypoints)
@@ -537,9 +541,9 @@ bool odometry::proceed_video(Mat* frame)
 	find_backround_points();
 
 	kompensate_jitter();
-	// kompensate_roll();
+	//kompensate_roll();
 
-	// kp.calc_distances_1(fokus);
+	kp.calc_distances_1(fokus);
 
 	//	transform_Affine();
 

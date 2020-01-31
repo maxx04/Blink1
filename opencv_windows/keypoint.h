@@ -32,6 +32,12 @@ public:
 	inline void set_flow(Point2f d) { flow[0] = d; }
 	inline Point2f get_flow(int i) { CV_Assert(i >= 0 && i < ANZAHL_VORPOSITIONS); return flow[i]; }
 	inline void correct_flow(Point2f d) { flow[0] += d; }
+	inline Point2f get_full_flow()
+	{
+		Point2f p(0, 0);
+		for (size_t i = 0; i < ANZAHL_VORPOSITIONS; i++) p += flow[i];
+		return p;
+	}
 
 };
 

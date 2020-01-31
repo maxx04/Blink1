@@ -196,7 +196,7 @@ void histogram::plot_result(Point p)
 	if (max == 0)
 	{
 		//TODO Assert hinzufügen
-		cerr << "maximale bin 0" << endl;
+		cerr << "keine Werte fuer Histogramm" << endl;
 		return;
 	}
 

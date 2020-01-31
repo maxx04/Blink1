@@ -250,23 +250,23 @@ void keypoints::calc_distances()
 void keypoints::draw(cv::Mat* image)
 {
 	int i = 0;
-	float magnify = 1.0;
+	float magnify = 2.0;
 
 	for (keypoint p : point)
 	{
 		circle(*image, (Point)p.position, 3, Scalar(255, 250, 0));
-		//line(*image, (Point)p.position, (Point)(magnify * p.l + p.position), Scalar(220, 220, 0), 2);
-		//line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 2);
+		line(*image, (Point)p.position, (Point)(magnify * p.l + p.position), Scalar(220, 220, 0), 1);
+		line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 1);
 
-		//stringstream text;
+		stringstream text;
 
-		//text << format("%5.1f", p.d);
+		text << format("%5.1f", p.d);
 
-		//if (p.position.x < (image->cols - 40))
-		//{
-		//	putText(*image, text.str(), p.position + Point2f(3, -3),
-		//		FONT_HERSHEY_PLAIN, 1.0f, Scalar(200, 0, 0), 2);
-		//}
+		if (p.position.x < (image->cols - 40))
+		{
+			putText(*image, text.str(), p.position + Point2f(3, -3),
+				FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 2);
+		}
 
 		i++;
 	}
@@ -277,7 +277,7 @@ void keypoints::draw_background_points(cv::Mat* image)
 {
 	for (int n : background_points)
 	{
-		circle(*image, (Point)point[n].position, 8, Scalar(255, 0, 0), 2);
+		circle(*image, (Point)point[n].position, 3, Scalar(255, 0, 0), 2);
 	}
 }
 
@@ -289,38 +289,47 @@ void keypoints::calc_distances_1(Point2f fc)
 	assert(frame_center.x != 0.0 && frame_center.y != 0.0);
 
 	Point2f v(0, 0);
-	//Point2f position(0, 0);
+	Point2f r, l, b;
 	float length_l, length_r;
-	float L = 10.0; // einen Schritt Vorwaerts
+	float L = 5.0; // einen Schritt Vorwaerts
 
 	// TODO bereinigen alte positionen
 
 	for (int i = 0; i < point.size(); i++)
 	{
 
-		Point2f r = point[i].position - frame_center;
+		r =  frame_center - point[i].position;
+
 		length_r = length(r);
+		
+		v = point[i].get_full_flow();
 
-		v = point[i].flow[0];
-
-		if (r.x != 0.0)
+		if (abs(r.x) > 2.0)
 		{
-			length_l = length_r * v.x / r.x;
-
-			if (length_r != 0.0)
-			{
-				point[i].d = L * length_l / length_r + length_l;
-
-				point[i].l = length_l / length_r * r; //TODO andere varianten r = 0 abarbeiten
-
-				point[i].b = v - point[i].l;
-			}
-
+			l = (v.x / r.x) * r;
+		}
+		else if (abs(r.y) > 0.0)
+		{
+			l = (v.y / r.y) * r;
 		}
 		else
 		{
-			length_l = 0.0;
+			cout << "r ist 0.0" << endl;
 		}
+
+		length_l = length(l);
+
+		if (length_l != 0.0)
+		{
+			point[i].d = L * ( length_r / length_l + 1);
+
+			point[i].l = l; //TODO andere varianten r = 0 abarbeiten
+
+			point[i].b = v - l;
+
+		}
+
+
 
 
 

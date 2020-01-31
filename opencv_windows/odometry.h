@@ -27,8 +27,6 @@ using namespace cv;
 using namespace std;
 
 
-
-
 // Klass odometry ermittelt Bewegung des Robots und Abstand zu Schlüsselpunkten
 class odometry
 {
@@ -38,6 +36,7 @@ class odometry
 	vector<int> backround_points_numbers; 
 	Point2f fokus;	// Mittelpunkt vom Bild
 	double frame_time = 0.0;
+	int frame_number = 0;
  	bool needToInitKeypoints = true;
 	Mat gray, prevGray, image;
 	//Mat Affine;
