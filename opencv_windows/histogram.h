@@ -41,6 +41,7 @@ public:
 	vector<point_satz>* bins_group; // Einsortierte Werte in Segmenten
 	int values_index; // Aktuelles fortlaufende Nummer beim Sammeln den Werten
 	float mean;	// Mittelwert
+	float main_mean; //wert wird berechnet in sort, meistens liegende werte 70% //TODO 
 
 	histogram();
 
@@ -57,10 +58,8 @@ public:
 
 	int sort(float range_min, float range_max);	 // Werte einsortieren und Zeichnen	die mitgehen
 	int sort();
-
-	// Histogramm-Mittelwert ausgeben
-	// main_points - verweis auf vektor für punkte d
-	double get_main_middle_value(const vector<int>* main_points);
+	
+	double get_main_middle_value();	// Histogramm-Mittelwert ausgeben
 
 	void clear();  // Werte löschen
 

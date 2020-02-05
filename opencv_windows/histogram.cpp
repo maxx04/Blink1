@@ -6,7 +6,8 @@ histogram::histogram()
 	values_index = 0;
 	window_width = 300;
 	windows_high = 120;
-	mean = 0;
+	mean = 0.0;
+	main_mean = 0.0;
 	windows_h_offset = 10; //base Histogramm
 	plotResult.create(windows_high + windows_h_offset, window_width, CV_8UC3);
 	plotResult.setTo(Scalar(0, 0, 0)); // hintergrund
@@ -76,6 +77,8 @@ int histogram::sort(float rmn, float rmx)
 
 	}
 
+	main_mean = get_main_middle_value();
+
 	plot_result(Point(0, 0));
 
 	return 0;
@@ -86,7 +89,7 @@ int histogram::sort()
 	return sort(range_min, range_max);
 }
 
-double histogram::get_main_middle_value(const vector<int>* main_points)
+double histogram::get_main_middle_value()
 {
 	// Bedinnungen zu finden: max und daneben 70% punkten, mittelwert finden.
 	// TODO verfinern kriterien
@@ -157,6 +160,7 @@ void histogram::clear()
 	values.clear();
 	values_index = 0;
 	mean = 0;
+	main_mean = 0.0;
 	bins_counters.clear();
 
 	range_min = 1e10;
@@ -218,7 +222,7 @@ void histogram::plot_result(Point p)
 
 	stringstream Titel;
 
-	Titel << name << format(" %.1f - %.1f", range_min, range_max);
+	Titel << name << format(" %.1f/%.1f/%.1f", range_min, main_mean, range_max);
 
 	setWindowTitle(name, Titel.str());
 	

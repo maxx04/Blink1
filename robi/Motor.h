@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <math.h>
 #include "gpio_control.h"
-#include "i2c.h"
+//#include "i2c.h"
 
 #define MAX_MOTORS 2
 #include <unistd.h>

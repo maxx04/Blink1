@@ -7,6 +7,7 @@ keypoints::keypoints()
 	hist_angle = histogram(120, "versatzwinkel");
 	hist_length = histogram(50, "versatzlaenge");
 	hist_roll = histogram(50, "roll");
+	hist_step = histogram(20, "step");
 
 	for (size_t i = 0; i < point.size(); i++)	 //OPTI
 	{
@@ -23,6 +24,7 @@ void keypoints::clear(void)
 {
 	point.clear();
 	background_points.clear();
+	ground_points.clear();
 }
 
 float keypoints::distance(Point2f a, Point2f b)
@@ -43,6 +45,11 @@ Point2f keypoints::get_next_summ_vector()
 	main_jitter.pop();
 
 	return sum;
+}
+
+void keypoints::set_fokus(Point2f f)
+{
+	frame_center = f;
 }
 
 int keypoints::kompensate_roll() // wird jedes frame bearbeitet
@@ -94,7 +101,7 @@ int keypoints::kompensate_roll() // wird jedes frame bearbeitet
 
 	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren main backraund bewegung
-	double d = hist_roll.get_main_middle_value(&background_points);
+	double d = hist_roll.main_mean;
 
 	cout << d << endl;
 
@@ -142,7 +149,7 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 
 	//TODO finde hauptdirection: das ist background direction
 	// dabei gut zu markieren die punkten die gehoeren main backraund bewegung
-	double d = hist_angle.get_main_middle_value(&background_points);
+	double d = hist_angle.main_mean;
 
 	hist_angle.clear();
 
@@ -166,7 +173,7 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 	hist_length.sort(hist_length.mean - hist_length.mean * 0.9,
 		hist_length.mean + hist_length.mean * 0.9);
 
-	double v = hist_length.get_main_middle_value(&background_points);
+	double v = hist_length.main_mean;
 
 	hist_length.clear();
 
@@ -200,51 +207,42 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 	return 0;
 }
 
-void keypoints::calc_distances()
+float keypoints::calc_step()
 {
 	float VFOV2 = 19.1 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
 	float H = 118.0; // Kameraabstand vom Boden [mm]
-	float alfa = 5.1 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
-	float V = 720.0; // Anzahl Pixeln vom Bild in vertikale Richtung
-	float U = 1280.0; // Anzahl Pixeln vom Bild in horizontaleale Richtung
+	float alfa = 3.1 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+	float V = 2 * frame_center.y; // Anzahl Pixeln vom Bild in vertikale Richtung
 	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
 	float gamma;
 	float v1;  //Bild koordinate y für vorherige Position
 	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
 
-	//distance_to_cam.clear();
-	numbers_of_downpoints.clear();
-	//step_length.clear();
-	//same_step_pt.clear();
-	hist_roll.clear();
+	hist_step.clear();
 
-	for (int i = 0; i < point.size(); i++)
+	for (int i : ground_points)
 	{
 		float v = point[i].get_position().y; // Bildkoordinaten vom Schlüsselpunkt y
-		float u = point[i].get_position().x; // Bildkoordinaten vom Schlüsselpunkt x
 
-		if (v < V / 2) continue; // wenn obere Bildhälfte dan nicht berechnen
-
-		beta = atan((2.0 * v / V - 1.0) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
+		beta = atan((2.0f * v / V - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
 
 		distance = H / tan(alfa + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
 
-		//distance_to_cam.push_back(distance);
-		numbers_of_downpoints.push_back(i);
+		float v1 = v - point[i].get_flow(0).y;
 
-		float v1 = point[i].get_position().y;
-		//float u1 = prev_points[i].x;
+		beta1 = atan((2.0f * v1 / V - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen
 
-		beta1 = atan((2 * v1 - V) * tan(VFOV2)); // OPTI tan_beta lassen
+		float step =  H / tan(alfa + beta1) - distance;	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
 
-		float l = distance - H / tan(alfa + beta1);	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
+		hist_step.collect({ i, step }); //TODO grenzen verfeinern
 
-		//hist_distance.collect({ i, l }); //TODO grenzen verfeinern
-
-		//step_length.push_back(l);
-
-		return;
 	}
+
+	hist_step.sort();
+
+	float middle_step = hist_step.main_mean;
+
+ 	return middle_step;
 }
 
 void keypoints::draw(cv::Mat* image)
@@ -256,7 +254,7 @@ void keypoints::draw(cv::Mat* image)
 	{
 		circle(*image, (Point)p.position, 3, Scalar(255, 250, 0));
 		line(*image, (Point)p.position, (Point)(magnify * p.l + p.position), Scalar(220, 220, 0), 1);
-		line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 1);
+		line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 2);
 
 		stringstream text;
 
@@ -281,24 +279,30 @@ void keypoints::draw_background_points(cv::Mat* image)
 	}
 }
 
-// berechnen geteilte radiale un transitionale Bewegung
-void keypoints::calc_distances_1(Point2f fc)
+void keypoints::draw_ground_points(cv::Mat* image)
 {
-	frame_center = fc;
+	for (int n : ground_points)
+	{
+		circle(*image, (Point)point[n].position, 4, Scalar(0, 200, 0), 2);
+	}
+}
+
+// berechnen geteilte radiale un transitionale Bewegung
+void keypoints::calc_distances(float step)
+{
+	float L = step; // einen Schritt Vorwaerts
 												 
 	assert(frame_center.x != 0.0 && frame_center.y != 0.0);
 
 	Point2f v(0, 0);
 	Point2f r, l, b;
 	float length_l, length_r;
-	float L = 5.0; // einen Schritt Vorwaerts
 
-	// TODO bereinigen alte positionen
 
 	for (int i = 0; i < point.size(); i++)
 	{
 
-		r =  frame_center - point[i].position;
+		r = point[i].position - frame_center;
 
 		length_r = length(r);
 		
@@ -311,6 +315,8 @@ void keypoints::calc_distances_1(Point2f fc)
 		else if (abs(r.y) > 0.0)
 		{
 			l = (v.y / r.y) * r;
+
+			l.x = 0.0; //HACK
 		}
 		else
 		{
@@ -321,7 +327,7 @@ void keypoints::calc_distances_1(Point2f fc)
 
 		if (length_l != 0.0)
 		{
-			point[i].d = L * ( length_r / length_l + 1);
+			point[i].d = L* (length_r / length_l + 1);
 
 			point[i].l = l; //TODO andere varianten r = 0 abarbeiten
 

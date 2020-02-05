@@ -70,6 +70,8 @@ void odometry::set_fokus(Mat* frame)
 {
 	fokus.x = (float)(frame->cols / 2);
 	fokus.y = (float)(frame->rows / 2); 
+
+	kp.set_fokus(fokus);
 }
 
 void odometry::find_keypoints()
@@ -135,6 +137,8 @@ void odometry::take_picture(Mat* frame)
 	//undistort(*frame, image, cameraMatrix, distCoeffs); //TODO nur auf Punkte anwenden  //HACK
 
 	cvtColor(image, gray, COLOR_BGR2GRAY);	//OPTI kann man vorher machen
+
+	//gray.copyTo(image);	//HACK
 }
 
 void odometry::check_for_followed_points(vector<Point2f>* prev_points, vector<Point2f>* current_points, vector<uchar>* status, vector<float>* err)
@@ -251,6 +255,11 @@ void odometry::draw_background_points()
 	kp.draw_background_points(&image);
 }
 
+void odometry::draw_ground_points()
+{
+	kp.draw_ground_points(&image);
+}
+
 //void odometry::draw_calculated_points()
 //{
 //	for (size_t i = 0; i < kp.calculated_points[0].size(); i++) // TODO was?
@@ -284,7 +293,7 @@ void odometry::draw_summ_vector()
 
 int odometry::draw_image()
 {
-	int time = 30000; //ms
+	int time = 3000; //ms
 
 	// draw Zielpunkt wenn gibt es 
 	//draw_aim_point();
@@ -297,6 +306,8 @@ int odometry::draw_image()
 	draw_keypoints();
 
 	draw_background_points();
+
+	draw_ground_points();
 
 	//draw_nearest_point();
 
@@ -348,22 +359,29 @@ void odometry::swap()
 
 bool odometry::key(int wait)
 {
-	char c = (char)waitKey(wait);
+	static int  wait_time = 0;
+
+	char c = (char)waitKey(wait_time);
 
 	if (c == 27) return true;
 
 	switch (c)
 	{
+
+	case 's':
+		wait_time = 0;
+		break;
+
+	case 'g':
+		wait_time = 1000;
+		break;
+
 	case 'r':
 		needToInitKeypoints = true;
 		break;
 
-	case 'c':
-		kp.clear();
+	default:
 		break;
-
-	//case 'k':
-	//	cam_calibrate();
 	}
 
 	return false;
@@ -434,7 +452,7 @@ void odometry::look_to_aim()
 //	return n;
 //}
 
-void odometry::find_backround_points()
+void odometry::find_background_points()
 {
 	int index = 0;
 	Point2f d;
@@ -451,6 +469,28 @@ void odometry::find_backround_points()
 			kp.background_points.push_back(index);
 		}
 			
+		index++;
+	}
+
+}
+
+void odometry::find_ground_points()
+{
+	int index = 0;
+	Point2f d;
+	int l = 300;
+
+	kp.ground_points.clear();
+
+	for (keypoint p : kp.point)
+	{
+		d = p.get_position();
+
+		if (d.y > 2*fokus.y - l && d.x < fokus.x + l && d.x > fokus.x - l)
+		{
+			kp.ground_points.push_back(index);
+		}
+
 		index++;
 	}
 
@@ -522,6 +562,9 @@ void odometry::draw_flow()
 //
 bool odometry::proceed_video(Mat* frame)
 {
+
+	int wait_t = 0;
+
 	take_picture(frame);
 
 	frame_number++;
@@ -530,26 +573,30 @@ bool odometry::proceed_video(Mat* frame)
 
 	if (needToInitKeypoints)
 	{
-		find_keypoints_FAST();
-		//find_keypoints();
+		//find_keypoints_FAST();
+		find_keypoints();
 		needToInitKeypoints = false;
 		return false;
 	}
 
 	find_followed_points();
 
-	find_backround_points();
+	find_background_points();
+
+	find_ground_points();
 
 	kompensate_jitter();
 	//kompensate_roll();
 
-	kp.calc_distances_1(fokus);
+	float step = kp.calc_step();
+
+	kp.calc_distances(step);
 
 	//	transform_Affine();
 
-	int wait_time = draw_image();
+	draw_image();
 
-	if (key(wait_time)) return true;
+	if (key(wait_t)) return true;
 
 	return false;
 }

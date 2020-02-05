@@ -62,7 +62,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <SourcePath>~/i2clib</SourcePath>
-    <ProjectPublicIncludePath>~/JetsonGPIO/include</ProjectPublicIncludePath>
+    <ProjectPublicIncludePath>/usr/include/opencv4;~/JetsonGPIO/include</ProjectPublicIncludePath>
     <AdditionalSourcesToCopyMapping>$(SolutionDir)UDP_Base.h:=$(RemoteProjectDir)/UDP_Base.h;$(SolutionDir)UDP_Base.cpp:=$(RemoteProjectDir)/UDP_Base.cpp;$(SolutionDir)xsocket.hpp:=$(RemoteProjectDir)/xsocket.hpp</AdditionalSourcesToCopyMapping>
     <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);</SourcesToCopyRemotelyOverride>
     <IncludePath>/usr/local/include/opencv4;~/libi2c</IncludePath>
@@ -106,6 +106,9 @@
       <UnresolvedSymbolReferences>true</UnresolvedSymbolReferences>
       <Trace>true</Trace>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>/usr/include/opencv4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

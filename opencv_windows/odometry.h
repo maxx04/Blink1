@@ -49,7 +49,9 @@ class odometry
 public:
 	odometry(Mat* frame);
 	~odometry();
+
 	void set_fokus(Mat* frame);
+
 	void take_picture(Mat* frame);	// Bildvorbereitung
 	void find_keypoints();
 	void find_keypoints_FAST();
@@ -63,6 +65,7 @@ public:
 	void find_followed_points();
 	void draw_keypoints();
 	void draw_background_points();
+	void draw_ground_points();
 	void draw_main_points();
 	void draw_summ_vector();
 	int draw_image();
@@ -71,7 +74,8 @@ public:
 	void kompensate_roll();
 	void swap();
 	bool key(int wait);
-	void find_backround_points();
+	void find_background_points();
+	void find_ground_points();
 	void draw_flow();
 	bool proceed_video(Mat* frame);
 	void new_data_proceed(UDP_Base* udp_base);
