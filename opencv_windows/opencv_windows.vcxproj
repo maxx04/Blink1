@@ -55,6 +55,7 @@
     <ClInclude Include="histogram.h" />
     <ClInclude Include="keypoint.h" />
     <ClInclude Include="keypoints.h" />
+    <ClInclude Include="odomap.h" />
     <ClInclude Include="odometry.h" />
   </ItemGroup>
   <ItemGroup>
@@ -62,7 +63,11 @@
     <ClCompile Include="histogram.cpp" />
     <ClCompile Include="keypoint.cpp" />
     <ClCompile Include="keypoints.cpp" />
+    <ClCompile Include="odomap.cpp" />
     <ClCompile Include="odometry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\robi\default.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

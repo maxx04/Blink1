@@ -42,7 +42,6 @@
     <ClInclude Include="..\UDP_Base.h" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="default.xml" />
     <Xml Include="out_camera_data.xml" />
   </ItemGroup>
   <ItemGroup>

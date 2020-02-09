@@ -138,6 +138,11 @@ void proceed_video(std::string& input)
 		//cap.get(cv::CAP_PROP_FRAME_WIDTH); //1280
 		//cap.get(cv::CAP_PROP_FRAME_HEIGHT); //720
 
+	for (size_t i = 0; i < 30; i++)
+	{
+		cap.read(vframe);
+	}
+
 
 	while (true)
 	{
@@ -149,6 +154,8 @@ void proceed_video(std::string& input)
 
 		// dann zurueck zu frames
 	}
+
+	waitKey(0);
 }
 
 int receive_frame(net::socket& sock, net::endpoint& ep, cv::Mat& frame)

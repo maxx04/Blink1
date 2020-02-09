@@ -94,7 +94,6 @@
     <ClInclude Include="Servos.h" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="default.xml" />
     <Xml Include="out_camera_data.xml" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">

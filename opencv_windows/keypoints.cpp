@@ -209,12 +209,11 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 
 float keypoints::calc_step()
 {
-	float VFOV2 = 19.1 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
+	float VFOV2 = 14.8997 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
 	float H = 118.0; // Kameraabstand vom Boden [mm]
-	float alfa = 3.1 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+	float alfa = 3.8357 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
 	float V = 2 * frame_center.y; // Anzahl Pixeln vom Bild in vertikale Richtung
 	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
-	float gamma;
 	float v1;  //Bild koordinate y für vorherige Position
 	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
 
@@ -262,8 +261,8 @@ void keypoints::draw(cv::Mat* image)
 
 		if (p.position.x < (image->cols - 40))
 		{
-			putText(*image, text.str(), p.position + Point2f(3, -3),
-				FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 2);
+			//putText(*image, text.str(), p.position + Point2f(3, -3),
+				//FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 2);
 		}
 
 		i++;

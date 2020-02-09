@@ -11,6 +11,7 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 	if (event == EVENT_LBUTTONDOWN)
 	{
 		AimPoint = Point2f((float)x, (float)(y));
+		cout << AimPoint << endl;
 		setAimPt = true;
 	}
 }
@@ -20,7 +21,8 @@ odometry::odometry(Mat* frame)
 {
 	needToInitKeypoints = true;
 	step_butch = 3;
-	magnify_vektor_draw = 2;
+	magnify_vektor_draw = 1;
+
 
 	set_fokus(frame);
 
@@ -44,6 +46,9 @@ odometry::odometry(Mat* frame)
 	{
 		
 		ks["camera_matrix"] >> cameraMatrix;
+
+		cout << cameraMatrix << endl;
+
 		ks["distortion_coefficients"] >> distCoeffs; //TODO
 
 		if (cameraMatrix.at<double>(0, 2) != fokus.x || cameraMatrix.at<double>(1, 2) != fokus.y)
@@ -291,6 +296,12 @@ void odometry::draw_summ_vector()
 	};
 }
 
+void odometry::draw_map()
+{
+	map.draw_map();
+
+}
+
 int odometry::draw_image()
 {
 	int time = 3000; //ms
@@ -314,6 +325,8 @@ int odometry::draw_image()
 	draw_flow();
 
 	draw_summ_vector();
+
+	draw_map();
 
 	//time = 0;
 
@@ -456,7 +469,7 @@ void odometry::find_background_points()
 {
 	int index = 0;
 	Point2f d;
-	int l = 300;
+	int l = 100;
 
 	kp.background_points.clear();
 
@@ -464,7 +477,7 @@ void odometry::find_background_points()
 	{
 		d = p.get_position();
 
-		if (d.y < l  && d.x < fokus.x + l && d.x > fokus.x - l)
+		if (d.y < fokus.y  && d.x < fokus.x + l && d.x > fokus.x - l)
 		{
 			kp.background_points.push_back(index);
 		}
@@ -592,7 +605,21 @@ bool odometry::proceed_video(Mat* frame)
 
 	kp.calc_distances(step);
 
-	//	transform_Affine();
+	float fl = cameraMatrix.at<double>(0, 0);
+	static float winkel = 0.0;
+	float vy, vx;
+
+	if (step < 30.0f && step > -30.0f)
+	{
+		//vy = step /  fl * main_of_frame.x;
+		winkel += atan(main_of_frame.x / fl) * 180.0 / M_PI;
+		cout << main_of_frame.x << "|" << winkel << endl;
+		vy = step * cos(winkel / 180.0 * M_PI);
+		vx = step * sin(winkel / 180.0 * M_PI);
+		map.add_step(Point2f(vx, vy));
+	}
+
+	//transform_Affine();
 
 	draw_image();
 

@@ -27,6 +27,9 @@
     <ClInclude Include="odometry.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="odomap.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="keypoint.cpp">
@@ -44,5 +47,13 @@
     <ClCompile Include="odometry.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="odomap.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\robi\default.xml">
+      <Filter>Ressourcendateien</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

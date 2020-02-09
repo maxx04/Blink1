@@ -201,6 +201,7 @@ void histogram::plot_result(Point p)
 	{
 		//TODO Assert hinzufügen
 		cerr << "keine Werte fuer Histogramm" << endl;
+		main_mean = 0.0;
 		return;
 	}
 

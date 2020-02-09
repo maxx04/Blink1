@@ -21,6 +21,7 @@
 
 #include "keypoints.h"
 #include "histogram.h"
+#include "odomap.h"
 
 
 using namespace cv;
@@ -31,19 +32,22 @@ using namespace std;
 class odometry
 {
 	const string main_window_name = "Frame"; // Name für die Fenster die aktuelles Frame darstellt
+
 	int step_butch; // anzahl frames die auf block werden bearbeitet.
-	// punktnummern in keypoints : vector POINTS die sind als Hintegrund angenommen
-	vector<int> backround_points_numbers; 
 	Point2f fokus;	// Mittelpunkt vom Bild
-	double frame_time = 0.0;
+	//double frame_time = 0.0;
 	int frame_number = 0;
  	bool needToInitKeypoints = true;
 	Mat gray, prevGray, image;
+
 	//Mat Affine;
 	Mat cameraMatrix;
 	Mat distCoeffs;
+
+	odomap map; // Bewegungsabbildung in 2d
+
 	keypoints kp; // keypoints von 
-	Point2f main_of_frame; // Ergebnissvektor fur 2d Bildverschiebung
+	Point2f main_of_frame; // aktuelle Ergebnissvektor fur 2d Bildverschiebung
 	float magnify_vektor_draw;
 
 public:
@@ -68,6 +72,7 @@ public:
 	void draw_ground_points();
 	void draw_main_points();
 	void draw_summ_vector();
+	void draw_map();
 	int draw_image();
 	void show_image();
 	void kompensate_jitter();
