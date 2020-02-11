@@ -1,8 +1,6 @@
 #pragma once
 #pragma warning(disable : 4996)
 
-
-
 #include <iostream>
 #include <string>
 #include <ctime>
@@ -31,11 +29,19 @@ using namespace std;
 // Klass odometry ermittelt Bewegung des Robots und Abstand zu Schlüsselpunkten
 class odometry
 {
+
+	//friend class keypoints; //HACK 
+
+	float focal_length;
+	float VFOV2; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
+	float cam_v_distance; // Kameraabstand vom Boden [mm]
+	float cam_pitch;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+
 	const string main_window_name = "Frame"; // Name für die Fenster die aktuelles Frame darstellt
 
 	int step_butch; // anzahl frames die auf block werden bearbeitet.
 	Point2f fokus;	// Mittelpunkt vom Bild
-	//double frame_time = 0.0;
+
 	int frame_number = 0;
  	bool needToInitKeypoints = true;
 	Mat gray, prevGray, image;
@@ -66,7 +72,7 @@ public:
 	void check_for_followed_points(vector<Point2f>* prev_points, vector<Point2f>* current_points, 
 		vector<uchar>* status, vector<float>* err);
 
-	void find_followed_points();
+
 	void draw_keypoints();
 	void draw_background_points();
 	void draw_ground_points();
@@ -74,16 +80,27 @@ public:
 	void draw_summ_vector();
 	void draw_map();
 	int draw_image();
+	void draw_flow();
+
 	void show_image();
+
 	void kompensate_jitter();
 	void kompensate_roll();
+
 	void swap();
 	bool key(int wait);
+
+	float calc_step();
+	void calc_distances(float step);  // berechnet distanz vom kamera zu punkten vor dem step Bewegung
+
 	void find_background_points();
 	void find_ground_points();
-	void draw_flow();
+	void find_followed_points();
+
 	bool proceed_video(Mat* frame);
 	void new_data_proceed(UDP_Base* udp_base);
+
+	
 
 };
 

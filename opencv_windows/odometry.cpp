@@ -16,14 +16,8 @@ static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 	}
 }
 
-
 odometry::odometry(Mat* frame)
 {
-	needToInitKeypoints = true;
-	step_butch = 3;
-	magnify_vektor_draw = 1;
-
-
 	set_fokus(frame);
 
 	FileStorage ks("../out_camera_data.xml", FileStorage::READ); // Read the settings
@@ -61,6 +55,14 @@ odometry::odometry(Mat* frame)
 
 	}
 
+	focal_length = cameraMatrix.at<double>(0, 0);
+	VFOV2 = atan(fokus.y / focal_length); 
+	cam_v_distance = 118.0; 
+	cam_pitch = 3.8357 * M_PI / 180.0;  
+	needToInitKeypoints = true;
+	step_butch = 3;
+	magnify_vektor_draw = 1;
+
 	namedWindow(main_window_name, WINDOW_NORMAL | WINDOW_KEEPRATIO );
 
 	setMouseCallback(main_window_name, onMouse, 0);
@@ -76,7 +78,6 @@ void odometry::set_fokus(Mat* frame)
 	fokus.x = (float)(frame->cols / 2);
 	fokus.y = (float)(frame->rows / 2); 
 
-	kp.set_fokus(fokus);
 }
 
 void odometry::find_keypoints()
@@ -286,14 +287,15 @@ void odometry::draw_summ_vector()
 	Point2f p1, p2, p3;
 	p2 = fokus;
 
-	while (!kp.summ_queue_empty())
+	for (Point2f p: kp.main_jitter)
 	{
-		p3 = p2 + magnify_vektor_draw * kp.get_next_summ_vector();
+		p3 = p2 + magnify_vektor_draw * p;
 
 		line(image, (Point)p2, (Point)p3, Scalar(220, 220, 0), 3);
 		circle(image, (Point)p2, 3, Scalar(0, 255, 0), 3);
 		p2 = p3;
-	};
+	}
+
 }
 
 void odometry::draw_map()
@@ -465,6 +467,87 @@ void odometry::look_to_aim()
 //	return n;
 //}
 
+float odometry::calc_step()
+{
+
+	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
+	float v1;  //Bild koordinate y für vorherige Position
+	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
+
+	kp.hist_step.clear();
+
+	for (int i : kp.ground_points)
+	{
+		float v = kp.point[i].get_position().y; // Bildkoordinaten vom Schlüsselpunkt y
+
+		beta = atan(( v / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
+
+		distance = cam_v_distance / tan(cam_pitch + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
+
+		float v1 = v - kp.point[i].get_flow(0).y;
+
+		beta1 = atan((v1 / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen
+
+		float step = cam_v_distance / tan(cam_pitch + beta1) - distance;	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
+
+		kp.hist_step.collect({ i, step }); //TODO grenzen verfeinern
+
+	}
+
+	kp.hist_step.sort();
+
+	float middle_step = kp.hist_step.main_mean;
+
+	return middle_step;
+}
+
+void odometry::calc_distances(float step)
+{
+	float L = step; // einen Schritt Vorwaerts
+
+	assert(fokus.x != 0.0 && fokus.y != 0.0);
+
+	Point2f v(0, 0);
+	Point2f r, l, b;
+	float length_l, length_r;
+
+
+	for (int i = 0; i < kp.point.size(); i++)
+	{
+
+		r = kp.point[i].get_position() - fokus;
+
+		length_r = kp.length(r);
+
+		v = kp.point[i].get_full_flow();
+
+		if (abs(r.x) > 2.0)
+		{
+			l = (v.x / r.x) * r;
+		}
+		else if (abs(r.y) > 0.0)
+		{
+			l = (v.y / r.y) * r;
+
+			l.x = 0.0; //HACK
+		}
+		else
+		{
+			cout << "r ist 0.0" << endl;
+		}
+
+		length_l = kp.length(l);
+
+		if (length_l != 0.0)
+		{
+			kp.point[i].set_vectors(l, v - l, L * (length_r / length_l + 1));
+		}
+
+	}
+
+	return;
+}
+
 void odometry::find_background_points()
 {
 	int index = 0;
@@ -483,6 +566,11 @@ void odometry::find_background_points()
 		}
 			
 		index++;
+	}
+
+	if (index == 0)
+	{
+		needToInitKeypoints = true;
 	}
 
 }
@@ -505,6 +593,11 @@ void odometry::find_ground_points()
 		}
 
 		index++;
+	}
+
+	if (index == 0)
+	{
+		needToInitKeypoints = true;
 	}
 
 }
@@ -601,9 +694,9 @@ bool odometry::proceed_video(Mat* frame)
 	kompensate_jitter();
 	//kompensate_roll();
 
-	float step = kp.calc_step();
+	float step = calc_step();
 
-	kp.calc_distances(step);
+	calc_distances(step);
 
 	float fl = cameraMatrix.at<double>(0, 0);
 	static float winkel = 0.0;

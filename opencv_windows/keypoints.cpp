@@ -2,7 +2,6 @@
 
 keypoints::keypoints()
 {
-	frame_center = Point2f(0, 0);
 
 	hist_angle = histogram(120, "versatzwinkel");
 	hist_length = histogram(50, "versatzlaenge");
@@ -27,29 +26,14 @@ void keypoints::clear(void)
 	ground_points.clear();
 }
 
-float keypoints::distance(Point2f a, Point2f b)
+inline float keypoints::distance(Point2f a, Point2f b)
 {
 	return sqrt(pow((a.x - b.x), 2) + pow((a.y - b.y), 2));
 }
 
-float keypoints::length(Point2f a)
+inline float keypoints::length(Point2f a)
 {
 	return sqrt(pow((a.x), 2) + pow((a.y), 2));
-}
-
-Point2f keypoints::get_next_summ_vector()
-{
-	Point2f sum;
-
-	sum = main_jitter.front();
-	main_jitter.pop();
-
-	return sum;
-}
-
-void keypoints::set_fokus(Point2f f)
-{
-	frame_center = f;
 }
 
 int keypoints::kompensate_roll() // wird jedes frame bearbeitet
@@ -127,8 +111,6 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 {
 	Point2f p, main, tmp;
 
-	//int i = 0;
-
 	for (int n : background_points)
 	{
 		p = point[n].get_flow(0); //OPTI mehrmals woanders durchgefuehrt
@@ -142,7 +124,6 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 
 		if (p.x != 0.0)	hist_angle.collect(point_satz{ n, (float)d }); // TODO assert
 
-		//i++;
 	}
 
 	hist_angle.sort(0, 360);
@@ -192,11 +173,11 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 	// Wenn bewegung ist 0
 	if (v == 0.0)
 	{
-		main_jitter.push(Point2f(0, 0));
+		main_jitter.push_back(Point2f(0, 0));
 		return	0;
 	}
 
-	main_jitter.push(main);
+	main_jitter.push_back(main);
 
 	// Kompensieren jitter
 	for (int i = 0; i < point.size(); i++)
@@ -205,43 +186,6 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 	}
 
 	return 0;
-}
-
-float keypoints::calc_step()
-{
-	float VFOV2 = 14.8997 * M_PI / 180.0; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
-	float H = 118.0; // Kameraabstand vom Boden [mm]
-	float alfa = 3.8357 * M_PI / 180.0;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
-	float V = 2 * frame_center.y; // Anzahl Pixeln vom Bild in vertikale Richtung
-	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
-	float v1;  //Bild koordinate y für vorherige Position
-	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
-
-	hist_step.clear();
-
-	for (int i : ground_points)
-	{
-		float v = point[i].get_position().y; // Bildkoordinaten vom Schlüsselpunkt y
-
-		beta = atan((2.0f * v / V - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
-
-		distance = H / tan(alfa + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
-
-		float v1 = v - point[i].get_flow(0).y;
-
-		beta1 = atan((2.0f * v1 / V - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen
-
-		float step =  H / tan(alfa + beta1) - distance;	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
-
-		hist_step.collect({ i, step }); //TODO grenzen verfeinern
-
-	}
-
-	hist_step.sort();
-
-	float middle_step = hist_step.main_mean;
-
- 	return middle_step;
 }
 
 void keypoints::draw(cv::Mat* image)
@@ -259,11 +203,8 @@ void keypoints::draw(cv::Mat* image)
 
 		text << format("%5.1f", p.d);
 
-		if (p.position.x < (image->cols - 40))
-		{
 			//putText(*image, text.str(), p.position + Point2f(3, -3),
 				//FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 2);
-		}
 
 		i++;
 	}
@@ -284,74 +225,5 @@ void keypoints::draw_ground_points(cv::Mat* image)
 	{
 		circle(*image, (Point)point[n].position, 4, Scalar(0, 200, 0), 2);
 	}
-}
 
-// berechnen geteilte radiale un transitionale Bewegung
-void keypoints::calc_distances(float step)
-{
-	float L = step; // einen Schritt Vorwaerts
-												 
-	assert(frame_center.x != 0.0 && frame_center.y != 0.0);
-
-	Point2f v(0, 0);
-	Point2f r, l, b;
-	float length_l, length_r;
-
-
-	for (int i = 0; i < point.size(); i++)
-	{
-
-		r = point[i].position - frame_center;
-
-		length_r = length(r);
-		
-		v = point[i].get_full_flow();
-
-		if (abs(r.x) > 2.0)
-		{
-			l = (v.x / r.x) * r;
-		}
-		else if (abs(r.y) > 0.0)
-		{
-			l = (v.y / r.y) * r;
-
-			l.x = 0.0; //HACK
-		}
-		else
-		{
-			cout << "r ist 0.0" << endl;
-		}
-
-		length_l = length(l);
-
-		if (length_l != 0.0)
-		{
-			point[i].d = L* (length_r / length_l + 1);
-
-			point[i].l = l; //TODO andere varianten r = 0 abarbeiten
-
-			point[i].b = v - l;
-
-		}
-
-
-
-
-
-		//distance_to_cam.push_back(distance);
-		//numbers_of_downpoints.push_back(i);
-
-		//hist_distance.collect({ i, l }); //TODO grenzen verfeinern
-
-		//step_length.push_back(length_l);
-	}
-
-
-	//hist_distance.range_max = 100;
-	//hist_distance.range_min = -100;
-	//hist_distance.sort();
-
-	//float lr = hist_distance.get_main_middle_value(&same_step_pt);	// Mittelwert für Weg
-
-	return;
 }
