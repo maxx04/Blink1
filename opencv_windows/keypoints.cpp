@@ -8,10 +8,10 @@ keypoints::keypoints()
 	hist_roll = histogram(50, "roll");
 	hist_step = histogram(20, "step");
 
-	for (size_t i = 0; i < point.size(); i++)	 //OPTI
-	{
-		point[i].set_flow(Point2f(0, 0));
-	}
+	//for (size_t i = 0; i < point.size(); i++)	 //OPTI
+	//{
+	//	point[i].set_flow(Point2f(0, 0));
+	//}
 }
 
 keypoints::~keypoints()
@@ -22,6 +22,7 @@ keypoints::~keypoints()
 void keypoints::clear(void)
 {
 	point.clear();
+	keypoint::current_step = 0; // HACK Fuellung ueberwachen
 	background_points.clear();
 	ground_points.clear();
 }
@@ -188,23 +189,50 @@ int keypoints::kompensate_jitter() // wird jedes frame bearbeitet
 	return 0;
 }
 
-void keypoints::draw(cv::Mat* image)
+int keypoints::check_trajektory()
 {
-	int i = 0;
-	float magnify = 2.0;
+
+	// die punkte die kann man folgen werden gezählt 
+	// und kopiert in point
+
+	int index = 0;
+
 
 	for (keypoint p : point)
 	{
-		circle(*image, (Point)p.position, 3, Scalar(255, 250, 0));
-		line(*image, (Point)p.position, (Point)(magnify * p.l + p.position), Scalar(220, 220, 0), 1);
-		line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 2);
+
+		if (p.check_for_line())
+		{
+			point[index] = p;
+
+			index++;
+		}
+
+	}
+
+	point.resize(index);
+
+	//wenn weniger als 100 Punkten dann neue Punkte erstellen.
+	return index;
+
+}
+
+void keypoints::draw(cv::Mat* image)
+{
+	int i = 0;
+
+	for (keypoint p : point)
+	{
+		//circle(*image, (Point)p.position, 3, Scalar(255, 250, 0));
+		//line(*image, (Point)p.position, (Point)(magnify * p.l + p.position), Scalar(220, 220, 0), 1);
+		//line(*image, (Point)p.position, (Point)(magnify * p.b + p.position), Scalar(0, 220, 200), 2);
 
 		stringstream text;
 
 		text << format("%5.1f", p.d);
 
 			//putText(*image, text.str(), p.position + Point2f(3, -3),
-				//FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 2);
+			//	FONT_HERSHEY_PLAIN, 1.0f, Scalar(0, 0, 0), 1);
 
 		i++;
 	}
@@ -215,7 +243,7 @@ void keypoints::draw_background_points(cv::Mat* image)
 {
 	for (int n : background_points)
 	{
-		circle(*image, (Point)point[n].position, 3, Scalar(255, 0, 0), 2);
+		circle(*image, (Point)point[n].position, 4, Scalar(255, 0, 0), 1);
 	}
 }
 
@@ -223,7 +251,7 @@ void keypoints::draw_ground_points(cv::Mat* image)
 {
 	for (int n : ground_points)
 	{
-		circle(*image, (Point)point[n].position, 4, Scalar(0, 200, 0), 2);
+		circle(*image, (Point)point[n].position, 4, Scalar(0, 200, 0), 1);
 	}
 
 }

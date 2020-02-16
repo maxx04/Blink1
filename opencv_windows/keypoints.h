@@ -26,6 +26,7 @@ class keypoints
 	
 public:
 	const int MAX_COUNT = 800; // Maksimale Anzahl den Punkten die werden berücksichtigt
+	float magnify = 3.0;
 
 	vector<Point2f> main_jitter;	// Reihe für 2d Vektors den resultierendes Bildverschiebung
 	vector<keypoint> point; // Schlüsselpunkte selber
@@ -47,6 +48,8 @@ public:
 
  	int kompensate_roll();
 	int kompensate_jitter();
+
+	int check_trajektory();
 
 	void draw(cv::Mat* image);
 	void draw_background_points(cv::Mat* image);

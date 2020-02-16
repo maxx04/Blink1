@@ -144,11 +144,10 @@ void proceed_video(std::string& input)
 	}
 
 
-	while (true)
-	{
-		cap.read(vframe);
+	PC.take_picture(&vframe);
 
-		if (vframe.rows == 0) break;  //OPTI mehr proffesionel machen
+	while (cap.read(vframe))
+	{
 
 		if (PC.proceed_video(&vframe)) break;
 

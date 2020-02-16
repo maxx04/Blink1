@@ -29,6 +29,9 @@ using namespace std;
 // Klass odometry ermittelt Bewegung des Robots und Abstand zu Schlüsselpunkten
 class odometry
 {
+	const int min_background_points = 3;
+	const int min_ground_points = 20;
+	const int min_followed_points = 100;
 
 	//friend class keypoints; //HACK 
 
@@ -36,11 +39,11 @@ class odometry
 	float VFOV2; // Vertikale Kameraansichtwinkel geteilt auf  [radian]
 	float cam_v_distance; // Kameraabstand vom Boden [mm]
 	float cam_pitch;  // Winkel zwischen Bodenebene und Horizotale Kameraebene [radian]
+	float yaw_angle;  // roboter Azimut Winkel
 
 	const string main_window_name = "Frame"; // Name für die Fenster die aktuelles Frame darstellt
 
-	int step_butch; // anzahl frames die auf block werden bearbeitet.
-	Point2f fokus;	// Mittelpunkt vom Bild
+	Point2f fokus;	// Mittelpunkt vom Bild	- "principial point"
 
 	int frame_number = 0;
  	bool needToInitKeypoints = true;
@@ -76,7 +79,7 @@ public:
 	void draw_keypoints();
 	void draw_background_points();
 	void draw_ground_points();
-	void draw_main_points();
+	//void draw_main_points();
 	void draw_summ_vector();
 	void draw_map();
 	int draw_image();
@@ -98,6 +101,7 @@ public:
 	void find_followed_points();
 
 	bool proceed_video(Mat* frame);
+	void find_yaw(float step);
 	void new_data_proceed(UDP_Base* udp_base);
 
 	

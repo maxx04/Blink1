@@ -4,7 +4,7 @@
 static bool setAimPt = false;
 static Point2f AimPoint;
 
-#define MIN_FOLLOWED_POINTS 100
+
 
 static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
 {
@@ -38,12 +38,14 @@ odometry::odometry(Mat* frame)
 	}
 	else
 	{
-		
+
 		ks["camera_matrix"] >> cameraMatrix;
 
-		cout << cameraMatrix << endl;
+
 
 		ks["distortion_coefficients"] >> distCoeffs; //TODO
+
+		cout << cameraMatrix << endl << distCoeffs << endl;
 
 		if (cameraMatrix.at<double>(0, 2) != fokus.x || cameraMatrix.at<double>(1, 2) != fokus.y)
 		{
@@ -56,14 +58,14 @@ odometry::odometry(Mat* frame)
 	}
 
 	focal_length = cameraMatrix.at<double>(0, 0);
-	VFOV2 = atan(fokus.y / focal_length); 
-	cam_v_distance = 118.0; 
-	cam_pitch = 3.8357 * M_PI / 180.0;  
+	VFOV2 = atan(fokus.y / focal_length);
+	cam_v_distance = 118.0;
+	cam_pitch = 3.8357 * M_PI / 180.0;
+	yaw_angle = 0.0;
 	needToInitKeypoints = true;
-	step_butch = 3;
-	magnify_vektor_draw = 1;
+	magnify_vektor_draw = 3;
 
-	namedWindow(main_window_name, WINDOW_NORMAL | WINDOW_KEEPRATIO );
+	namedWindow(main_window_name, WINDOW_NORMAL | WINDOW_KEEPRATIO);
 
 	setMouseCallback(main_window_name, onMouse, 0);
 
@@ -76,13 +78,13 @@ odometry::~odometry()
 void odometry::set_fokus(Mat* frame)
 {
 	fokus.x = (float)(frame->cols / 2);
-	fokus.y = (float)(frame->rows / 2); 
+	fokus.y = (float)(frame->rows / 2);
 
 }
 
 void odometry::find_keypoints()
 {
-	vector<Point2f> key_points;
+	vector<Point2f> key_points;// , key_points_ud;
 
 	// Terminate Kriterium
 	TermCriteria termcrit = TermCriteria(TermCriteria::COUNT | TermCriteria::EPS, 10, 0.03);
@@ -90,35 +92,40 @@ void odometry::find_keypoints()
 	Size subPixWinSize = Size(18, 18);
 
 	//finde features
-	goodFeaturesToTrack(gray, key_points, kp.MAX_COUNT, 0.03, 10, Mat(), 15, 5);
+	goodFeaturesToTrack(prevGray, key_points, kp.MAX_COUNT, 0.03, 10, Mat(), 15, 5);
 
 	//refine position
-	cornerSubPix(gray, key_points, subPixWinSize, Size(-1, -1), termcrit);
+	cornerSubPix(prevGray, key_points, subPixWinSize, Size(-1, -1), termcrit);
 
-	// automatic initialization
+	//	undistortPoints(key_points, key_points_ud, cameraMatrix, distCoeffs); //HACK
+
+		// automatic initialization
 	kp.clear();
 
 	// fülle keypunkte
 	for (Point2f p : key_points)
-	{											  
+	{
 		kp.point.push_back(keypoint(p));
 	}
 
-	
+
 }
 
 void odometry::find_keypoints_FAST()
 {   //uses FAST as of now, modify parameters as necessary
 	vector<KeyPoint> keypoints_1;
-	vector<Point2f> key_points;
+	vector<Point2f> key_points;// , key_points_ud;
 
 	int fast_threshold = 20;
 	bool nonmaxSuppression = true;
 
-	AGAST(gray, keypoints_1, fast_threshold, nonmaxSuppression, AgastFeatureDetector::OAST_9_16);
+	AGAST(prevGray, keypoints_1, fast_threshold, nonmaxSuppression, AgastFeatureDetector::OAST_9_16);
 	//FAST(gray, keypoints_1, fast_threshold, nonmaxSuppression);
 
 	KeyPoint::convert(keypoints_1, key_points, vector<int>());
+
+	//HACK nur notwendige punkte in Zukunft benutzen
+	//undistortPoints(key_points, key_points_ud, cameraMatrix, distCoeffs); 
 
 	// automatic initialization
 	kp.clear();
@@ -135,7 +142,7 @@ void odometry::take_picture(Mat* frame)
 {
 	if (frame->empty())	return; //TODO Fehlerabarbeitung
 
-	swap();	// vorbereite vorherige Punkte für nächste Berechnung
+	cv::swap(gray, prevGray); // erhalte vorheriges Bild 
 
 	//kopieren in Abbildung
 	frame->copyTo(image);
@@ -148,11 +155,12 @@ void odometry::take_picture(Mat* frame)
 }
 
 void odometry::check_for_followed_points(vector<Point2f>* prev_points, vector<Point2f>* current_points, vector<uchar>* status, vector<float>* err)
-{															      
+{
 	int number_followed_points = 0;
 
 	// die punkte die kann man folgen werden gezählt 
 	// und kopiert in point
+
 	int index = 0;
 	int n = 0;
 	keypoint p;
@@ -162,23 +170,18 @@ void odometry::check_for_followed_points(vector<Point2f>* prev_points, vector<Po
 		if (st == 1)	// Punkt ist in Ordnung
 		{
 			p = kp.point[n];
+
 			//letzte punkte in point
-			p.set_position((*current_points)[n]);
+			p.set_position((*current_points)[n]); //OPTI nur einmal uebergeben current
 			//Verschiebe alte Werte
 			p.shift_flow();
 			//berechne aktuelle Verschiebung
 			p.set_flow((*current_points)[n] - (*prev_points)[n]);
 
 			kp.point[index] = p;
-			//kp.prev_points[index] = kp.current_points[n];
-			//kp.prev_points[index] = kp.prev_points[n];
 
 			index++;
 			number_followed_points++;
-		}			
-		else
-		{
-			;
 		}
 
 		n++;
@@ -186,16 +189,16 @@ void odometry::check_for_followed_points(vector<Point2f>* prev_points, vector<Po
 
 	kp.point.resize(index);
 
-	//TODO Punkte auf Linie ueberpruefen
+	kp.point[0].set_step();	// setzen befuellungsgrad vom flow
 
 	//wenn weniger als 100 Punkten dann neue Punkte erstellen.
-	if (number_followed_points < MIN_FOLLOWED_POINTS) needToInitKeypoints = true; 
+	if (number_followed_points < min_followed_points) needToInitKeypoints = true;
 }
 
 void odometry::find_followed_points()
 {
 	// Terminate Kriterium für die LukasKande
-	TermCriteria termcrit = TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 0.01);
+	TermCriteria termcrit = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 30, 0.01);
 
 	Size  winSize = Size(21, 21);  // SubWindow für LukasKande
 
@@ -212,7 +215,7 @@ void odometry::find_followed_points()
 	{
 		prev_points.push_back(p.get_position());
 	}
-	
+
 	if (!prev_points.empty())
 	{
 		//if (prevGray.empty()) gray.copyTo(prevGray); // Absicherung
@@ -225,7 +228,7 @@ void odometry::find_followed_points()
 		//cout << "calc " << timeSec << " sec " << "  " << points[1].size() << endl;
 
 		// Affine = estimateRigidTransform(kp.prev_points, kp.current_points, true);
-		//Was ich eigentlich tue
+		// Was ich eigentlich tue
 
 		//cout << "Affine: " << Affine.at<double>(0, 2) << " - " << Affine.at<double>(1, 2) << endl << endl;
 	}
@@ -234,7 +237,7 @@ void odometry::find_followed_points()
 		needToInitKeypoints = true;
 		cerr << "Keine punkte zum Verfolgen" << endl;
 	}
-		
+
 }
 
 //void odometry::transform_Affine()
@@ -249,7 +252,6 @@ void odometry::find_followed_points()
 //
 //	}
 //}
-
 
 void odometry::draw_keypoints()
 {
@@ -274,27 +276,33 @@ void odometry::draw_ground_points()
 //	}
 //}
 
-void odometry::draw_main_points()
-{
-	for (size_t i = 0; i < kp.background_points.size(); i++) 
-	{
-		circle(image, (Point)kp.point[kp.background_points[i]].get_position(), 7, Scalar(0, 200, 0));
-	}
-}
+//void odometry::draw_main_points()
+//{
+//	for (size_t i = 0; i < kp.background_points.size(); i++) 
+//	{
+//		circle(image, (Point)kp.point[kp.background_points[i]].get_position(), 7, Scalar(0, 200, 0));
+//	}
+//}
 
 void odometry::draw_summ_vector()
 {
 	Point2f p1, p2, p3;
+
+
 	p2 = fokus;
+	p3 = p2 + magnify_vektor_draw * kp.main_jitter[kp.main_jitter.size() - 1];
 
-	for (Point2f p: kp.main_jitter)
-	{
-		p3 = p2 + magnify_vektor_draw * p;
+	line(image, (Point)p2, (Point)p3, Scalar(220, 220, 0), 1);
+	circle(image, (Point)p2, 2, Scalar(0, 255, 0), -3);
 
-		line(image, (Point)p2, (Point)p3, Scalar(220, 220, 0), 3);
-		circle(image, (Point)p2, 3, Scalar(0, 255, 0), 3);
-		p2 = p3;
-	}
+	//for (Point2f p: kp.main_jitter)
+	//{
+	//	p3 = p2 + magnify_vektor_draw * p;
+
+	//	line(image, (Point)p2, (Point)p3, Scalar(220, 220, 0), 1);
+	//	circle(image, (Point)p2, 2, Scalar(0, 255, 0), -3);
+	//	p2 = p3;
+	//}
 
 }
 
@@ -424,7 +432,7 @@ void odometry::look_to_aim()
 	richtung.y = m.y / pixel_pro_step;
 	// 3a) finde wo ist jetzt den Punkt (z.B. über Matrix)
 	// kontrolle über vergleich p[0] - P[1]
-	// 4) wenn differenz immer noch groß, gehe zu schritt 1. 
+	// 4) wenn differenz immer noch groß, gehe zu schritt 1.
 	// 3) bewege einen schritt in Richtung
 	if (abs(m.x) > 20.0 || abs(m.y) > 20.0)
 	{
@@ -480,7 +488,7 @@ float odometry::calc_step()
 	{
 		float v = kp.point[i].get_position().y; // Bildkoordinaten vom Schlüsselpunkt y
 
-		beta = atan(( v / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
+		beta = atan((v / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
 
 		distance = cam_v_distance / tan(cam_pitch + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
 
@@ -540,7 +548,7 @@ void odometry::calc_distances(float step)
 
 		if (length_l != 0.0)
 		{
-			kp.point[i].set_vectors(l, v - l, L * (length_r / length_l + 1));
+			kp.point[i].set_vectors(l, v - l, (length_r / length_l + 1.0f));
 		}
 
 	}
@@ -560,15 +568,15 @@ void odometry::find_background_points()
 	{
 		d = p.get_position();
 
-		if (d.y < fokus.y  && d.x < fokus.x + l && d.x > fokus.x - l)
+		if (d.y < fokus.y && d.x < fokus.x + l && d.x > fokus.x - l)
 		{
 			kp.background_points.push_back(index);
 		}
-			
+
 		index++;
 	}
 
-	if (index == 0)
+	if (kp.background_points.size() < min_background_points)	 // HACK 
 	{
 		needToInitKeypoints = true;
 	}
@@ -579,7 +587,7 @@ void odometry::find_ground_points()
 {
 	int index = 0;
 	Point2f d;
-	int l = 300;
+	int l = 600;
 
 	kp.ground_points.clear();
 
@@ -587,7 +595,7 @@ void odometry::find_ground_points()
 	{
 		d = p.get_position();
 
-		if (d.y > 2*fokus.y - l && d.x < fokus.x + l && d.x > fokus.x - l)
+		if (d.y > fokus.y + 200.0 && d.x < fokus.x + l && d.x > fokus.x - l)
 		{
 			kp.ground_points.push_back(index);
 		}
@@ -595,7 +603,7 @@ void odometry::find_ground_points()
 		index++;
 	}
 
-	if (index == 0)
+	if (kp.ground_points.size() < min_ground_points)	 // HACK korrigieren 
 	{
 		needToInitKeypoints = true;
 	}
@@ -613,16 +621,16 @@ void odometry::draw_flow()
 
 		int i = 0;
 
-		while (i < ANZAHL_VORPOSITIONS)  //HACK
+		while (i < flow_steps)  //HACK
 		{
 			p1 = p0 + magnify_vektor_draw * p.get_flow(i++); //OPTI verbessern
 
-			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 250), 2);
+			line(image, (Point)p0, (Point)(p1), Scalar(0, 0, 250), 1);
 
 			p0 = p1;
 		};
 
-		line(image, (Point)p.get_position(), (Point)(p.get_position() + magnify_vektor_draw * p.get_full_flow()), Scalar(250, 0, 0), 2);
+		//line(image, (Point)p.get_position(), (Point)(p.get_position() + magnify_vektor_draw * p.get_full_flow()), Scalar(250, 0, 0), 2);
 
 	}
 
@@ -677,40 +685,52 @@ bool odometry::proceed_video(Mat* frame)
 
 	imshow(main_window_name, *frame);
 
-	if (needToInitKeypoints)
-	{
-		//find_keypoints_FAST();
-		find_keypoints();
-		needToInitKeypoints = false;
-		return false;
-	}
+	int trying = 0;
 
-	find_followed_points();
+	do {
 
-	find_background_points();
+		if (needToInitKeypoints)
+		{
+			//cv::swap(prevGray, gray);  // letztes Bild wiederherstellen
 
-	find_ground_points();
+			//find_keypoints_FAST();
+			find_keypoints();
+			needToInitKeypoints = false;
 
-	kompensate_jitter();
-	//kompensate_roll();
+			//cv::swap(prevGray, gray);  // noch mal tauschen um Folgepunkte zu finden
+
+			if (trying++ > 3)
+			{
+				cout << "versuche finden Keypunkte " << trying << endl;
+				//return false;
+				exit(8);
+			}
+		}
+
+		find_followed_points();
+
+		//OPTI undistort points
+
+		find_background_points();
+
+		kompensate_jitter();
+		//kompensate_roll();
+
+		kp.check_trajektory();
+
+		find_background_points(); //OPTI falsche punkte vorhanden wegen trajektory
+
+		find_ground_points();
+
+	} while (needToInitKeypoints);
+
+	trying = 0;
 
 	float step = calc_step();
 
 	calc_distances(step);
 
-	float fl = cameraMatrix.at<double>(0, 0);
-	static float winkel = 0.0;
-	float vy, vx;
-
-	if (step < 30.0f && step > -30.0f)
-	{
-		//vy = step /  fl * main_of_frame.x;
-		winkel += atan(main_of_frame.x / fl) * 180.0 / M_PI;
-		cout << main_of_frame.x << "|" << winkel << endl;
-		vy = step * cos(winkel / 180.0 * M_PI);
-		vx = step * sin(winkel / 180.0 * M_PI);
-		map.add_step(Point2f(vx, vy));
-	}
+	find_yaw(step);
 
 	//transform_Affine();
 
@@ -719,6 +739,23 @@ bool odometry::proceed_video(Mat* frame)
 	if (key(wait_t)) return true;
 
 	return false;
+}
+
+void odometry::find_yaw(float step)
+{
+	// finde yaw wiWinkel
+	float vy, vx;
+
+	if (step < 30.0f && step > -30.0f)
+	{
+		//vy = step /  fl * main_of_frame.x;
+		yaw_angle += atan(main_of_frame.x / focal_length) * 180.0 / M_PI;
+		cout << main_of_frame.x << "|" << yaw_angle << endl;
+		vy = step * cos(yaw_angle / 180.0 * M_PI);
+		vx = step * sin(yaw_angle / 180.0 * M_PI);
+
+		map.add_step(Point2f(vx, vy));
+	}
 }
 
 void odometry::new_data_proceed(UDP_Base* udp_base)

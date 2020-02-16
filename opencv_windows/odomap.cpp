@@ -25,7 +25,7 @@ void odomap::draw_map()
 
 		line(map, (Point)p0, (Point)(p1), Scalar(0, 0, 250), 2);
 
-		way += p1.y - p0.y;
+		way += mv.step.y;
 
 		p0 = p1;
 																					  
