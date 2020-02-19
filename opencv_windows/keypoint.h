@@ -16,9 +16,11 @@ class keypoint
 	cv::Point2f flow[flow_steps];	 // Vorherige VERSCHIEBUNGEN des Punktes in vorherigen Aufnahmen 
 	cv::Point2f l; // radiale Vektor vom flow[0]
 	cv::Point2f b; // verschiebungs Vektor vom flow[0]
-	float d;  // relatives abstand, wenn auf Schritt multiplizieren wird Abstand Kamera zu Punkt
 
 public:
+
+	cv::Point3f rel_ground_pos;	// 	Koordinaten Keypunkten zu Roboter(Cam)
+	float d;  // relatives abstand, wenn auf Schritt multiplizieren wird Abstand Kamera zu Punkt
 
 	keypoint();
 	bool check_for_line(); // pruefen ob Flow in bestimmten Bereich ist

@@ -1,9 +1,7 @@
 #include "odometry.h"
 
-
 static bool setAimPt = false;
 static Point2f AimPoint;
-
 
 
 static void onMouse(int event, int x, int y, int /*flags*/, void* /*param*/)
@@ -59,9 +57,11 @@ odometry::odometry(Mat* frame)
 
 	focal_length = cameraMatrix.at<double>(0, 0);
 	VFOV2 = atan(fokus.y / focal_length);
+	HFOV2 = atan(fokus.y / focal_length);
 	cam_v_distance = 118.0;
 	cam_pitch = 3.8357 * M_PI / 180.0;
 	yaw_angle = 0.0;
+	current_position = Point2f(0,0);
 	needToInitKeypoints = true;
 	magnify_vektor_draw = 3;
 
@@ -240,6 +240,11 @@ void odometry::find_followed_points()
 
 }
 
+void odometry::find_obstacles()
+{
+
+}
+
 //void odometry::transform_Affine()
 //{
 //	if (!Affine.empty() && !kp.prev_points.empty())
@@ -308,7 +313,7 @@ void odometry::draw_summ_vector()
 
 void odometry::draw_map()
 {
-	map.draw_map();
+	map.draw_map(this);
 
 }
 
@@ -556,6 +561,33 @@ void odometry::calc_distances(float step)
 	return;
 }
 
+void odometry::calc_kp_coordinates()
+{
+	float beta_x, beta_y;
+
+	int i = 0;
+
+	for (keypoint p : kp.point)
+	{
+		//beta_y = atan((p.get_position().y / fokus.y - 1.0f) * tan(VFOV2));
+
+		//p.rel_ground_pos.y = cam_v_distance / tan(cam_pitch + beta_y); // auf dem Boden
+
+		p.rel_ground_pos.y = p.d * (ego_moving[ego_moving.size()-1]).y;
+
+		//beta_x = atan((p.get_position().x / fokus.x - 1.0f) * tan(HFOV2));
+
+		p.rel_ground_pos.x = p.rel_ground_pos.y / focal_length * (p.get_position().x - fokus.x);
+
+		p.rel_ground_pos.z = p.rel_ground_pos.y / focal_length * (p.get_position().y - fokus.y);
+
+		kp.point[i] = p;
+
+		i++;
+
+	}
+}
+
 void odometry::find_background_points()
 {
 	int index = 0;
@@ -693,8 +725,8 @@ bool odometry::proceed_video(Mat* frame)
 		{
 			//cv::swap(prevGray, gray);  // letztes Bild wiederherstellen
 
-			//find_keypoints_FAST();
-			find_keypoints();
+			find_keypoints_FAST();
+			//find_keypoints();
 			needToInitKeypoints = false;
 
 			//cv::swap(prevGray, gray);  // noch mal tauschen um Folgepunkte zu finden
@@ -732,7 +764,13 @@ bool odometry::proceed_video(Mat* frame)
 
 	find_yaw(step);
 
+	calc_kp_coordinates();
+
+	find_obstacles();
+
 	//transform_Affine();
+
+	map.draw_map(this);
 
 	draw_image();
 
@@ -743,18 +781,19 @@ bool odometry::proceed_video(Mat* frame)
 
 void odometry::find_yaw(float step)
 {
-	// finde yaw wiWinkel
-	float vy, vx;
 
 	if (step < 30.0f && step > -30.0f)
 	{
-		//vy = step /  fl * main_of_frame.x;
-		yaw_angle += atan(main_of_frame.x / focal_length) * 180.0 / M_PI;
-		cout << main_of_frame.x << "|" << yaw_angle << endl;
-		vy = step * cos(yaw_angle / 180.0 * M_PI);
-		vx = step * sin(yaw_angle / 180.0 * M_PI);
+		Point2f p;
 
-		map.add_step(Point2f(vx, vy));
+		yaw_angle += atan(main_of_frame.x / focal_length) * 180.0 / M_PI;
+		//cout << main_of_frame.x << "|" << yaw_angle << endl;
+		p.y = step * cos(yaw_angle / 180.0 * M_PI);
+		p.x = -step * sin(yaw_angle / 180.0 * M_PI);
+
+		ego_moving.push_back(p);
+
+		current_position += p;
 	}
 }
 
