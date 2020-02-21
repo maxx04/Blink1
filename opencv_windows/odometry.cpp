@@ -61,6 +61,7 @@ odometry::odometry(Mat* frame)
 	cam_v_distance = 118.0;
 	cam_pitch = 3.8357 * M_PI / 180.0;
 	yaw_angle = 0.0;
+	pitch_angle = 0.0f;
 	current_position = Point2f(0,0);
 	needToInitKeypoints = true;
 	magnify_vektor_draw = 3;
@@ -119,8 +120,37 @@ void odometry::find_keypoints_FAST()
 	int fast_threshold = 20;
 	bool nonmaxSuppression = true;
 
-	AGAST(prevGray, keypoints_1, fast_threshold, nonmaxSuppression, AgastFeatureDetector::OAST_9_16);
-	//FAST(gray, keypoints_1, fast_threshold, nonmaxSuppression);
+	//AGAST(prevGray, keypoints_1, fast_threshold, nonmaxSuppression, AgastFeatureDetector::OAST_9_16);
+	FAST(prevGray, keypoints_1, fast_threshold, nonmaxSuppression);
+
+	KeyPoint::convert(keypoints_1, key_points, vector<int>());
+
+	//HACK nur notwendige punkte in Zukunft benutzen
+	//undistortPoints(key_points, key_points_ud, cameraMatrix, distCoeffs); 
+
+	// automatic initialization
+	kp.clear();
+
+	// fülle keypunkte
+	for (Point2f p : key_points)
+	{
+		kp.point.push_back(keypoint(p));
+	}
+
+}
+
+void odometry::find_keypoints_ORB()
+{   //uses FAST as of now, modify parameters as necessary
+	vector<KeyPoint> keypoints_1;
+	vector<Point2f> key_points;// , key_points_ud;
+
+	//int fast_threshold = 20;
+	//bool nonmaxSuppression = true;
+
+	Mat descriptors1;
+
+	Ptr<Feature2D> orb = ORB::create(kp.MAX_COUNT);
+	orb->detectAndCompute(prevGray, Mat(), keypoints_1, descriptors1);
 
 	KeyPoint::convert(keypoints_1, key_points, vector<int>());
 
@@ -486,6 +516,7 @@ float odometry::calc_step()
 	float beta, beta1;	// Winkel vom Mittelachse Kamera zu dem Punkt auf dem Boden [radian]
 	float v1;  //Bild koordinate y für vorherige Position
 	float distance;	// Abstand vom Kamera zu Punkt auf horizontale Ebene
+	float current_pitch = atan(main_of_frame.y / focal_length);	  // [radian]
 
 	kp.hist_step.clear();
 
@@ -495,13 +526,13 @@ float odometry::calc_step()
 
 		beta = atan((v / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen / Formel (2) tan(b) = (2*v/V-1)*tan(VFOV/2)
 
-		distance = cam_v_distance / tan(cam_pitch + beta); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
+		distance = cam_v_distance / tan(cam_pitch + beta - current_pitch); // OPTI cos(alfa); tan(alfa) vorberechnen	// TODO assert	alfa + beta = pi/2
 
 		float v1 = v - kp.point[i].get_flow(0).y;
 
 		beta1 = atan((v1 / fokus.y - 1.0f) * tan(VFOV2)); // OPTI tan_beta lassen
 
-		float step = cam_v_distance / tan(cam_pitch + beta1) - distance;	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
+		float step = cam_v_distance / tan(cam_pitch + beta1 - current_pitch) - distance;	 // Weg für den Schlüsselpunkt zwischen Frames	// TODO assert	alfa + beta = pi/2
 
 		kp.hist_step.collect({ i, step }); //TODO grenzen verfeinern
 
@@ -511,12 +542,21 @@ float odometry::calc_step()
 
 	float middle_step = kp.hist_step.main_mean;
 
+	Point2f p;
+
+	p.y = middle_step * cos(yaw_angle / 180.0 * M_PI);
+	p.x = -middle_step * sin(yaw_angle / 180.0 * M_PI);
+
+	ego_moving.push_back(p);
+
+	current_position += p;
+
 	return middle_step;
 }
 
-void odometry::calc_distances(float step)
+void odometry::calc_relative_distances()
 {
-	float L = step; // einen Schritt Vorwaerts
+	//float L = step; // einen Schritt Vorwaerts
 
 	assert(fokus.x != 0.0 && fokus.y != 0.0);
 
@@ -565,15 +605,15 @@ void odometry::calc_kp_coordinates()
 {
 	float beta_x, beta_y;
 
-	int i = 0;
+	int i = 0;																						    
 
 	for (keypoint p : kp.point)
 	{
-		//beta_y = atan((p.get_position().y / fokus.y - 1.0f) * tan(VFOV2));
+		beta_y = atan((p.get_position().y / fokus.y - 1.0f) * tan(VFOV2));
 
-		//p.rel_ground_pos.y = cam_v_distance / tan(cam_pitch + beta_y); // auf dem Boden
+		p.rel_ground_pos.y = cam_v_distance / tan(cam_pitch + beta_y); // auf dem Boden
 
-		p.rel_ground_pos.y = p.d * (ego_moving[ego_moving.size()-1]).y;
+		//p.rel_ground_pos.y = p.d * (ego_moving[ego_moving.size()-1]).y;
 
 		//beta_x = atan((p.get_position().x / fokus.x - 1.0f) * tan(HFOV2));
 
@@ -592,7 +632,7 @@ void odometry::find_background_points()
 {
 	int index = 0;
 	Point2f d;
-	int l = 100;
+	int l = 300;
 
 	kp.background_points.clear();
 
@@ -725,6 +765,7 @@ bool odometry::proceed_video(Mat* frame)
 		{
 			//cv::swap(prevGray, gray);  // letztes Bild wiederherstellen
 
+			//find_keypoints_ORB();
 			find_keypoints_FAST();
 			//find_keypoints();
 			needToInitKeypoints = false;
@@ -735,7 +776,8 @@ bool odometry::proceed_video(Mat* frame)
 			{
 				cout << "versuche finden Keypunkte " << trying << endl;
 				//return false;
-				exit(8);
+				waitKey(0);
+				//exit(8);
 			}
 		}
 
@@ -748,7 +790,7 @@ bool odometry::proceed_video(Mat* frame)
 		kompensate_jitter();
 		//kompensate_roll();
 
-		kp.check_trajektory();
+		kp.check_trajektory(); // Prüfen auf Linienform vom Flow, ausschliessen Keypoints
 
 		find_background_points(); //OPTI falsche punkte vorhanden wegen trajektory
 
@@ -758,13 +800,18 @@ bool odometry::proceed_video(Mat* frame)
 
 	trying = 0;
 
+	find_yaw_pitch();  // fuer weitere berechnungen
+
 	float step = calc_step();
 
-	calc_distances(step);
-
-	find_yaw(step);
+	calc_relative_distances(); // Abstände zu Punkten berechnen
 
 	calc_kp_coordinates();
+
+	// finden Schritt aus vorherigen Position des Bodenpunkten 
+	// denn die auf gleiche Position (Relativ zu Anfang) sollen bleiben
+	// in 2d soll man dx, dy, delta-yaw finden.
+	// bei neuer Suche wird schritt abgenullt
 
 	find_obstacles();
 
@@ -779,22 +826,15 @@ bool odometry::proceed_video(Mat* frame)
 	return false;
 }
 
-void odometry::find_yaw(float step)
+void odometry::find_yaw_pitch()
 {
-
-	if (step < 30.0f && step > -30.0f)
-	{
 		Point2f p;
 
 		yaw_angle += atan(main_of_frame.x / focal_length) * 180.0 / M_PI;
+		pitch_angle += atan(main_of_frame.y / focal_length) * 180.0 / M_PI;
 		//cout << main_of_frame.x << "|" << yaw_angle << endl;
-		p.y = step * cos(yaw_angle / 180.0 * M_PI);
-		p.x = -step * sin(yaw_angle / 180.0 * M_PI);
 
-		ego_moving.push_back(p);
 
-		current_position += p;
-	}
 }
 
 void odometry::new_data_proceed(UDP_Base* udp_base)

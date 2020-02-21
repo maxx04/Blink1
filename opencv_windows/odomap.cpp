@@ -5,7 +5,7 @@
 
 odomap::odomap()
 {
-	scale = 0.5f;
+	scale = 1.0f;
 
 	namedWindow(map_window_name, WINDOW_NORMAL | WINDOW_KEEPRATIO);
 	
@@ -21,7 +21,7 @@ void odomap::draw_map(odometry* odm)
 
 	 map = Mat::zeros(1000, 1000, CV_8UC3);
 
-	p0 = Point2f(map.cols / 2, map.rows / 2);
+	p0 = Point2f(map.cols / 2, map.rows);
 
 	zero_point = p0;
 
@@ -60,11 +60,12 @@ void odomap::draw_map(odometry* odm)
 		p.y = - odm->current_position.y - kp.rel_ground_pos.x * sin_yaw - kp.rel_ground_pos.y * cos_yaw;
 		h = -kp.rel_ground_pos.z / 10 + 100;
 
-		circle(map, zero_point + scale * p , 2, Scalar(h, h, 0));
+		circle(map, zero_point + scale * p, 1, Scalar(h, h, 0));
 	}
 
 
-	window_title << format("map %.1f / %.1f / %.1f / ", odm->current_position.x, odm->current_position.y, odm->yaw_angle) ;
+	window_title << format("map %.1f / %.1f / %.2f / %.2f",
+		odm->current_position.x, odm->current_position.y, odm->yaw_angle, odm->pitch_angle) ;
 
 	setWindowTitle(map_window_name, window_title.str());
 
